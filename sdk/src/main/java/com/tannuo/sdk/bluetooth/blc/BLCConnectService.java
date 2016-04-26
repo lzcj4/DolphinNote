@@ -30,8 +30,7 @@ public class BLCConnectService extends ConnectServiceBase {
     // Unique UUID for this application
     public static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private ConnectThread mConnectThread;
-    private IOThread mIOThread;
+    private BLCThread mThread;
     private int mState;
 
     public BLCConnectService(Context context, TouchScreenListener touchListener) {
@@ -66,7 +65,7 @@ public class BLCConnectService extends ConnectServiceBase {
     @Override
     public int disconnect() {
         Log.d(TAG, "disconnect");
-        cancelAllThreads();
+        stopBLCThread();
         mHandler.stop();
         setState(BL_STATE_LISTEN);
         return BL_STATE_READY;
@@ -77,159 +76,106 @@ public class BLCConnectService extends ConnectServiceBase {
      *
      * @param state An integer defining the current connection state
      */
-    private synchronized void setState(int state) {
+    private void setState(int state) {
         Log.d(TAG, "setState() " + mState + " -> " + state);
         mState = state;
     }
 
-    /**
-     * Start the chat service. Specifically reset AcceptThread to begin a
-     * session in listening (server) mode. Called by the Activity onResume()
-     */
-    public synchronized void reset() {
+
+    public void reset() {
         Log.d(TAG, "reset");
 
-        cancelAllThreads();
+        stopBLCThread();
         setState(BL_STATE_LISTEN);
     }
 
-    /**
-     * Start the ConnectThread to initiate a connection to a remote device.
-     *
-     * @param device The BluetoothDevice to connect
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
-     */
-    public synchronized void connect(BluetoothDevice device, boolean secure) {
+
+    public void connect(BluetoothDevice device, boolean isSecure) {
         Log.d(TAG, "connect to: " + device);
 
-        // Cancel any thread attempting to make a connection
-        if (mState == BL_STATE_CONNECTING) {
-            cancelConnectThread();
-        }
-
-        cancelIOThread();
-
-        // Start the thread to connect with the given device
-        mConnectThread = new ConnectThread(device, secure);
-        mConnectThread.start();
+        stopBLCThread();
+        mThread = new BLCThread(device, isSecure);
+        mThread.start();
         setState(BL_STATE_CONNECTING);
     }
 
-    /**
-     * Start the IOThread to begin managing a Bluetooth connection
-     *
-     * @param socket The BluetoothSocket on which the connection was made
-     * @param device The BluetoothDevice that has been startIO
-     */
-    public void startIO(BluetoothSocket socket, BluetoothDevice
-            device, final String socketType) {
-        Log.d(TAG, "startIO, Socket Type:" + socketType);
-
-        cancelAllThreads();
-
-        // Start the thread to manage the connection and perform transmissions
-        mIOThread = new IOThread(socket, socketType);
-        mIOThread.start();
-        mTouchListener.onBLConnected();
-        setState(BL_STATE_CONNECTED);
-    }
-
-
-    public void stop() {
-        Log.d(TAG, "stop");
-
-        cancelAllThreads();
-        setState(BL_STATE_NONE);
-    }
-
-    private void cancelConnectThread() {
-        if (mConnectThread != null) {
-            mConnectThread.cancel();
-            mConnectThread = null;
+    private void stopBLCThread() {
+        if (mThread != null) {
+            mThread.cancel();
+            mThread = null;
         }
     }
 
-    private void cancelIOThread() {
-        if (mIOThread != null) {
-            mIOThread.cancel();
-            mIOThread = null;
-        }
-    }
 
-    private void cancelAllThreads() {
-        cancelConnectThread();
-        cancelIOThread();
-    }
-
-    /**
-     * Write to the IOThread in an unsynchronized manner
-     *
-     * @param data The bytes to write
-     * @see IOThread#write(byte[])
-     */
     @Override
     public void write(byte[] data) {
-        // Create temporary object
-        IOThread r;
-        // Synchronize a copy of the IOThread
-        synchronized (this) {
-            if (mState != BL_STATE_CONNECTED) return;
-            r = mIOThread;
-        }
-        // Perform the write unsynchronized
-        r.write(data);
+        mThread.write(data);
     }
 
-    /**
-     * Indicate that the connection attempt failed and notify the UI Activity.
-     */
-    private void connectionFailed() {
+
+    private void connectFailed() {
         mTouchListener.onError(BL_ERROR_CONN_FAILED);
         this.reset();
     }
 
-    /**
-     * Indicate that the connection was lost and notify the UI Activity.
-     */
+    private void connectSucceed() {
+        setState(BL_STATE_CONNECTED);
+        mTouchListener.onBLConnected();
+    }
+
     private void connectionLost() {
         mTouchListener.onError(BL_ERROR_CONN_LOST);
         this.reset();
     }
 
-    /**
-     * This thread runs while attempting to make an outgoing connection
-     * with a device. It runs straight through; the connection either
-     * succeeds or fails.
-     */
-    private class ConnectThread extends Thread {
-        private final BluetoothSocket mSocket;
-        private final BluetoothDevice mDevice;
+    private class BLCThread extends Thread {
+        private BluetoothSocket mSocket;
+        private BluetoothDevice mDevice;
         private String mSocketType;
 
-        public ConnectThread(BluetoothDevice device, boolean secure) {
-            mDevice = device;
-            BluetoothSocket blSocket = null;
-            mSocketType = secure ? "Secure" : "Insecure";
+        private InputStream mInStream;
+        private OutputStream mOutStream;
+        private boolean isRunning = true;
 
-            // Get a BluetoothSocket for a connection with the
-            // given BluetoothDevice
-            try {
-                blSocket = device.createRfcommSocketToServiceRecord(SPP_UUID);
-                Log.d(TAG, "Create Socket...");
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+        public BLCThread(BluetoothDevice device, boolean secure) {
+            if (null == device) {
+                throw new IllegalArgumentException("device");
             }
-            mSocket = blSocket;
+            mDevice = device;
+            mSocketType = secure ? "Secure" : "Insecure";
+            setName("BLCThread_" + mSocketType);
         }
 
         public void run() {
             Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
-            setName("ConnectThread" + mSocketType);
 
+            if (!connect()) {
+                return;
+            }
+
+            connectSucceed();
+
+            if (getStream()) {
+                readInLoop();
+            } else {
+                connectionLost();
+            }
+        }
+
+        private boolean connect() {
+            boolean result = false;
+            try {
+                mBTAdapter.cancelDiscovery();
+                mSocket = mDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                Log.d(TAG, "Create Socket...");
+            } catch (IOException e) {
+                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+            }
             mBTAdapter.cancelDiscovery();
 
             try {
                 mSocket.connect();
+                result = true;
             } catch (IOException e) {
                 try {
                     mSocket.close();
@@ -237,63 +183,33 @@ public class BLCConnectService extends ConnectServiceBase {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
-                connectionFailed();
-                return;
+                connectFailed();
             }
+            return result;
 
-            // Reset the ConnectThread because we're done
-            synchronized (BLCConnectService.this) {
-                mConnectThread = null;
-            }
-
-            // Start the startIO thread
-            startIO(mSocket, mDevice, mSocketType);
         }
 
-        public void cancel() {
-            try {
-                mSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "close() of connect " + mSocketType + " socket failed", e);
-            }
-        }
-    }
-
-    /**
-     * This thread runs during a connection with a remote device.
-     * It handles all incoming and outgoing transmissions.
-     */
-    private class IOThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-        private boolean isRunning = true;
-
-        public IOThread(BluetoothSocket socket, String socketType) {
-            Log.d(TAG, "create IOThread: " + socketType);
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
+        private boolean getStream() {
+            boolean result = true;
             // Get the BluetoothSocket input and output streams
             try {
-                tmpIn = socket.getInputStream();
-            } catch (IOException e) {
+                mInStream = mSocket.getInputStream();
+
+            } catch (Exception e) {
                 Log.e(TAG, "temp sockets not created", e);
+                result = false;
             }
 
             try {
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
+                mOutStream = mSocket.getOutputStream();
+            } catch (Exception e) {
                 Log.e(TAG, "temp sockets not created", e);
+                result = false;
             }
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
+            return result;
         }
 
-        public void run() {
-            Log.i(TAG, "BEGIN mIOThread");
-
+        private void readInLoop() {
             byte[] buffer = new byte[1024];
             int readLen;
 
@@ -301,7 +217,7 @@ public class BLCConnectService extends ConnectServiceBase {
             while (isRunning) {
                 try {
                     // Read from the InputStream
-                    readLen = mmInStream.read(buffer);
+                    readLen = mInStream.read(buffer);
                     if (readLen == 0) {
                         continue;
                     }
@@ -325,7 +241,9 @@ public class BLCConnectService extends ConnectServiceBase {
          */
         public void write(byte[] buffer) {
             try {
-                mmOutStream.write(buffer);
+                if (mOutStream != null) {
+                    mOutStream.write(buffer);
+                }
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
@@ -334,13 +252,14 @@ public class BLCConnectService extends ConnectServiceBase {
         public void cancel() {
             try {
                 this.isRunning = false;
-                mmSocket.close();
+                if (mSocket != null) {
+                    mSocket.close();
+                }
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
         }
     }
-
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
