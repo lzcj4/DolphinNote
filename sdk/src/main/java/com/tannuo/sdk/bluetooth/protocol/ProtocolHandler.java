@@ -19,7 +19,7 @@ public class ProtocolHandler {
     private final TouchScreenListener mTouchListener;
 
     private HandlerThread mProtocolThread;
-    private CallbackHandler mHandler;
+    private ProtocolParseHandler mHandler;
     public static final int ACTION_PROTOCOL_PARSE = 1;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
@@ -37,7 +37,7 @@ public class ProtocolHandler {
     private void start() {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
-        mHandler = new CallbackHandler(mProtocolThread.getLooper());
+        mHandler = new ProtocolParseHandler(mProtocolThread.getLooper());
     }
 
     public void sendMessage(int what, Object obj) {
@@ -60,8 +60,8 @@ public class ProtocolHandler {
         mProtocolThread.quit();
     }
 
-    private class CallbackHandler extends Handler {
-        public CallbackHandler(Looper looper) {
+    private class ProtocolParseHandler extends Handler {
+        public ProtocolParseHandler(Looper looper) {
             super(looper);
         }
 
@@ -72,14 +72,14 @@ public class ProtocolHandler {
                     if (null == buffer) {
                         return;
                     }
-                    handlerProtocol(buffer);
+                    parse(buffer);
                     break;
                 default:
                     break;
             }
         }
 
-        private void handlerProtocol(byte[] data) {
+        private void parse(byte[] data) {
             if (null == data || data.length == 0) {
                 return;
             }

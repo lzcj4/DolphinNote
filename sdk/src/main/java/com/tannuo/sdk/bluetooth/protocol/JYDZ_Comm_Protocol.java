@@ -153,6 +153,11 @@ public class JYDZ_Comm_Protocol implements Protocol {
     }
 
     void reset() {
+        mLen = 0;
+        mDataFeature = 0;
+        mChecksum = 0;
+        mPoints = 0;
+
         Arrays.fill(mDataBuffer, (byte) 0);
         mTouchScreen.reset();
     }
