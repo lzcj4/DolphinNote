@@ -2,6 +2,7 @@ package com.tannuo.sdk.bluetooth.protocol;
 
 import android.util.Log;
 
+import com.tannuo.sdk.BuildConfig;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.util.DataUtil;
 
@@ -204,52 +205,53 @@ public class JYDZ_Comm_Protocol implements Protocol {
         printData(data);
         this.reset();
 
-        int result = ERROR_NONE;
+        int errorCode = ERROR_NONE;
         //  68 03 71 11 ED    按下截屏键
 
         byte header = data[0];
         if (header != PROTOCOL_HEADER) {
-            result = ERROR_HEADER;
+            errorCode = ERROR_HEADER;
             Log.e(TAG, "get invalid protocol header ");
         }
 
-        if (result == ERROR_NONE) {
+        if (errorCode == ERROR_NONE) {
             mLen = data.length > 1 ? data[1] : 0;
             if (mLen < FEATURE_CHECKSUM_LEN) {
-                result = ERROR_DATA_LENGTH;
+                errorCode = ERROR_DATA_LENGTH;
                 Log.e(TAG, "get invalid protocol  data len ");
             }
         }
 
-        if (result == ERROR_NONE) {
+        if (errorCode == ERROR_NONE) {
             mDataFeature = data.length > 2 ? data[2] : 0;
             calcPoints();
             if (!lengthCheck()) {
-                result = ERROR_DATA_FEATURE;
+                errorCode = ERROR_DATA_FEATURE;
                 Log.e(TAG, "get data feature and calc point len failed ");
             }
         }
 
-        if (result == ERROR_NONE) {
+        if (errorCode == ERROR_NONE) {
             int dataLen = getDataLen();
             int startIndex = 3;// header+feature+len
             int endIndex = startIndex + dataLen + 1;
             if (dataLen > 0 && endIndex < data.length) {
                 mDataBuffer = Arrays.copyOfRange(data, startIndex, endIndex);
             } else {
-                result = ERROR_DATA;
+                errorCode = ERROR_DATA;
                 Log.e(TAG, "get real data failed ");
             }
         }
-        if (result == ERROR_NONE) {
+        if (errorCode == ERROR_NONE) {
             mChecksum = data[data.length - 1];
             if (!checkSum()) {
-                result = ERROR_CHECKSUM;
+                errorCode = ERROR_CHECKSUM;
                 Log.d(TAG, "checksum invalid");
             }
         }
 
-        if (result == ERROR_NONE) {
+        int result = ERROR_NONE;
+        if (errorCode == ERROR_NONE) {
             result = setScreenData();
         }
 
@@ -261,11 +263,13 @@ public class JYDZ_Comm_Protocol implements Protocol {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02x", b));
+        if (BuildConfig.DEBUG) {
+            StringBuilder sb = new StringBuilder();
+            for (byte b : data) {
+                sb.append(String.format("%02x", b));
+            }
+            Log.d(TAG, String.format("received data:%s", sb.toString()));
         }
-        Log.d(TAG, String.format("received data:%s", sb.toString()));
     }
 
     private int setScreenData() {

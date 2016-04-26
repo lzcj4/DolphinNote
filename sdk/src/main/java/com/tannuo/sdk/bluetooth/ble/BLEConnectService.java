@@ -48,11 +48,11 @@ public class BLEConnectService extends ConnectServiceBase {
     /**
      * Write only characteristic
      */
-    private BluetoothGattCharacteristic mTXChara;
+    private BluetoothGattCharacteristic mGattTXChara;
     /**
      * Read only characteristic
      */
-    private BluetoothGattCharacteristic mRXChara;
+    private BluetoothGattCharacteristic mGattRXChara;
     private List<MTBeacon> scan_devices = new ArrayList<MTBeacon>();
 
     private boolean mIsGattConnected = false;
@@ -144,9 +144,9 @@ public class BLEConnectService extends ConnectServiceBase {
 
     @Override
     public void write(byte[] data) {
-        if (null != mTXChara) {
-            mTXChara.setValue(data);
-            mBluetoothGatt.writeCharacteristic(mTXChara);
+        if (null != mGattTXChara) {
+            mGattTXChara.setValue(data);
+            mBluetoothGatt.writeCharacteristic(mGattTXChara);
         } else {
             //Log.v(TAG,"mRFCommTX_flag NOT SET");
         }
@@ -201,19 +201,19 @@ public class BLEConnectService extends ConnectServiceBase {
                     for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                         uuid = gattCharacteristic.getUuid().toString();
                         if (uuid.equalsIgnoreCase(UART_UUID_TX)) {
-                            mTXChara = gattCharacteristic;
+                            mGattTXChara = gattCharacteristic;
                             //Log.v(TAG,"TX GET");
                         } else if (uuid.equalsIgnoreCase(UART_UUID_RX)) {
                             int proper;
-                            mRXChara = gattCharacteristic;
-                            proper = mRXChara.getProperties();
+                            mGattRXChara = gattCharacteristic;
+                            proper = mGattRXChara.getProperties();
                             //Log.v(TAG,"RX GET"+proper);
                             if (0 != (proper &
                                     (BluetoothGattCharacteristic.PROPERTY_NOTIFY |
                                             BluetoothGattCharacteristic.PROPERTY_INDICATE))
                                     ) {
-                                mBluetoothGatt.setCharacteristicNotification(mRXChara, true);
-                                BluetoothGattDescriptor descriptor = mRXChara.getDescriptor(
+                                mBluetoothGatt.setCharacteristicNotification(mGattRXChara, true);
+                                BluetoothGattDescriptor descriptor = mGattRXChara.getDescriptor(
                                         UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
                                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                                 mBluetoothGatt.writeDescriptor(descriptor);
