@@ -28,7 +28,7 @@ import java.util.UUID;
 public class BLCConnectService extends ConnectServiceBase {
 
     // Unique UUID for this application
-    public static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private BLCThread mThread;
     private int mState;
@@ -55,11 +55,15 @@ public class BLCConnectService extends ConnectServiceBase {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         mContext.registerReceiver(mReceiver, filter);
+        this.cancelDiscovery();
+        mBTAdapter.startDiscovery();
+        return BL_STATE_READY;
+    }
+
+    private void cancelDiscovery() {
         if (mBTAdapter.isDiscovering()) {
             mBTAdapter.cancelDiscovery();
         }
-        mBTAdapter.startDiscovery();
-        return BL_STATE_READY;
     }
 
     @Override
@@ -81,14 +85,14 @@ public class BLCConnectService extends ConnectServiceBase {
         mState = state;
     }
 
-    public void reset() {
+    private void reset() {
         Log.d(TAG, "reset");
 
         stopBLCThread();
         setState(BL_STATE_LISTEN);
     }
 
-    public void connect(BluetoothDevice device, boolean isSecure) {
+    private void connect(BluetoothDevice device, boolean isSecure) {
         Log.d(TAG, "connect to: " + device);
 
         stopBLCThread();
@@ -107,7 +111,9 @@ public class BLCConnectService extends ConnectServiceBase {
 
     @Override
     public void write(byte[] data) {
-        mThread.write(data);
+        if (null != mThread && null != data) {
+            mThread.write(data);
+        }
     }
 
     private void connectFailed() {
@@ -143,9 +149,8 @@ public class BLCConnectService extends ConnectServiceBase {
             setName("BLCThread_" + mSocketType);
         }
 
+        @Override
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
-
             if (!connect()) {
                 return;
             }
@@ -162,18 +167,18 @@ public class BLCConnectService extends ConnectServiceBase {
         private boolean connect() {
             boolean result = false;
             try {
-                mBTAdapter.cancelDiscovery();
+                cancelDiscovery();
                 mSocket = mDevice.createRfcommSocketToServiceRecord(SPP_UUID);
                 Log.d(TAG, "Create Socket...");
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
             }
-            mBTAdapter.cancelDiscovery();
 
             try {
                 mSocket.connect();
                 result = true;
             } catch (IOException e) {
+                Log.e(TAG, "BLC socket:" + mSocketType + " connect failed", e);
                 try {
                     mSocket.close();
                 } catch (IOException e2) {
@@ -188,18 +193,17 @@ public class BLCConnectService extends ConnectServiceBase {
 
         private boolean getStream() {
             boolean result = true;
-            // Get the BluetoothSocket input and output streams
             try {
                 mInStream = mSocket.getInputStream();
             } catch (Exception e) {
-                Log.e(TAG, "temp sockets not created", e);
+                Log.e(TAG, "get BLC input stream failed", e);
                 result = false;
             }
 
             try {
                 mOutStream = mSocket.getOutputStream();
             } catch (Exception e) {
-                Log.e(TAG, "temp sockets not created", e);
+                Log.e(TAG, "get BLC output stream failed", e);
                 result = false;
             }
             return result;
@@ -209,16 +213,14 @@ public class BLCConnectService extends ConnectServiceBase {
             byte[] buffer = new byte[1024];
             int readLen;
 
-            // Keep listening to the InputStream while startIO
             while (isRunning) {
                 try {
-                    // Read from the InputStream
                     readLen = mInStream.read(buffer);
                     if (readLen == 0) {
                         continue;
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "stream read failed", e);
+                    Log.e(TAG, "BLC input stream read failed", e);
                     connectionLost();
                     // Start the service over to restart listening mode
                     BLCConnectService.this.reset();
@@ -242,7 +244,7 @@ public class BLCConnectService extends ConnectServiceBase {
                     mOutStream.flush();
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Exception during write", e);
+                Log.e(TAG, "BLC output stream write failed", e);
             }
         }
 
@@ -259,7 +261,7 @@ public class BLCConnectService extends ConnectServiceBase {
                     mSocket.close();
                 }
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                Log.e(TAG, "Close BLC stream and socket", e);
             }
         }
     }
@@ -272,21 +274,26 @@ public class BLCConnectService extends ConnectServiceBase {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (null == device || !device.getName().equalsIgnoreCase(mDeviceName)) {
+                if (null == device) {
                     return;
                 }
 
-                if (TextUtils.isEmpty(mDeviceAddr)) {
-                    mDeviceAddr = device.getAddress();
-                } else {
-                    mDeviceName = device.getName();
-                }
+                if ((!TextUtils.isEmpty(mDeviceName) && device.getName().equalsIgnoreCase(mDeviceName)) ||
+                        ((!TextUtils.isEmpty(mDeviceAddr) && device.getAddress().equalsIgnoreCase(mDeviceAddr)))) {
+                    if (TextUtils.isEmpty(mDeviceAddr)) {
+                        mDeviceAddr = device.getAddress();
+                    }
 
-                mDevice = device;
-                mBTAdapter.cancelDiscovery();
-                connect(device, true);
-                mContext.unregisterReceiver(mReceiver);
-                Log.v(TAG, "Device Get  " + mDeviceAddr);
+                    if (TextUtils.isEmpty(mDeviceName)) {
+                        mDeviceName = device.getName();
+                    }
+
+                    mDevice = device;
+                    cancelDiscovery();
+                    connect(device, true);
+                    mContext.unregisterReceiver(mReceiver);
+                    Log.v(TAG, String.format("Discovery BLC device:%s , mac addr:%s", mDeviceName, mDeviceAddr));
+                }
 
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (mDevice == null) {
@@ -296,6 +303,7 @@ public class BLCConnectService extends ConnectServiceBase {
                 mDevice = null;
                 mDeviceAddr = null;
                 mContext.unregisterReceiver(mReceiver);
+                Log.v(TAG, String.format("Discovery BLC finished"));
             }
         }
     };

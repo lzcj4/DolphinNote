@@ -12,17 +12,16 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.ConnectServiceBase;
 import com.tannuo.sdk.bluetooth.GattAttributes;
-import com.tannuo.sdk.bluetooth.MTBeacon;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.protocol.JYDZ_Comm_Protocol;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +33,9 @@ import java.util.UUID;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BLEConnectService extends ConnectServiceBase {
 
-    public static final String UART_UUID = "0000f1f0-0000-1000-8000-00805f9b34fb";
-    public static final String UART_UUID_TX = "0000f1f1-0000-1000-8000-00805f9b34fb";
-    public static final String UART_UUID_RX = "0000f1f2-0000-1000-8000-00805f9b34fb";
+    private static final String UART_UUID = "0000f1f0-0000-1000-8000-00805f9b34fb";
+    private static final String UART_UUID_TX = "0000f1f1-0000-1000-8000-00805f9b34fb";
+    private static final String UART_UUID_RX = "0000f1f2-0000-1000-8000-00805f9b34fb";
 
     /**
      * Unit: ms
@@ -53,17 +52,17 @@ public class BLEConnectService extends ConnectServiceBase {
      * Read only characteristic
      */
     private BluetoothGattCharacteristic mGattRXChara;
-    private List<MTBeacon> scan_devices = new ArrayList<MTBeacon>();
 
     private boolean mIsGattConnected = false;
 
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new LeScanCallbackImpl();
-    private BluetoothGattCallback mGattCallback = new BluetoothGattCallbackImpl();
+    private BluetoothAdapter.LeScanCallback mLeScanCallback;
+    private BluetoothGattCallback mGattCallback;
 
     public BLEConnectService(Context context, TouchScreenListener touchListener) {
         super(context, touchListener);
+        mLeScanCallback = new LeScanCallbackImpl();
+        mGattCallback = new BluetoothGattCallbackImpl();
         mProtocol = new JYDZ_Comm_Protocol(new TouchScreen(8000, 20000));
-
         mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
     }
 
@@ -121,13 +120,16 @@ public class BLEConnectService extends ConnectServiceBase {
     }
 
     private boolean connectGatt(BluetoothDevice device) {
-        disconnectGatt();
-        BluetoothDevice device_tmp = mBTAdapter.getRemoteDevice(device.getAddress());
-        if (device_tmp == null) {
-            return false;
+        if (device == null) {
+            throw new IllegalArgumentException("device");
         }
-        mBluetoothGatt = device_tmp.connectGatt(mContext.getApplicationContext(), false,
-                mGattCallback);
+        disconnectGatt();
+//        BluetoothDevice device_tmp = mBTAdapter.getRemoteDevice(device.getAddress());
+//        if (device_tmp == null) {
+//            return false;
+//        }
+
+        mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
         // mIsGattConnected = true;
         return true;
     }
@@ -144,7 +146,8 @@ public class BLEConnectService extends ConnectServiceBase {
 
     @Override
     public void write(byte[] data) {
-        if (null != mGattTXChara) {
+        if (null != mGattTXChara && null != mBluetoothGatt &&
+                null != data) {
             mGattTXChara.setValue(data);
             mBluetoothGatt.writeCharacteristic(mGattTXChara);
         } else {
@@ -156,8 +159,9 @@ public class BLEConnectService extends ConnectServiceBase {
 
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-            Log.d(TAG, "DEVICE GET!" + device.getName());
-            if (device.getName().equalsIgnoreCase(mDeviceName)) {
+            Log.d(TAG, String.format("BLE device scanned, name:%s , addr:%s", device.getName(), device.getAddress()));
+            if ((!TextUtils.isEmpty(mDeviceName) && device.getName().equalsIgnoreCase(mDeviceName)) ||
+                    ((!TextUtils.isEmpty(mDeviceAddr) && device.getAddress().equalsIgnoreCase(mDeviceAddr)))) {
                 mDevice = device;
                 stopLeScan(mLeScanCallback);
                 connectGatt(device);
@@ -172,10 +176,12 @@ public class BLEConnectService extends ConnectServiceBase {
                                             int newState) {
             super.onConnectionStateChange(gatt, status, newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                Log.d(TAG, String.format("++ BLE BluetoothGattCallback connection connected"));
                 mIsGattConnected = true;
                 mTouchListener.onBLConnected();
                 mBluetoothGatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.d(TAG, String.format("-- BLE BluetoothGattCallback connection disconnected"));
                 mIsGattConnected = false;
                 mTouchListener.onError(BL_ERROR_CONN_LOST);
             }
@@ -191,7 +197,7 @@ public class BLEConnectService extends ConnectServiceBase {
                     if (!uuid.equalsIgnoreCase(UART_UUID)) {
                         continue;
                     }
-
+                    Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", UART_UUID));
                     mGattService = service;
                     Map<String, String> grounp = new HashMap<String, String>();
                     grounp.put("name", GattAttributes.lookup(uuid, "unknow"));
@@ -202,12 +208,12 @@ public class BLEConnectService extends ConnectServiceBase {
                         uuid = gattCharacteristic.getUuid().toString();
                         if (uuid.equalsIgnoreCase(UART_UUID_TX)) {
                             mGattTXChara = gattCharacteristic;
-                            //Log.v(TAG,"TX GET");
+                            Log.d(TAG, String.format("-- BLE BluetoothGattCallback write only characteristic found :%s", UART_UUID_TX));
                         } else if (uuid.equalsIgnoreCase(UART_UUID_RX)) {
                             int proper;
                             mGattRXChara = gattCharacteristic;
                             proper = mGattRXChara.getProperties();
-                            //Log.v(TAG,"RX GET"+proper);
+                            Log.d(TAG, String.format("-- BLE BluetoothGattCallback read only characteristic found :%s", UART_UUID_RX));
                             if (0 != (proper &
                                     (BluetoothGattCharacteristic.PROPERTY_NOTIFY |
                                             BluetoothGattCharacteristic.PROPERTY_INDICATE))
