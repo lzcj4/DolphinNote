@@ -1,10 +1,10 @@
-package com.tannuo.sdk.bluetooth;
+package com.tannuo.sdk.bluetooth.connectservice;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 
-import com.tannuo.sdk.bluetooth.ble.BLEConnectService;
+import com.tannuo.sdk.bluetooth.TouchScreenListener;
 
 /**
  * Created by nick on 2016/4/23.

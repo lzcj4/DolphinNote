@@ -1,4 +1,4 @@
-package com.tannuo.sdk.bluetooth;
+package com.tannuo.sdk.bluetooth.connectservice;
 
 /**
  * Created by nick on 2016/4/23.

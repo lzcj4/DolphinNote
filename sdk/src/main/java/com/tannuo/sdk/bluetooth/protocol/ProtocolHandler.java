@@ -5,7 +5,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.tannuo.sdk.bluetooth.ConnectService;
+import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 

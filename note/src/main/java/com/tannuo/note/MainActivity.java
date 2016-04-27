@@ -7,8 +7,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.tannuo.sdk.bluetooth.BTServiceFactory;
-import com.tannuo.sdk.bluetooth.ConnectService;
+import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
+import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
 
 import butterknife.Bind;

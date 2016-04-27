@@ -1,4 +1,4 @@
-package com.tannuo.sdk.bluetooth.blc;
+package com.tannuo.sdk.bluetooth.connectservice;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.tannuo.sdk.bluetooth.ConnectServiceBase;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.protocol.JYDZ_Comm_Protocol;
