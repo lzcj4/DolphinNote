@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="3dc6c9a42a0cd09662497a10a89f6faec7eca20b">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\instant-run_4f2e889bb716e624fa8ca823eb1ab4b2d813e4fc.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="fa4056e1aa5c35eb3b2568724076a3e7ab05151b">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\instant-run-bootstrap_5b72d52b4dcd5e97da6e2da06e131275a5ff40cf.jar" />
+    </item>
+    <item
+        jar="C:\Users\nlang\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.6.0\98476622f10715998eacf9240d6b479f12c66143\okio-1.6.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\okio-1.6.0_b719e11d472a5987566e39afb229ee42af39e778.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\io.reactivex\rxandroid\1.1.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="d4c4b83de2f6412072d2a29b1b7a5b03edaad5ff">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\io.reactivex-rxandroid-1.1.0_2eeac29b41748b43bfa8d7dedcab17bfb9313152.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.3.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="23be6993826b8fd88bbc8d14928bb3b8960d3d4e">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.3.0_3c7a4df7c6f4df5fb3289f2a54cd562aff1afad2.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.3.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="1b8e03daaa43fb0a4cd57e378167c2fd70454c1e">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.3.0_f83835feb1a9a824b2eaf9aadc71e591b3dacc91.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.3.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="a0b5d60246cd9d4f3f2443611b3b4c25265840b5">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.3.0_61f12734735820f6a7897e472be64da61657e65d.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\libs\internal_impl-23.3.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="4da5a4d697d32497c6f85567a5112e62fdfd0676">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\internal_impl-23.3.0_2258041d7de525041cf5e8274a6ae47a9f17032a.jar" />
+    </item>
+    <item
+        jar="E:\GitHub\DolphinNote\note\build\intermediates\exploded-aar\com.android.support\support-v4\23.3.0\jars\classes.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="8a034dd16c0dfd75fe86c52c2cd581592acc684a">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.3.0_a49daa489722263d4fa131d63fdbfd0b2d3fd1b8.jar" />
+    </item>
+    <item
+        jar="C:\Users\nlang\.gradle\caches\modules-2\files-2.1\com.jakewharton\butterknife\7.0.1\d5d13ea991eab0252e3710e5df3d6a9d4b21d461\butterknife-7.0.1.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="d5d13ea991eab0252e3710e5df3d6a9d4b21d461">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\butterknife-7.0.1_fd020087e009ef782e710776d461aa72d9181971.jar" />
+    </item>
+    <item
+        jar="C:\Users\nlang\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp\okhttp\2.5.0\4de2b4ed3445c37ec1720a7d214712e845a24636\okhttp-2.5.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="4de2b4ed3445c37ec1720a7d214712e845a24636">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\okhttp-2.5.0_45d941f74e19022ccea00d46745866cc14ce99e5.jar" />
+    </item>
+    <item
+        jar="D:\AndroidSdk\extras\android\m2repository\com\android\support\support-annotations\23.3.0\support-annotations-23.3.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="db7791d75a07fef9844d06236c1c59ba7bf6997c">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\support-annotations-23.3.0_ca2c3a95107a1d4c5a1951719ce72cb86c3771dd.jar" />
+    </item>
+    <item
+        jar="C:\Users\nlang\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit\retrofit\2.0.0-beta2\880d9e0997b2d1bfc98e0d121ced33ee5d04aac4\retrofit-2.0.0-beta2.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="880d9e0997b2d1bfc98e0d121ced33ee5d04aac4">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\retrofit-2.0.0-beta2_5123fe79325cad143bad8fefc91fc2e704b58375.jar" />
+    </item>
+    <item
+        jar="C:\Users\nlang\.gradle\caches\modules-2\files-2.1\io.reactivex\rxjava\1.1.0\748f0546d5c3c27f1aef07270ffea0c45f0c42a4\rxjava-1.1.0.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="748f0546d5c3c27f1aef07270ffea0c45f0c42a4">
+        <dex dex="E:\GitHub\DolphinNote\note\build\intermediates\pre-dexed\debug\rxjava-1.1.0_8fbca3c64eea758869bedefcb878929716d26a70.jar" />
+    </item>
+
+</items>

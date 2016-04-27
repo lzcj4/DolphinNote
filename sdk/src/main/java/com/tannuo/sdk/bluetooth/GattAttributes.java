@@ -7,7 +7,7 @@ import java.util.HashMap;
  */
 public class GattAttributes {
     private static HashMap<String, String> attributes = new HashMap();
- 
+
     static {
         // Sample Services.
         attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Heart Rate Service");
@@ -15,7 +15,7 @@ public class GattAttributes {
         // Sample Characteristics.
         attributes.put("00002a37-0000-1000-8000-00805f9b34fb", "Heart Rate Measurement");
         attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
-   
+
         // GATT Services
         attributes.put("00001800-0000-1000-8000-00805f9b34fb", "GenericAccess");
         attributes.put("00001801-0000-1000-8000-00805f9b34fb", "GenericAttribute");
@@ -25,7 +25,7 @@ public class GattAttributes {
         attributes.put("00002801-0000-1000-8000-00805f9b34fb", "Secondary Service");
         attributes.put("00002802-0000-1000-8000-00805f9b34fb", "Include");
         attributes.put("00002803-0000-1000-8000-00805f9b34fb", "Characteristic");
-        
+
         // GATT Descriptors
         attributes.put("00002900-0000-1000-8000-00805f9b34fb", "Characteristic Extended Properties");
         attributes.put("00002901-0000-1000-8000-00805f9b34fb", "Characteristic User Description");
@@ -44,7 +44,7 @@ public class GattAttributes {
         attributes.put("00002a03-0000-1000-8000-00805f9b34fb", "Reconnection Address");
         attributes.put("00002a04-0000-1000-8000-00805f9b34fb", "PPCP");
         attributes.put("00002a05-0000-1000-8000-00805f9b34fb", "Service Changed");
-        
+
         // GATT Service UUIDs
         attributes.put("00001802-0000-1000-8000-00805f9b34fb", "Immediate Alert");
         attributes.put("00001803-0000-1000-8000-00805f9b34fb", "Link Loss");
@@ -67,7 +67,7 @@ public class GattAttributes {
         attributes.put("00001816-0000-1000-8000-00805f9b34fb", "Cycling Speed and Cadence");
         attributes.put("00001818-0000-1000-8000-00805f9b34fb", "Cycling Power");
         attributes.put("00001819-0000-1000-8000-00805f9b34fb", "Location and Navigation");
-    
+
         // GATT Characteristic UUIDs
         attributes.put("00002a06-0000-1000-8000-00805f9b34fb", "Alert Level");
         attributes.put("00002a07-0000-1000-8000-00805f9b34fb", "Tx Power Level");
@@ -145,9 +145,9 @@ public class GattAttributes {
         attributes.put("00002a69-0000-1000-8000-00805f9b34fb", "Position Quality");
         attributes.put("00002a6a-0000-1000-8000-00805f9b34fb", "LN Feature");
         attributes.put("00002a6b-0000-1000-8000-00805f9b34fb", "LN Control Point");
-    
+
     }
- 
+
     public static String lookup(String uuid, String defaultName) {
         String name = attributes.get(uuid);
         return name == null ? defaultName : name;

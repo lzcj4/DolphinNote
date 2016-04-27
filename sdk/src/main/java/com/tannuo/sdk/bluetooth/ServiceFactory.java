@@ -8,6 +8,7 @@ import android.content.Context;
 public interface ServiceFactory {
     /**
      * get bluetooth connect service
+     *
      * @param context
      * @param touchListener
      * @return

@@ -9,6 +9,8 @@ import com.tannuo.sdk.bluetooth.ConnectService;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * Created by nick on 2016/4/24.
@@ -37,7 +39,7 @@ public class ProtocolHandler {
     private void start() {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
-        mHandler = new ProtocolParseHandler(mProtocolThread.getLooper());
+        mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
     }
 
     public void sendMessage(int what, Object obj) {
@@ -60,9 +62,12 @@ public class ProtocolHandler {
         mProtocolThread.quit();
     }
 
-    private class ProtocolParseHandler extends Handler {
-        public ProtocolParseHandler(Looper looper) {
+    private static class ProtocolParseHandler extends Handler {
+        private WeakReference<ProtocolHandler> wrProtocolHanlder;
+
+        public ProtocolParseHandler(Looper looper, ProtocolHandler protocolHandler) {
             super(looper);
+            wrProtocolHanlder = new WeakReference<>(protocolHandler);
         }
 
         public void handleMessage(Message msg) {
@@ -80,28 +85,33 @@ public class ProtocolHandler {
         }
 
         private void parse(byte[] data) {
-            if (null == data || data.length == 0) {
+            if (null == data || data.length == 0 || wrProtocolHanlder.get() == null) {
                 return;
             }
-            switch (mProtocol.parse(data)) {
+
+            Protocol protocol = wrProtocolHanlder.get().mProtocol;
+            ConnectService service = wrProtocolHanlder.get().mService;
+            TouchScreenListener touchListener = wrProtocolHanlder.get().mTouchListener;
+
+            switch (protocol.parse(data)) {
                 case JYDZ_Comm_Protocol.STATUS_CHANGE_DATA_FEATURE:
-                    byte[] cmdChangeFeature = mProtocol.changeDataFeature();
+                    byte[] cmdChangeFeature = protocol.changeDataFeature();
                     if (cmdChangeFeature != null) {
-                        mService.write(cmdChangeFeature);
+                        service.write(cmdChangeFeature);
                     }
                     break;
                 case JYDZ_Comm_Protocol.STATUS_DATA_GET_OK:
-                    TouchScreen touchScreen = mProtocol.getTouchScreen();
+                    TouchScreen touchScreen = protocol.getTouchScreen();
                     if (touchScreen.mTouchDownList.size() > 0) {
-                        mTouchListener.onTouchDown(touchScreen.mTouchDownList);
+                        touchListener.onTouchDown(touchScreen.mTouchDownList);
                         touchScreen.mTouchDownList.clear();
                     }
                     if (touchScreen.mTouchUpList.size() > 0) {
-                        mTouchListener.onTouchUp(touchScreen.mTouchUpList);
+                        touchListener.onTouchUp(touchScreen.mTouchUpList);
                         touchScreen.mTouchUpList.clear();
                     }
                     if (touchScreen.mTouchMoveList.size() > 0) {
-                        mTouchListener.onTouchMove(touchScreen.mTouchMoveList);
+                        touchListener.onTouchMove(touchScreen.mTouchMoveList);
                         touchScreen.mTouchMoveList.clear();
                     }
                     break;

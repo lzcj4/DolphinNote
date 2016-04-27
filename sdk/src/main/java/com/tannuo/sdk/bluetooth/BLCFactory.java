@@ -10,6 +10,6 @@ import com.tannuo.sdk.bluetooth.blc.BLCConnectService;
 public class BLCFactory implements ServiceFactory {
     @Override
     public ConnectService get(Context context, TouchScreenListener touchListener) {
-       return new BLCConnectService(context, touchListener);
+        return new BLCConnectService(context, touchListener);
     }
 }

@@ -81,14 +81,12 @@ public class BLCConnectService extends ConnectServiceBase {
         mState = state;
     }
 
-
     public void reset() {
         Log.d(TAG, "reset");
 
         stopBLCThread();
         setState(BL_STATE_LISTEN);
     }
-
 
     public void connect(BluetoothDevice device, boolean isSecure) {
         Log.d(TAG, "connect to: " + device);
@@ -111,7 +109,6 @@ public class BLCConnectService extends ConnectServiceBase {
     public void write(byte[] data) {
         mThread.write(data);
     }
-
 
     private void connectFailed() {
         mTouchListener.onError(BL_ERROR_CONN_FAILED);
@@ -194,7 +191,6 @@ public class BLCConnectService extends ConnectServiceBase {
             // Get the BluetoothSocket input and output streams
             try {
                 mInStream = mSocket.getInputStream();
-
             } catch (Exception e) {
                 Log.e(TAG, "temp sockets not created", e);
                 result = false;
@@ -222,7 +218,7 @@ public class BLCConnectService extends ConnectServiceBase {
                         continue;
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                    Log.e(TAG, "stream read failed", e);
                     connectionLost();
                     // Start the service over to restart listening mode
                     BLCConnectService.this.reset();
@@ -243,6 +239,7 @@ public class BLCConnectService extends ConnectServiceBase {
             try {
                 if (mOutStream != null) {
                     mOutStream.write(buffer);
+                    mOutStream.flush();
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
@@ -252,6 +249,12 @@ public class BLCConnectService extends ConnectServiceBase {
         public void cancel() {
             try {
                 this.isRunning = false;
+                if (mInStream != null) {
+                    mInStream.close();
+                }
+                if (mOutStream != null) {
+                    mOutStream.close();
+                }
                 if (mSocket != null) {
                     mSocket.close();
                 }

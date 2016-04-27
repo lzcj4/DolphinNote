@@ -37,15 +37,16 @@ public abstract class ConnectServiceBase implements ConnectService {
     protected BluetoothDevice mDevice;
 
     protected JYDZ_Comm_Protocol mProtocol;
-    protected  ProtocolHandler mHandler;
+    protected ProtocolHandler mHandler;
 
-    protected  ConnectServiceBase(Context context,TouchScreenListener touchListener){
-        if(null==context|| null==touchListener){
+    protected ConnectServiceBase(Context context, TouchScreenListener touchListener) {
+        if (null == context || null == touchListener) {
             throw new IllegalArgumentException("ConnectServiceBase construct failed");
         }
         mContext = context;
         mTouchListener = touchListener;
     }
+
     public abstract int connect(String deviceName, String deviceAddr, String pwd);
 
     public abstract int disconnect();
