@@ -2,7 +2,6 @@ package com.tannuo.sdk.bluetooth.protocol;
 
 import android.util.Log;
 
-import com.tannuo.sdk.BuildConfig;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.util.DataUtil;
 
@@ -79,12 +78,12 @@ public class JYDZ_Comm_Protocol implements Protocol {
 //    0x73	        编号	        4字节
 //    示例(Hex)： 68  06  73  00000001  E2  标识码帧
 
-    private int mLen;
-    private int mDataFeature;
-    private int mChangeDataFeature;
-    private int mUSBCode;
+    private byte mLen;
+    private byte mDataFeature;
+    private byte mChangeDataFeature;
+    private byte mUSBCode;
 
-    private int mChecksum;
+    private byte mChecksum;
     private int mPoints = 1;
     private TouchScreen mTouchScreen;
 
@@ -111,11 +110,10 @@ public class JYDZ_Comm_Protocol implements Protocol {
 
     private boolean checkSum() {
         int len = getDataLen();
-        int sum = PROTOCOL_HEADER + mDataFeature + mLen;
+        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mLen);
         for (int i = 0; i < len; i++) {
             sum += mDataBuffer[i];
         }
-        sum = DataUtil.intToByte(sum);
         return mChecksum == sum;
     }
 
@@ -209,7 +207,6 @@ public class JYDZ_Comm_Protocol implements Protocol {
         }
         printData(data);
         this.reset();
-
         int errorCode = ERROR_NONE;
         //  68 03 71 11 ED    按下截屏键
 
@@ -239,7 +236,7 @@ public class JYDZ_Comm_Protocol implements Protocol {
         if (errorCode == ERROR_NONE) {
             int dataLen = getDataLen();
             int startIndex = 3;// header+feature+len
-            int endIndex = startIndex + dataLen + 1;
+            int endIndex = startIndex + dataLen;
             if (dataLen > 0 && endIndex < data.length) {
                 mDataBuffer = Arrays.copyOfRange(data, startIndex, endIndex);
             } else {
@@ -268,13 +265,13 @@ public class JYDZ_Comm_Protocol implements Protocol {
             return;
         }
 
-        if (BuildConfig.DEBUG) {
-            StringBuilder sb = new StringBuilder();
-            for (byte b : data) {
-                sb.append(String.format("%02x", b));
-            }
-            Log.d(TAG, String.format("received data:%s", sb.toString()));
+        //if (BuildConfig.DEBUG) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : data) {
+            sb.append(String.format("%02x ", b));
         }
+        Log.d(TAG, String.format("received data:%s", sb.toString()));
+        // }
     }
 
     private int setScreenData() {

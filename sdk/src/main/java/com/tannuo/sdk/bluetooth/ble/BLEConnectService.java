@@ -244,7 +244,7 @@ public class BLEConnectService extends ConnectServiceBase {
                                             BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
             byte[] data = characteristic.getValue();
-            mHandler.sendMessage(ProtocolHandler.ACTION_PROTOCOL_PARSE, data);
+            mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);
         }
 
         @Override

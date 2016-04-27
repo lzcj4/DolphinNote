@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.tannuo.sdk.bluetooth.BTServiceFactory;
+import com.tannuo.sdk.bluetooth.ConnectService;
 import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
 
 import butterknife.Bind;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnDisconnect;
     @Bind(R.id.edtName)
     EditText edtName;
+    private ConnectService mService;
 
     @Override
     public void setFinishOnTouchOutside(boolean finish) {
@@ -39,7 +41,15 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.btnConnect)
     void btnConnectClick() {
         BTServiceFactory factory = new BTServiceFactory();
-        factory.get(this, new TouchScreenListenerImpl());
+        mService = factory.get(this, new TouchScreenListenerImpl());
+        mService.connect(this.edtName.getText().toString(), null, null);
+    }
+
+    @OnClick(R.id.btnDisconnect)
+    void btnDisonnectClick() {
+        if (mService != null) {
+            mService.disconnect();
+        }
     }
 
     @Override

@@ -28,6 +28,7 @@
         android:layout_width="200dp"
         android:layout_height="50dp"
         android:id="@+id/edtName"
+        android:text="android"
         android:layout_below="@id/btnConnect"
         android:layout_marginTop="50dp"/>
 </RelativeLayout>

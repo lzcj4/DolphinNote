@@ -226,7 +226,7 @@ public class BLCConnectService extends ConnectServiceBase {
                 }
 
                 byte[] data = Arrays.copyOfRange(buffer, 0, readLen);
-                mHandler.sendMessage(ProtocolHandler.ACTION_PROTOCOL_PARSE, data);
+                mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);
             }
         }
 
@@ -275,6 +275,7 @@ public class BLCConnectService extends ConnectServiceBase {
                 if (null == device || !device.getName().equalsIgnoreCase(mDeviceName)) {
                     return;
                 }
+
                 if (TextUtils.isEmpty(mDeviceAddr)) {
                     mDeviceAddr = device.getAddress();
                 } else {

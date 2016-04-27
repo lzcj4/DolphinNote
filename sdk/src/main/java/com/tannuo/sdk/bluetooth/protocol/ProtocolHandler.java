@@ -22,7 +22,7 @@ public class ProtocolHandler {
 
     private HandlerThread mProtocolThread;
     private ProtocolParseHandler mHandler;
-    public static final int ACTION_PROTOCOL_PARSE = 1;
+    public static final int MESSAGE_PROTOCOL_PARSE = 1;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
                            TouchScreenListener touchListener) {
@@ -72,7 +72,7 @@ public class ProtocolHandler {
 
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case ACTION_PROTOCOL_PARSE:
+                case MESSAGE_PROTOCOL_PARSE:
                     byte[] buffer = (byte[]) msg.obj;
                     if (null == buffer) {
                         return;
