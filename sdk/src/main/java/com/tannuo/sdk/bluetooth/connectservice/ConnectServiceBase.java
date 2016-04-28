@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.protocol.JYDZ_Comm_Protocol;
+import com.tannuo.sdk.bluetooth.protocol.BTProtocol;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 
 /**
@@ -37,7 +37,7 @@ public abstract class ConnectServiceBase implements ConnectService {
     protected BluetoothAdapter mBTAdapter;
     protected BluetoothDevice mDevice;
 
-    protected JYDZ_Comm_Protocol mProtocol;
+    protected BTProtocol mProtocol;
     protected ProtocolHandler mHandler;
 
     protected ConnectServiceBase(Context context, TouchScreenListener touchListener) {

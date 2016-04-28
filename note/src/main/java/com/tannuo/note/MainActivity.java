@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
 
+import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
 import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
-import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -17,39 +17,46 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.btnConnect)
-    Button btnConnect;
-    @Bind(R.id.btnDisconnect)
-    Button btnDisconnect;
     @Bind(R.id.edtName)
     EditText edtName;
+    
     private ConnectService mService;
-
-    @Override
-    public void setFinishOnTouchOutside(boolean finish) {
-        super.setFinishOnTouchOutside(finish);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
     }
 
-    @OnClick(R.id.btnConnect)
-    void btnConnectClick() {
-        BTServiceFactory factory = new BTServiceFactory();
-        mService = factory.get(this, new TouchScreenListenerImpl());
-        mService.connect(this.edtName.getText().toString(), null, null);
+    @OnClick({R.id.btnConnect, R.id.btnDisconnect})
+    void buttonClick(View view) {
+        int id = view.getId();
+        if (id == R.id.btnConnect) {
+            this.connect();
+        } else if (id == R.id.btnDisconnect) {
+            this.disconnect();
+        }
     }
 
-    @OnClick(R.id.btnDisconnect)
-    void btnDisonnectClick() {
+    private void connect() {
+        if (null == mService) {
+            BTServiceFactory factory = new BTServiceFactory();
+            mService = factory.get(this, new TouchScreenListenerImpl());
+            mService.connect(this.edtName.getText().toString(), null, null);
+        }
+    }
+
+    private void disconnect() {
         if (mService != null) {
             mService.disconnect();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        disconnect();
     }
 
     @Override

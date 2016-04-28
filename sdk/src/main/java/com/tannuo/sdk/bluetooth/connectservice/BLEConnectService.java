@@ -18,7 +18,7 @@ import android.util.Log;
 import com.tannuo.sdk.bluetooth.GattAttributes;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.protocol.JYDZ_Comm_Protocol;
+import com.tannuo.sdk.bluetooth.protocol.BTProtocol;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 
 import java.util.HashMap;
@@ -61,7 +61,7 @@ public class BLEConnectService extends ConnectServiceBase {
         super(context, touchListener);
         mLeScanCallback = new LeScanCallbackImpl();
         mGattCallback = new BluetoothGattCallbackImpl();
-        mProtocol = new JYDZ_Comm_Protocol(new TouchScreen(8000, 20000));
+        mProtocol = new BTProtocol(new TouchScreen(8000, 20000));
         mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
     }
 

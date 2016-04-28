@@ -94,13 +94,13 @@ public class ProtocolHandler {
             TouchScreenListener touchListener = wrProtocolHanlder.get().mTouchListener;
 
             switch (protocol.parse(data)) {
-                case JYDZ_Comm_Protocol.STATUS_CHANGE_DATA_FEATURE:
+                case BTProtocol.STATUS_CHANGE_DATA_FEATURE:
                     byte[] cmdChangeFeature = protocol.changeDataFeature();
                     if (cmdChangeFeature != null) {
                         service.write(cmdChangeFeature);
                     }
                     break;
-                case JYDZ_Comm_Protocol.STATUS_DATA_GET_OK:
+                case BTProtocol.STATUS_GET_DATA:
                     TouchScreen touchScreen = protocol.getTouchScreen();
                     if (touchScreen.mTouchDownList.size() > 0) {
                         touchListener.onTouchDown(touchScreen.mTouchDownList);

@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.protocol.JYDZ_Comm_Protocol;
+import com.tannuo.sdk.bluetooth.protocol.BTProtocol;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class BLCConnectService extends ConnectServiceBase {
 
     public BLCConnectService(Context context, TouchScreenListener touchListener) {
         super(context, touchListener);
-        mProtocol = new JYDZ_Comm_Protocol(new TouchScreen(600, 2000));
+        mProtocol = new BTProtocol(new TouchScreen(600, 2000));
         mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
     }
 
@@ -269,9 +269,7 @@ public class BLCConnectService extends ConnectServiceBase {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (null == device) {
                     return;

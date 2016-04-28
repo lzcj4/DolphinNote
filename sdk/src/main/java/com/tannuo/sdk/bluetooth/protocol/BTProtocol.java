@@ -10,15 +10,15 @@ import java.util.Arrays;
 /**
  * Created by nick on 2016/4/23.
  */
-public class JYDZ_Comm_Protocol implements Protocol {
+public class BTProtocol implements Protocol {
     private final String TAG = this.getClass().getSimpleName();
 
     public static final int STATUS_CHANGE_DATA_FEATURE = 1;
-    public static final int STATUS_DATA_GET_OK = 2;
-    public static final int STATUS_GESTURE_GET = 3;
-    public static final int STATUS_SNAPSHOT_GET = 4;
-    public static final int STATUS_IDENTI_GET = 5;
-    public static final int STATUS_SCREEN_FEATURE_GET = 6;
+    public static final int STATUS_GET_DATA = 2;
+    public static final int STATUS_GET_GESTURE = 3;
+    public static final int STATUS_GET_SNAPSHOT = 4;
+    public static final int STATUS_GET_IDENTI = 5;
+    public static final int STATUS_GET_SCREEN_FEATURE = 6;
 
     private static final int ERROR_NONE = 0;
     private static final int ERROR_HEADER = -1;
@@ -27,20 +27,29 @@ public class JYDZ_Comm_Protocol implements Protocol {
     private static final int ERROR_DATA_FEATURE = -4;
     private static final int ERROR_CHECKSUM = -5;
 
+    /**
+     * Data feature with 5 bytes data
+     */
     private static final int FEATURE_DATA_5 = 0;
+    /**
+     * Data feature with 6 bytes data
+     */
     private static final int FEATURE_DATA_6 = 1;
+    /**
+     * Data feature with 10 bytes data
+     */
     private static final int FEATURE_DATA_10 = 2;
 
     private static final int FEATURE_DATA_5_LEN = 5;
     private static final int FEATURE_DATA_6_LEN = 6;
     private static final int FEATURE_DATA_10_LEN = 10;
 
-    private static final int FEATURE_SCREEN_ARGUMENT = 0x60;
-    private static final int FEATURE_GESTURE = 0x70;
-    private static final int FEATURE_SNAPSHOT = 0x71;
-    private static final int FEATURE_IDENTI = 0x73;
-    private static final int FEATURE_USB_CONTROL = 0x80;
-    private static final int FEATURE_CHANGE_DATA_FORMAT = 0x81;
+    private static final byte FEATURE_SCREEN = 0x60;
+    private static final byte FEATURE_GESTURE = 0x70;
+    private static final byte FEATURE_SNAPSHOT = 0x71;
+    private static final byte FEATURE_IDENTI = 0x73;
+    private static final byte FEATURE_USB_CONTROL = (byte) 0x80;
+    private static final byte FEATURE_CHANGE_DATA_FORMAT = (byte) 0x81;
 
     private static final int USB_ENABLED = 1;
     private static final int USB_DISABLED = 0;
@@ -48,16 +57,15 @@ public class JYDZ_Comm_Protocol implements Protocol {
     private static final int MESSAGE_UART_CMD_GET = 100;
 
     private static final int PROTOCOL_HEADER = 0x68;
-    private static final int JYDZ_PROTOCOL_MAX_LENGTH = 40;
-    private final int FEATURE_CHECKSUM_LEN = 2;
+    private static final int PROTOCOL_MAX_LENGTH = 40;
+    private static final int FEATURE_CHECKSUM_LEN = 2;
 
-    private static final byte[] PACKAGE_ENABLE_USB = {0x68, 0x03, (byte) 0x80, 0x00, (byte) 0xEB};
-    private static final byte[] PACKAGE_DISABLE_USB = {0x68, 0x03, (byte) 0x80, (byte) 0xAA, (byte) 0x95};
+    private static final byte[] PACKAGE_ENABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, 0x00, (byte) 0xEB};
+    private static final byte[] PACKAGE_DISABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, (byte) 0xAA, (byte) 0x95};
 
-    private static final byte[] PACKAGE_FEATURE_DATA_5 = {0x68, 0x03, (byte) 0x81, 0x00, (byte) 0xEC};
-    private static final byte[] PACKAGE_FEATURE_DATA_6 = {0x68, 0x03, (byte) 0x81, 0x01, (byte) 0xED};
-    private static final byte[] PACKAGE_FEATURE_DATA_10 = {0x68, 0x03, (byte) 0x81, 0x02, (byte) 0xEE};
-
+    private static final byte[] PACKAGE_FEATURE_DATA_5 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x00, (byte) 0xEC};
+    private static final byte[] PACKAGE_FEATURE_DATA_6 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x01, (byte) 0xED};
+    private static final byte[] PACKAGE_FEATURE_DATA_10 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x02, (byte) 0xEE};
 
 //    名称	         含义	                        长度	      备注
 //    帧头	         0x68	                        1字节
@@ -89,13 +97,13 @@ public class JYDZ_Comm_Protocol implements Protocol {
 
     public byte[] mDataBuffer;
 
-    public JYDZ_Comm_Protocol(TouchScreen touchScreen) {
+    public BTProtocol(TouchScreen touchScreen) {
         mTouchScreen = touchScreen;
         mDataFeature = FEATURE_DATA_5;
         mChangeDataFeature = FEATURE_DATA_5;
         mUSBCode = USB_DISABLED;
 
-        mDataBuffer = new byte[256];// new int[400]
+        mDataBuffer = new byte[256];
         mLen = 0;
         mPoints = 0;
     }
@@ -108,16 +116,20 @@ public class JYDZ_Comm_Protocol implements Protocol {
         return result;
     }
 
-    private boolean checkSum() {
-        int len = getDataLen();
-        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mLen);
-        for (int i = 0; i < len; i++) {
-            sum += mDataBuffer[i];
+    private int calcPoints() {
+        if (mDataFeature == FEATURE_DATA_5) {
+            mPoints = getDataLen() / FEATURE_DATA_5_LEN;
+        } else if (mDataFeature == FEATURE_DATA_6) {
+            mPoints = getDataLen() / FEATURE_DATA_6_LEN;
+        } else if (mDataFeature == FEATURE_DATA_10) {
+            mPoints = getDataLen() / FEATURE_DATA_10_LEN;
+        } else {
+            throw new IllegalArgumentException("Invalid data feature");
         }
-        return mChecksum == sum;
+        mTouchScreen.setNumOfPoints(mPoints);
+        return mPoints;
     }
 
-    //
     private boolean lengthCheck() {
         int len;
         switch (mDataFeature) {
@@ -130,7 +142,7 @@ public class JYDZ_Comm_Protocol implements Protocol {
             case FEATURE_DATA_10:
                 len = FEATURE_CHECKSUM_LEN + mPoints * FEATURE_DATA_10_LEN;
                 break;
-            case FEATURE_SCREEN_ARGUMENT:
+            case FEATURE_SCREEN:
                 len = 11;
                 break;
             case FEATURE_GESTURE:
@@ -148,6 +160,15 @@ public class JYDZ_Comm_Protocol implements Protocol {
         }
         boolean result = len == mLen;
         return result;
+    }
+
+    private boolean checkSum() {
+        int len = getDataLen();
+        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mLen);
+        for (int i = 0; i < len; i++) {
+            sum += mDataBuffer[i];
+        }
+        return mChecksum == sum;
     }
 
     void reset() {
@@ -186,19 +207,6 @@ public class JYDZ_Comm_Protocol implements Protocol {
             return null;
     }
 
-    private int calcPoints() {
-        if (mDataFeature == FEATURE_DATA_5) {
-            mPoints = getDataLen() / FEATURE_DATA_5_LEN;
-        } else if (mDataFeature == FEATURE_DATA_6) {
-            mPoints = getDataLen() / FEATURE_DATA_6_LEN;
-        } else if (mDataFeature == FEATURE_DATA_10) {
-            mPoints = getDataLen() / FEATURE_DATA_10_LEN;
-        } else {
-            throw new IllegalArgumentException("Invalid data feature");
-        }
-        mTouchScreen.setNumOfPoints(mPoints);
-        return mPoints;
-    }
 
     @Override
     public int parse(byte[] data) {
@@ -277,29 +285,29 @@ public class JYDZ_Comm_Protocol implements Protocol {
     private int setScreenData() {
         int result = 0;
         switch (mDataFeature) {
-            case JYDZ_Comm_Protocol.FEATURE_DATA_5:
-            case JYDZ_Comm_Protocol.FEATURE_DATA_6:
+            case BTProtocol.FEATURE_DATA_5:
+            case BTProtocol.FEATURE_DATA_6:
                 result = STATUS_CHANGE_DATA_FEATURE;
                 break;
-            case JYDZ_Comm_Protocol.FEATURE_DATA_10:
+            case BTProtocol.FEATURE_DATA_10:
                 mTouchScreen.setPoint(mPoints, this.mDataBuffer);
-                result = STATUS_DATA_GET_OK;
+                result = STATUS_GET_DATA;
                 break;
-            case JYDZ_Comm_Protocol.FEATURE_SCREEN_ARGUMENT:
+            case BTProtocol.FEATURE_SCREEN:
                 mTouchScreen.setIrTouchFeature(this.mDataBuffer);
-                result = STATUS_SCREEN_FEATURE_GET;
+                result = STATUS_GET_SCREEN_FEATURE;
                 break;
-            case JYDZ_Comm_Protocol.FEATURE_GESTURE:
+            case BTProtocol.FEATURE_GESTURE:
                 mTouchScreen.setGesture(this.mDataBuffer[0]);
-                result = STATUS_GESTURE_GET;
+                result = STATUS_GET_GESTURE;
                 break;
-            case JYDZ_Comm_Protocol.FEATURE_SNAPSHOT:
+            case BTProtocol.FEATURE_SNAPSHOT:
                 mTouchScreen.setSnapshot(this.mDataBuffer[0]);
-                result = STATUS_SNAPSHOT_GET;
+                result = STATUS_GET_SNAPSHOT;
                 break;
-            case JYDZ_Comm_Protocol.FEATURE_IDENTI:
+            case BTProtocol.FEATURE_IDENTI:
                 mTouchScreen.setID(DataUtil.bytesToIntLittleEndian(mDataBuffer[0], mDataBuffer[1], mDataBuffer[2], mDataBuffer[3]));
-                result = STATUS_IDENTI_GET;
+                result = STATUS_GET_IDENTI;
                 break;
             default:
                 break;
