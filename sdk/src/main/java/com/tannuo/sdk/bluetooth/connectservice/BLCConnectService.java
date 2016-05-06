@@ -29,6 +29,8 @@ public class BLCConnectService extends ConnectServiceBase {
     // Unique UUID for this application
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    private UUID mSpp_Uuid = SPP_UUID;
+
     private BLCThread mThread;
     private int mState;
 
@@ -167,10 +169,12 @@ public class BLCConnectService extends ConnectServiceBase {
             boolean result = false;
             try {
                 cancelDiscovery();
-                mSocket = mDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                mSocket = mDevice.createRfcommSocketToServiceRecord(mSpp_Uuid);
                 Log.d(TAG, "Create Socket...");
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                connectFailed();
+                return false;
             }
 
             try {
@@ -187,7 +191,6 @@ public class BLCConnectService extends ConnectServiceBase {
                 connectFailed();
             }
             return result;
-
         }
 
         private boolean getStream() {

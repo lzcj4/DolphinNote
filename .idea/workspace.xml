@@ -20,12 +20,13 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/note/note.iml" afterPath="$PROJECT_DIR$/note/note.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java" afterPath="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataProxy.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/sdk.iml" afterPath="$PROJECT_DIR$/sdk/sdk.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java" />
     </list>
     <ignored path="DolphinNote.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -50,17 +51,7 @@
         <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="273" column="37" selection-start-line="273" selection-start-column="37" selection-end-line="273" selection-end-column="37" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProtocolHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="51" column="79" selection-start-line="51" selection-start-column="79" selection-end-line="51" selection-end-column="79" />
+              <caret line="120" column="44" selection-start-line="120" selection-start-column="44" selection-end-line="120" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -70,50 +61,29 @@
         <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+              <caret line="177" column="5" selection-start-line="177" selection-start-column="5" selection-end-line="177" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3343#3344#0" expanded="true" />
-                <element signature="e#3399#3400#0" expanded="true" />
-                <element signature="e#4617#4618#0" expanded="true" />
-                <element signature="e#4667#4668#0" expanded="true" />
-                <element signature="e#4749#4750#0" expanded="true" />
-                <element signature="e#4790#4791#0" expanded="true" />
-                <element signature="e#5106#5107#0" expanded="true" />
-                <element signature="e#5156#5157#0" expanded="true" />
-                <element signature="e#5217#5218#0" expanded="true" />
-                <element signature="e#5265#5266#0" expanded="true" />
-                <element signature="e#5321#5322#0" expanded="true" />
-                <element signature="e#5371#5372#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataLog.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java">
+      <file leaf-file-name="BLEConnectService.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.76086956">
-              <caret line="26" column="22" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
-              <folding>
-                <element signature="e#3258#3259#0" expanded="true" />
-                <element signature="e#3296#3297#0" expanded="true" />
-                <element signature="e#3340#3341#0" expanded="true" />
-                <element signature="e#3378#3379#0" expanded="true" />
-                <element signature="e#3423#3424#0" expanded="true" />
-                <element signature="e#3462#3463#0" expanded="true" />
-                <element signature="e#3507#3508#0" expanded="true" />
-                <element signature="e#3546#3547#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="-0.5935252">
+              <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Build.java" pinned="false" current-in-tab="false">
-        <entry file="file://D:/sdk/sources/android-23/android/os/Build.java">
+      <file leaf-file-name="ConnectServiceBase.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectServiceBase.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="425" column="32" selection-start-line="425" selection-start-column="32" selection-end-line="425" selection-end-column="32" />
+              <caret line="27" column="31" selection-start-line="27" selection-start-column="31" selection-end-line="27" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -2623,14 +2593,15 @@
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/JYDZ_Comm_Protocol.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/blc/BLCConnectService.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/ble/BLEConnectService.java" />
-        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java" />
         <option value="$PROJECT_DIR$/gradle.properties" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/BTProtocol.java" />
         <option value="$PROJECT_DIR$/note/src/main/res/layout/content_main.xml" />
-        <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataProxy.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java" />
+        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java" />
+        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java" />
+        <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java" />
       </list>
     </option>
   </component>
@@ -2666,7 +2637,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -2758,19 +2728,9 @@
               <option name="myItemId" value="sdk" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="DolphinNote" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="note" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderNode" />
+              <option name="myItemId" value="bluetooth" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -2779,44 +2739,43 @@
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="note" />
+              <option name="myItemId" value="sdk" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderNode" />
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidSourceTypeNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="layout" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderTypeNode" />
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tannuo" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sdk" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bluetooth" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="connectservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="DolphinNote" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="note" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DolphinNote" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="note" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="manifests" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidManifestsGroupNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="ProjectPane" />
       <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
@@ -3121,8 +3080,7 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16410257" sideWeight="0.5030257" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290469" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16410257" sideWeight="0.5030257" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -3130,8 +3088,7 @@
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23600605" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991454" sideWeight="0.4969743" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30408472" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -3143,6 +3100,8 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290469" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991454" sideWeight="0.4969743" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -3173,14 +3132,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BTServiceFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="21" column="31" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -3211,18 +3162,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3265,18 +3204,6 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3295,18 +3222,6 @@
           <caret line="50" column="34" selection-start-line="50" selection-start-column="34" selection-end-line="50" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3348,18 +3263,6 @@
           <caret line="50" column="34" selection-start-line="50" selection-start-column="34" selection-end-line="50" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3401,18 +3304,6 @@
           <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3540,19 +3431,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.534153">
-          <caret line="71" column="23" selection-start-line="71" selection-start-column="8" selection-end-line="71" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gradle.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7051282">
           <caret line="15" column="0" selection-start-line="15" selection-start-column="1" selection-end-line="18" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3560,7 +3442,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3568,14 +3449,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.37606838">
           <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="273" column="37" selection-start-line="273" selection-start-column="37" selection-end-line="273" selection-end-column="37" />
           <folding />
         </state>
       </provider>
@@ -3616,14 +3489,57 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="425" column="32" selection-start-line="425" selection-start-column="32" selection-end-line="425" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#35174#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.44604316">
+          <caret line="18" column="38" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreenListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4856115">
+          <caret line="56" column="16" selection-start-line="56" selection-start-column="9" selection-end-line="56" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4352518">
+          <caret line="15" column="26" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.039568346">
           <caret line="51" column="79" selection-start-line="51" selection-start-column="79" selection-end-line="51" selection-end-column="79" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="120" column="44" selection-start-line="120" selection-start-column="44" selection-end-line="120" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectServiceBase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="27" column="31" selection-start-line="27" selection-start-column="31" selection-end-line="27" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -3631,39 +3547,18 @@
     <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+          <caret line="177" column="5" selection-start-line="177" selection-start-column="5" selection-end-line="177" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3343#3344#0" expanded="true" />
-            <element signature="e#3399#3400#0" expanded="true" />
-            <element signature="e#4617#4618#0" expanded="true" />
-            <element signature="e#4667#4668#0" expanded="true" />
-            <element signature="e#4749#4750#0" expanded="true" />
-            <element signature="e#4790#4791#0" expanded="true" />
-            <element signature="e#5106#5107#0" expanded="true" />
-            <element signature="e#5156#5157#0" expanded="true" />
-            <element signature="e#5217#5218#0" expanded="true" />
-            <element signature="e#5265#5266#0" expanded="true" />
-            <element signature="e#5321#5322#0" expanded="true" />
-            <element signature="e#5371#5372#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java">
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLEConnectService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.76086956">
-          <caret line="26" column="22" selection-start-line="26" selection-start-column="22" selection-end-line="26" selection-end-column="22" />
-          <folding>
-            <element signature="e#3258#3259#0" expanded="true" />
-            <element signature="e#3296#3297#0" expanded="true" />
-            <element signature="e#3340#3341#0" expanded="true" />
-            <element signature="e#3378#3379#0" expanded="true" />
-            <element signature="e#3423#3424#0" expanded="true" />
-            <element signature="e#3462#3463#0" expanded="true" />
-            <element signature="e#3507#3508#0" expanded="true" />
-            <element signature="e#3546#3547#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="-0.5935252">
+          <caret line="33" column="0" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

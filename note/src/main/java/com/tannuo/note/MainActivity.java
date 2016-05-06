@@ -172,6 +172,9 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     @Override
     public void onError(int errorCode) {
         Log.v(TAG, "onError " + errorCode);
+        if (errorCode != 0) {
+            txtDevice.setText("设备连接失败");
+        }
     }
 
     @Override
