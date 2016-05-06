@@ -8,7 +8,7 @@ import android.os.Message;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
-import com.tannuo.sdk.util.DataProxy;
+import com.tannuo.sdk.util.DataLog;
 
 import java.lang.ref.WeakReference;
 
@@ -29,7 +29,7 @@ public class ProtocolHandler {
     private HandlerThread mProtocolThread;
     private ProtocolParseHandler mHandler;
     public static final int MESSAGE_PROTOCOL_PARSE = 1;
-    private DataProxy mDataProxy;
+    private DataLog mDataProxy;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
                            TouchScreenListener touchListener) {
@@ -50,12 +50,7 @@ public class ProtocolHandler {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
         mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
-
-        try {
-            mDataProxy = new DataProxy();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        mDataProxy = new DataLog();
     }
 
     public void sendMessage(int what, Object obj) {

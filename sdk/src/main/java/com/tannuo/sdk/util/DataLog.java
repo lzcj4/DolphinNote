@@ -11,9 +11,9 @@ import java.io.OutputStreamWriter;
 /**
  * Created by Nick_PC on 2016/5/5.
  */
-public class DataProxy {
+public class DataLog {
 
-    private static final String TAG = "DataProxy";
+    private static final String TAG = "DataLog";
     private static final String DATA_FOLDER = "BTData";
     private static final String DATA_IN_FILE = "In.txt";
     private static final String DATA_OUT_FILE = "Out.txt";
@@ -21,55 +21,46 @@ public class DataProxy {
     private OutputStreamWriter mInWriter;
     private OutputStreamWriter mOutWriter;
 
-    private static DataProxy instance;
+    private static DataLog instance;
 
-    public DataProxy() throws IllegalAccessException {
-
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            throw new IllegalAccessException("External storage is not mounted");
-        }
-        File rootFolder = Environment.getExternalStorageDirectory();
-        if (null != rootFolder && rootFolder.exists()) {
-            File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
-            boolean isFolderExisted = dataFolder.exists();
-            if (!dataFolder.exists()) {
-                isFolderExisted = dataFolder.mkdirs();
-            }
-            if (isFolderExisted) {
-                mInWriter = createDataFile(dataFolder, DATA_IN_FILE);
-                mOutWriter = createDataFile(dataFolder, DATA_OUT_FILE);
-            }
-        }
+    public DataLog()  {
+        createFiles();
         instance = this;
     }
 
-    public static void clear() {
-        if (instance != null) {
-            try {
-                if (null != instance.mInWriter) {
-                    instance.mInWriter.close();
-                }
-                File rootFolder = Environment.getExternalStorageDirectory();
-                if (null != rootFolder && rootFolder.exists()) {
-                    File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
-                    boolean isFolderExisted = dataFolder.exists();
-                    if (!dataFolder.exists()) {
-                        isFolderExisted = dataFolder.mkdirs();
-                    }
-                    if (isFolderExisted) {
-                        File file = new File(dataFolder, String.format("/%s", DATA_IN_FILE));
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                        instance.mInWriter = createDataFile(dataFolder, DATA_IN_FILE);
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+    private void createFiles(){
+        try {
+            File dataFolder = getDataFolder();
+            if (null != dataFolder) {
+                mInWriter = createDataFile(dataFolder, DATA_IN_FILE);
+                mOutWriter = createDataFile(dataFolder, DATA_OUT_FILE);
             }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+    private static File getDataFolder() throws  IllegalAccessException{
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            throw new IllegalAccessException("External storage is not mounted");
+        }
+        File result = null;
+        File rootFolder = Environment.getExternalStorageDirectory();
+        if (null != rootFolder && rootFolder.exists()) {
+            File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
+            if (!dataFolder.exists() && dataFolder.mkdirs())
+                result = dataFolder;
+        }
+        return result;
+    }
+
+
+    public static void clear() {
+        if (instance == null) {
+            return;
         }
 
+        instance.close();
+        instance.createFiles();
     }
 
     private static OutputStreamWriter createDataFile(File parentFolder, String fileName) {
@@ -77,12 +68,12 @@ public class DataProxy {
         File file = new File(parentFolder, String.format("/%s", fileName));
         if (file.exists()) {
             file.delete();
-            Log.i(DataProxy.TAG, String.format("--- file :%s/%s deleted ---", parentFolder.getAbsolutePath(), fileName));
+            Log.i(DataLog.TAG, String.format("--- file :%s/%s deleted ---", parentFolder.getAbsolutePath(), fileName));
         }
         try {
             if (file.createNewFile()) {
                 result = new OutputStreamWriter(new FileOutputStream(file));
-                Log.i(DataProxy.TAG, String.format("+++ new file :%s/%s created +++", parentFolder.getAbsolutePath(), fileName));
+                Log.i(DataLog.TAG, String.format("+++ new file :%s/%s created +++", parentFolder.getAbsolutePath(), fileName));
             }
         } catch (IOException e) {
             e.printStackTrace();

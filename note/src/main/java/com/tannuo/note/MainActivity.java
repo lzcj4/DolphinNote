@@ -20,7 +20,7 @@ import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
-import com.tannuo.sdk.util.DataProxy;
+import com.tannuo.sdk.util.DataLog;
 
 import java.util.List;
 
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     private void clear() {
         this.txtCount.setText("0");
         this.txtData.setText("");
-        DataProxy.clear();
+        DataLog.clear();
         rowIndex = 0;
         byteCount = 0;
     }
