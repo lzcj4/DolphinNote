@@ -159,8 +159,10 @@ public class BLEConnectService extends ConnectServiceBase {
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             Log.d(TAG, String.format("BLE device scanned, name:%s , addr:%s", device.getName(), device.getAddress()));
-            if ((!TextUtils.isEmpty(mDeviceName) && device.getName().equalsIgnoreCase(mDeviceName)) ||
-                    ((!TextUtils.isEmpty(mDeviceAddr) && device.getAddress().equalsIgnoreCase(mDeviceAddr)))) {
+            String name = device.getName();
+            String addr = device.getAddress();
+            if ((!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) ||
+                    ((!TextUtils.isEmpty(mDeviceAddr) && !TextUtils.isEmpty(addr) && addr.equalsIgnoreCase(mDeviceAddr)))) {
                 mDevice = device;
                 stopLeScan(mLeScanCallback);
                 connectGatt(device);

@@ -275,8 +275,10 @@ public class BLCConnectService extends ConnectServiceBase {
                     return;
                 }
 
-                if ((!TextUtils.isEmpty(mDeviceName) && device.getName().equalsIgnoreCase(mDeviceName)) ||
-                        ((!TextUtils.isEmpty(mDeviceAddr) && device.getAddress().equalsIgnoreCase(mDeviceAddr)))) {
+                String name = device.getName();
+                String addr = device.getAddress();
+                if ((!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) ||
+                        ((!TextUtils.isEmpty(mDeviceAddr) && !TextUtils.isEmpty(addr) && addr.equalsIgnoreCase(mDeviceAddr)))) {
                     if (TextUtils.isEmpty(mDeviceAddr)) {
                         mDeviceAddr = device.getAddress();
                     }
