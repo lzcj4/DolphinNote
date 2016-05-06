@@ -1,6 +1,8 @@
 package com.tannuo.note;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
@@ -39,15 +41,19 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
 
     private ConnectService mService;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         txtData.setMovementMethod(new ScrollingMovementMethod());
-        edtName.getViewTreeObserver().addOnWindowFocusChangeListener((view) -> {
-            hideInputMethod();
-        });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            edtName.getViewTreeObserver().addOnWindowFocusChangeListener((isFocused) -> {
+                InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+            });
+        }
     }
 
     @Override
@@ -56,11 +62,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         hideInputMethod();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void hideInputMethod() {
         edtName.postDelayed(() -> {
             InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
-        }, 2 * 1000);
+        }, 0 * 1000);
     }
 
     @OnClick({R.id.btnConnect, R.id.btnDisconnect, R.id.btnClear})

@@ -46,7 +46,9 @@ public class DataProxy {
     public static void clear() {
         if (instance != null) {
             try {
-                instance.mInWriter.close();
+                if (null != instance.mInWriter) {
+                    instance.mInWriter.close();
+                }
                 File rootFolder = Environment.getExternalStorageDirectory();
                 if (null != rootFolder && rootFolder.exists()) {
                     File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
