@@ -5,9 +5,10 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
+import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
+import com.tannuo.sdk.util.DataLog;
 
 import java.lang.ref.WeakReference;
 
@@ -16,13 +17,19 @@ import java.lang.ref.WeakReference;
  * Created by nick on 2016/4/24.
  */
 public class ProtocolHandler {
+    public interface OnDataReceive {
+        void onReceive(byte[] data);
+    }
+
     private final ConnectService mService;
     private final Protocol mProtocol;
     private final TouchScreenListener mTouchListener;
+    private OnDataReceive mDataReceive;
 
     private HandlerThread mProtocolThread;
     private ProtocolParseHandler mHandler;
     public static final int MESSAGE_PROTOCOL_PARSE = 1;
+    private DataLog mDataProxy;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
                            TouchScreenListener touchListener) {
@@ -32,6 +39,9 @@ public class ProtocolHandler {
         mService = service;
         mProtocol = protocol;
         mTouchListener = touchListener;
+        if (touchListener instanceof OnDataReceive) {
+            mDataReceive = (OnDataReceive) touchListener;
+        }
 
         start();
     }
@@ -40,6 +50,7 @@ public class ProtocolHandler {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
         mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
+        mDataProxy = new DataLog();
     }
 
     public void sendMessage(int what, Object obj) {
@@ -60,6 +71,7 @@ public class ProtocolHandler {
 
     public void stop() {
         mProtocolThread.quit();
+        mDataProxy.close();
     }
 
     private static class ProtocolParseHandler extends Handler {
@@ -88,10 +100,15 @@ public class ProtocolHandler {
             if (null == data || data.length == 0 || wrProtocolHanlder.get() == null) {
                 return;
             }
+            ProtocolHandler handler = wrProtocolHanlder.get();
+            Protocol protocol = handler.mProtocol;
+            ConnectService service = handler.mService;
+            TouchScreenListener touchListener = handler.mTouchListener;
 
-            Protocol protocol = wrProtocolHanlder.get().mProtocol;
-            ConnectService service = wrProtocolHanlder.get().mService;
-            TouchScreenListener touchListener = wrProtocolHanlder.get().mTouchListener;
+            handler.mDataProxy.writeInData(data);
+            if (handler.mDataReceive != null) {
+                handler.mDataReceive.onReceive(data);
+            }
 
             switch (protocol.parse(data)) {
                 case BTProtocol.STATUS_CHANGE_DATA_FEATURE:
@@ -101,6 +118,7 @@ public class ProtocolHandler {
                     }
                     break;
                 case BTProtocol.STATUS_GET_DATA:
+                    handler.mDataProxy.writeOutData(data);
                     TouchScreen touchScreen = protocol.getTouchScreen();
                     if (touchScreen.mTouchDownList.size() > 0) {
                         touchListener.onTouchDown(touchScreen.mTouchDownList);

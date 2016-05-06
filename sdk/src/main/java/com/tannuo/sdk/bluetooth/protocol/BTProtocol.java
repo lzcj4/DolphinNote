@@ -117,6 +117,7 @@ public class BTProtocol implements Protocol {
     }
 
     private int calcPoints() {
+        mPoints = 0;
         if (mDataFeature == FEATURE_DATA_5) {
             mPoints = getDataLen() / FEATURE_DATA_5_LEN;
         } else if (mDataFeature == FEATURE_DATA_6) {
@@ -124,7 +125,7 @@ public class BTProtocol implements Protocol {
         } else if (mDataFeature == FEATURE_DATA_10) {
             mPoints = getDataLen() / FEATURE_DATA_10_LEN;
         } else {
-            throw new IllegalArgumentException("Invalid data feature");
+            // throw new IllegalArgumentException("Invalid data feature");
         }
         mTouchScreen.setNumOfPoints(mPoints);
         return mPoints;
@@ -143,16 +144,16 @@ public class BTProtocol implements Protocol {
                 len = FEATURE_CHECKSUM_LEN + mPoints * FEATURE_DATA_10_LEN;
                 break;
             case FEATURE_SCREEN:
-                len = 11;
+                len = FEATURE_CHECKSUM_LEN + 9;
                 break;
             case FEATURE_GESTURE:
-                len = 3;
+                len = FEATURE_CHECKSUM_LEN + 1;
                 break;
             case FEATURE_SNAPSHOT:
-                len = 3;
+                len = FEATURE_CHECKSUM_LEN + 1;
                 break;
             case FEATURE_IDENTI:
-                len = 6;
+                len =FEATURE_CHECKSUM_LEN + 4;
                 break;
             default:
                 len = -1;
