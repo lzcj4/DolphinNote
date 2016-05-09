@@ -84,11 +84,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
 
     private void connect() {
         if (null == mService) {
+
+            txtDevice.setText("正在连接.......");
             BTServiceFactory factory = new BTServiceFactory();
 //            mService = factory.get(this, new TouchScreenListenerImpl());
             mService = factory.get(this, this);
             mService.connect(getDeviceName(), null, null);
-            txtDevice.setText("正在连接.......");
         }
     }
 

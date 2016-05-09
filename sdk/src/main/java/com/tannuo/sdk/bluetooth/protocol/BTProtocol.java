@@ -277,7 +277,7 @@ public class BTProtocol implements Protocol {
         //if (BuildConfig.DEBUG) {
         StringBuilder sb = new StringBuilder();
         for (byte b : data) {
-            sb.append(String.format("%02x ", b));
+            sb.append(String.format("%02X ", b));
         }
         Log.d(TAG, String.format("received data:%s", sb.toString()));
         // }
