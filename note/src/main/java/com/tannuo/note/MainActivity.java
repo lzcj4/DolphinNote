@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     private void disconnect() {
         if (mService != null) {
             mService.disconnect();
+            mService=null;
             txtDevice.setText("");
         }
     }
@@ -173,6 +174,11 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     @Override
     public void onError(int errorCode) {
         Log.v(TAG, "onError " + errorCode);
+        this.runOnUiThread(()->{
+            disconnect();
+            txtDevice.setText("设备连接失败");
+        });
+
     }
 
     @Override
