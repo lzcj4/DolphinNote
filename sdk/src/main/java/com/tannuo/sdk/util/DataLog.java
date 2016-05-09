@@ -23,12 +23,12 @@ public class DataLog {
 
     private static DataLog instance;
 
-    public DataLog()  {
+    public DataLog() {
         createFiles();
         instance = this;
     }
 
-    private void createFiles(){
+    private void createFiles() {
         try {
             File dataFolder = getDataFolder();
             if (null != dataFolder) {
@@ -39,7 +39,8 @@ public class DataLog {
             e.printStackTrace();
         }
     }
-    private static File getDataFolder() throws  IllegalAccessException{
+
+    private static File getDataFolder() throws IllegalAccessException {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             throw new IllegalAccessException("External storage is not mounted");
         }
@@ -47,8 +48,15 @@ public class DataLog {
         File rootFolder = Environment.getExternalStorageDirectory();
         if (null != rootFolder && rootFolder.exists()) {
             File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
-            if (!dataFolder.exists() && dataFolder.mkdirs())
+            if (!dataFolder.exists()) {
+                if (dataFolder.mkdirs()) {
+                    result = dataFolder;
+                } else {
+                    Log.e(TAG, "create btdata folder failed");
+                }
+            } else {
                 result = dataFolder;
+            }
         }
         return result;
     }
