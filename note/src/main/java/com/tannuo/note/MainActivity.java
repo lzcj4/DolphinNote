@@ -22,7 +22,13 @@ import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 import com.tannuo.sdk.util.DataLog;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -38,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     TextView txtCount;
     @Bind(R.id.txtDevice)
     TextView txtDevice;
+    @Bind(R.id.txtStartDate)
+    TextView txtStartDate;
+    @Bind(R.id.txtDuration)
+    TextView txtDuration;
 
     private ConnectService mService;
 
@@ -100,8 +110,11 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     private void disconnect() {
         if (mService != null) {
             mService.disconnect();
-            mService=null;
+            mService = null;
             txtDevice.setText("");
+//            txtStartDate.setText("");
+//            txtDuration.setText("");
+            stopTimer();
         }
     }
 
@@ -111,12 +124,13 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         DataLog.clear();
         rowIndex = 0;
         byteCount = 0;
+        stopTimer();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disconnect();
+        // disconnect();
     }
 
     @Override
@@ -174,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     @Override
     public void onError(int errorCode) {
         Log.v(TAG, "onError " + errorCode);
-        this.runOnUiThread(()->{
+        this.runOnUiThread(() -> {
             disconnect();
             txtDevice.setText("设备连接失败");
         });
@@ -191,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
 
     int rowIndex;
     int byteCount;
-
+    boolean isStarted = false;
 
     @Override
     public void onReceive(byte[] data) {
@@ -200,9 +214,52 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         byteCount += data.length;
 
         this.runOnUiThread(() -> {
+            if (!isStarted) {
+                isStarted = true;
+                startDate = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                txtStartDate.setText(sdf.format(startDate));
+                startTimer();
+            }
             txtData.append(str);
             txtCount.setText(String.valueOf(byteCount));
         });
+    }
+
+    Date startDate;
+    Timer timer;
+    int timeCounter = 0;
+
+    private void startTimer() {
+        stopTimer();
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                Date dtNow = new Date();
+                long duration = dtNow.getTime() - startDate.getTime();
+                Calendar calendar = Calendar.getInstance(Locale.CHINA);
+                calendar.setTimeInMillis(duration);
+                Date dt = calendar.getTime();
+                timeCounter++;
+                runOnUiThread(() -> {
+                    //SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+                    //txtDuration.setText(sdf.format(dt));
+                    txtDuration.setText(String.format("%s 秒", timeCounter));
+                });
+
+            }
+        };
+        timeCounter = 0;
+        timer.schedule(task, 1 * 1000, 1 * 1000);
+    }
+
+    private void stopTimer() {
+        if (null != timer) {
+            timer.cancel();
+            timeCounter = 0;
+        }
+        isStarted = false;
     }
 
     private String getDataStr(byte[] data) {
