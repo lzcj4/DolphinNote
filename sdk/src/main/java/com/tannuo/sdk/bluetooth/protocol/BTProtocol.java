@@ -153,7 +153,7 @@ public class BTProtocol implements Protocol {
                 len = FEATURE_CHECKSUM_LEN + 1;
                 break;
             case FEATURE_IDENTI:
-                len =FEATURE_CHECKSUM_LEN + 4;
+                len = FEATURE_CHECKSUM_LEN + 4;
                 break;
             default:
                 len = -1;
@@ -216,56 +216,56 @@ public class BTProtocol implements Protocol {
         }
         printData(data);
         this.reset();
-        int errorCode = ERROR_NONE;
         //  68 03 71 11 ED    按下截屏键
 
-        byte header = data[0];
-        if (header != PROTOCOL_HEADER) {
-            errorCode = ERROR_HEADER;
-            Log.e(TAG, "get invalid protocol header ");
-        }
+        int len = data.length;
+        int result = ERROR_NONE;
 
-        if (errorCode == ERROR_NONE) {
-            mLen = data.length > 1 ? data[1] : 0;
-            if (mLen < FEATURE_CHECKSUM_LEN) {
-                errorCode = ERROR_DATA_LENGTH;
-                Log.e(TAG, "get invalid protocol  data len ");
+        for (int i = 0; i < len; i++) {
+            byte header = data[i];
+            if (header != PROTOCOL_HEADER) {
+                // errorCode = ERROR_HEADER;
+                Log.e(TAG, "get invalid protocol header ");
+                continue;
             }
-        }
 
-        if (errorCode == ERROR_NONE) {
-            mDataFeature = data.length > 2 ? data[2] : 0;
+            mLen = data.length > i + 1 ? data[i + 1] : 0;
+            if (mLen < FEATURE_CHECKSUM_LEN) {
+                // errorCode = ERROR_DATA_LENGTH;
+                Log.e(TAG, "get invalid protocol  data len ");
+                continue;
+            }
+
+            mDataFeature = data.length > i + 2 ? data[i + 2] : 0;
             calcPoints();
             if (!lengthCheck()) {
-                errorCode = ERROR_DATA_FEATURE;
+                //  errorCode = ERROR_DATA_FEATURE;
                 Log.e(TAG, "get data feature and calc point len failed ");
+                continue;
             }
-        }
 
-        if (errorCode == ERROR_NONE) {
             int dataLen = getDataLen();
-            int startIndex = 3;// header+feature+len
-            int endIndex = startIndex + dataLen;
-            if (dataLen > 0 && endIndex < data.length) {
-                mDataBuffer = Arrays.copyOfRange(data, startIndex, endIndex);
+            int dataStartIndex = i + 3;// header+feature+len
+            int dataEndIndex = dataStartIndex + dataLen;
+            if (dataLen > 0 && dataEndIndex < data.length) {
+                mDataBuffer = Arrays.copyOfRange(data, dataStartIndex, dataEndIndex);
             } else {
-                errorCode = ERROR_DATA;
+                // errorCode = ERROR_DATA;
                 Log.e(TAG, "get real data failed ");
+                continue;
             }
-        }
-        if (errorCode == ERROR_NONE) {
-            mChecksum = data[data.length - 1];
+
+            int checksumIndex = i + 1 + mLen;
+            mChecksum = data[checksumIndex];
             if (!checkSum()) {
-                errorCode = ERROR_CHECKSUM;
+                // errorCode = ERROR_CHECKSUM;
                 Log.d(TAG, "checksum invalid");
+                continue;
             }
-        }
 
-        int result = ERROR_NONE;
-        if (errorCode == ERROR_NONE) {
             result = setScreenData();
+            i = checksumIndex;
         }
-
         return result;
     }
 

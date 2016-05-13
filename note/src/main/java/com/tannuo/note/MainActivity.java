@@ -22,11 +22,15 @@ import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 import com.tannuo.sdk.util.DataLog;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.greenrobot.eventbus.meta.SubscriberInfo;
+import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
+
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -66,6 +70,26 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         }
     }
 
+    private void testEnentBus(){
+        EventBus.builder().addIndex(new SubscriberInfoIndex() {
+            @Override
+            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
+                return null;
+            }
+        }).installDefaultEventBus();
+
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post("test");
+
+        ServerAPI api=new ServerAPI();
+        api.getServerConfig();
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC,sticky = false,priority = 0)
+    public void handleEvent(Object obj){
+
+    }
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -84,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
+            testEnentBus();
             this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
@@ -238,13 +263,14 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
             public void run() {
                 Date dtNow = new Date();
                 long duration = dtNow.getTime() - startDate.getTime();
-                Calendar calendar = Calendar.getInstance(Locale.CHINA);
-                calendar.setTimeInMillis(duration);
-                Date dt = calendar.getTime();
+//                Calendar calendar = Calendar.getInstance(Locale.CHINA);
+//                calendar.setTimeInMillis(duration);
+//                Date dt = calendar.getTime();
+                Date dt = new Date(duration);
                 timeCounter++;
                 runOnUiThread(() -> {
-                    //SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
-                    //txtDuration.setText(sdf.format(dt));
+//                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
+//                    txtDuration.setText(sdf.format(dt));
                     txtDuration.setText(String.format("%s 秒", timeCounter));
                 });
 
