@@ -14,5 +14,5 @@ public interface IServerAPI {
     Call<ServerConfig> getConfig();
 
     @GET("/appconfig")
-    Observable<ServerConfig> getConfigByRxJava();
+    Observable<HttpResult<ServerConfig>> getConfigByRxJava();
 }
