@@ -38,3 +38,8 @@ captures/
 
 # Keystore files
 *.jks
+*.lock
+.gradle/2.10/taskArtifacts/cache.properties.lock
+*.bin
+.gradle/2.10/taskArtifacts/fileHashes.bin
+*.bin

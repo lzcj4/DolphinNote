@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
                 imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
             });
         }
+    }
+
+    private  void testMetric(){
+        DisplayMetrics dMetrics=new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dMetrics);
+        DisplayMetrics metrics=this.getResources().getDisplayMetrics();
     }
 
     private void testEnentBus(){
