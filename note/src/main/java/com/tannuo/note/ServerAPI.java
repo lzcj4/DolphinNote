@@ -9,6 +9,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -21,6 +22,7 @@ public class ServerAPI {
     OkHttpClient client;
 
     IServerAPI serverAPI;
+    final String URI_BASE = "http://tn.glasslink.cn:3000/";
 
     {
         final int TIMEOUT = 60;
@@ -30,8 +32,12 @@ public class ServerAPI {
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .build();
 
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://tn.glasslink.cn:3000/").
-                addConverterFactory(GsonConverterFactory.create()).client(client).build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI_BASE)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(client)
+                .build();
 
         serverAPI = retrofit.create(IServerAPI.class);
     }
@@ -45,7 +51,7 @@ public class ServerAPI {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe((r) -> {
-                    Log.i("test",r.getWxAppKey());
+                    Log.i("test", r.getWxAppKey());
                 });
 
         serverAPI.getConfig().enqueue(new Callback<ServerConfig>() {

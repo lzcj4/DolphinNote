@@ -43,3 +43,4 @@ captures/
 *.bin
 .gradle/2.10/taskArtifacts/fileHashes.bin
 *.bin
+*.bin
