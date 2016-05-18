@@ -261,15 +261,19 @@ public class BTProtocol implements Protocol {
                 }
             }
 
+            mLen = len > i + 1 ? totalData[i + 1] : 0;
             if (mLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
                 Log.e(TAG, "get invalid protocol  data len ");
                 continue;
             } else {
+                if (i + mLen >= len) {
+                    lastContinueBytes = Arrays.copyOfRange(totalData, i, len);
                     break;
                 }
             }
 
+            mDataFeature = len > i + 2 ? totalData[i + 2] : 0;
             calcPoints();
             if (!lengthCheck()) {
                 //  errorCode = ERROR_DATA_FEATURE;
