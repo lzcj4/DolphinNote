@@ -4,8 +4,8 @@ package com.tannuo.sdk.util;
  * Created by nick on 2016/4/23.
  */
 public class DataUtil {
-    public static byte intToByte(int i) {
-        byte result = (byte) (i & 0xFF);
+    public static int byteToUnsignedByte(byte b) {
+        int result = b & 0xFF;
         return result;
     }
 

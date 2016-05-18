@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     TextView txtStartDate;
     @Bind(R.id.txtDuration)
     TextView txtDuration;
+    @Bind(R.id.txtScroll)
+    ScrollView txtScroll;
 
     private ConnectService mService;
 
@@ -62,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        txtData.setMovementMethod(new ScrollingMovementMethod());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             edtName.getViewTreeObserver().addOnWindowFocusChangeListener((isFocused) -> {
                 InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -71,13 +72,13 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         }
     }
 
-    private  void testMetric(){
-        DisplayMetrics dMetrics=new DisplayMetrics();
+    private void testMetric() {
+        DisplayMetrics dMetrics = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(dMetrics);
-        DisplayMetrics metrics=this.getResources().getDisplayMetrics();
+        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
     }
 
-    private void testEnentBus(){
+    private void testEnentBus() {
         EventBus.builder().addIndex(new SubscriberInfoIndex() {
             @Override
             public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
@@ -88,12 +89,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         EventBus.getDefault().register(this);
         EventBus.getDefault().post("test");
 
-        ServerAPI api=new ServerAPI();
+        ServerAPI api = new ServerAPI();
         api.getServerConfig();
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC,sticky = false,priority = 0)
-    public void handleEvent(Object obj){
+    @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)
+    public void handleEvent(Object obj) {
 
     }
 
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
-            testEnentBus();
+            //testEnentBus();
             this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
@@ -153,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     private void clear() {
         this.txtCount.setText("0");
         this.txtData.setText("");
-        DataLog.clear();
+        DataLog.getInstance().restart();
         rowIndex = 0;
         byteCount = 0;
         stopTimer();
@@ -254,6 +255,8 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
                 startTimer();
             }
             txtData.append(str);
+            txtData.scrollTo(0, (int) txtData.getY());
+            txtScroll.fullScroll(View.FOCUS_DOWN);
             txtCount.setText(String.valueOf(byteCount));
         });
     }

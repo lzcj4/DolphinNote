@@ -1,6 +1,7 @@
 package com.tannuo.sdk.util;
 
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -21,11 +22,16 @@ public class DataLog {
     private OutputStreamWriter mInWriter;
     private OutputStreamWriter mOutWriter;
 
-    private static DataLog instance;
+    public static DataLog getInstance() {
+        return InstanceHolder.instance;
+    }
 
-    public DataLog() {
+    private DataLog() {
         createFiles();
-        instance = this;
+    }
+
+    private static class InstanceHolder {
+        private static DataLog instance = new DataLog();
     }
 
     private void createFiles() {
@@ -62,13 +68,9 @@ public class DataLog {
     }
 
 
-    public static void clear() {
-        if (instance == null) {
-            return;
-        }
-
-        instance.close();
-        instance.createFiles();
+    public void restart() {
+        this.close();
+        this.createFiles();
     }
 
     private static OutputStreamWriter createDataFile(File parentFolder, String fileName) {
@@ -90,7 +92,7 @@ public class DataLog {
     }
 
     private void write(OutputStreamWriter writer, String data) {
-        if (writer != null) {
+        if (writer != null && !TextUtils.isEmpty(data)) {
             try {
                 writer.append(data);
                 writer.flush();
@@ -125,24 +127,21 @@ public class DataLog {
         write(mOutWriter, data);
     }
 
-    public void close() {
-        if (null != mInWriter) {
+    private static void closeStreamWriter(OutputStreamWriter writer) {
+        if (null != writer) {
             try {
-                mInWriter.close();
-                mInWriter = null;
+                writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
 
-        if (null != mOutWriter) {
-            try {
-                mOutWriter.close();
-                mOutWriter = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public void close() {
+        closeStreamWriter(mInWriter);
+        closeStreamWriter(mOutWriter);
+        mInWriter = null;
+        mOutWriter = null;
     }
 }
 

@@ -29,7 +29,7 @@ public class ProtocolHandler {
     private HandlerThread mProtocolThread;
     private ProtocolParseHandler mHandler;
     public static final int MESSAGE_PROTOCOL_PARSE = 1;
-    private DataLog mDataProxy;
+    private DataLog mDataLog;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
                            TouchScreenListener touchListener) {
@@ -50,7 +50,7 @@ public class ProtocolHandler {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
         mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
-        mDataProxy = new DataLog();
+        mDataLog =DataLog.getInstance();
     }
 
     public void sendMessage(int what, Object obj) {
@@ -71,7 +71,7 @@ public class ProtocolHandler {
 
     public void stop() {
         mProtocolThread.quit();
-        mDataProxy.close();
+        mDataLog.close();
     }
 
     private static class ProtocolParseHandler extends Handler {
@@ -105,7 +105,7 @@ public class ProtocolHandler {
             ConnectService service = handler.mService;
             TouchScreenListener touchListener = handler.mTouchListener;
 
-            handler.mDataProxy.writeInData(data);
+            handler.mDataLog.writeInData(data);
             if (handler.mDataReceive != null) {
                 handler.mDataReceive.onReceive(data);
             }
@@ -118,7 +118,7 @@ public class ProtocolHandler {
                     }
                     break;
                 case BTProtocol.STATUS_GET_DATA:
-                    handler.mDataProxy.writeOutData(data);
+                    handler.mDataLog.writeOutData(data);
                     TouchScreen touchScreen = protocol.getTouchScreen();
                     if (touchScreen.mTouchDownList.size() > 0) {
                         touchListener.onTouchDown(touchScreen.mTouchDownList);

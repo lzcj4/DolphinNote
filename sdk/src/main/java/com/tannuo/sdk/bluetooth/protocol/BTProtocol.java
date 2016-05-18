@@ -208,6 +208,29 @@ public class BTProtocol implements Protocol {
             return null;
     }
 
+    byte[] lastContinueBytes = new byte[0];
+
+    private byte[] combineBytes(byte[] data1, byte[] data2) {
+        byte[] result = new byte[0];
+        if (null == data1 && null == data2) {
+            return result;
+        }
+        if (null == data2) {
+            result = data1;
+        }
+
+        if (null == data1) {
+            result = data2;
+        }
+
+        if (null != data1 && null != data2) {
+            result = new byte[data1.length + data2.length];
+            System.arraycopy(data1, 0, result, 0, data1.length);
+            System.arraycopy(data2, 0, result, data1.length, data2.length);
+        }
+
+        return result;
+    }
 
     @Override
     public int parse(byte[] data) {
@@ -216,27 +239,37 @@ public class BTProtocol implements Protocol {
         }
         printData(data);
         this.reset();
-        //  68 03 71 11 ED    按下截屏键
+        //  68 0C 02 07 09 F7 35 FE 5E DF 00 B4 00 A1
+        byte[] totalData = combineBytes(lastContinueBytes, data);
+        int len = totalData.length;
 
-        int len = data.length;
+        if (lastContinueBytes.length != 0) {
+            lastContinueBytes = new byte[0];
+        }
         int result = ERROR_NONE;
 
         for (int i = 0; i < len; i++) {
-            byte header = data[i];
+            byte header = totalData[i];
             if (header != PROTOCOL_HEADER) {
                 // errorCode = ERROR_HEADER;
                 Log.e(TAG, "get invalid protocol header ");
                 continue;
+            } else {
+                if (i == totalData.length - 1) {
+                    lastContinueBytes = new byte[]{PROTOCOL_HEADER};
+                    break;
+                }
             }
 
-            mLen = data.length > i + 1 ? data[i + 1] : 0;
             if (mLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
                 Log.e(TAG, "get invalid protocol  data len ");
                 continue;
+            } else {
+                    break;
+                }
             }
 
-            mDataFeature = data.length > i + 2 ? data[i + 2] : 0;
             calcPoints();
             if (!lengthCheck()) {
                 //  errorCode = ERROR_DATA_FEATURE;
@@ -247,16 +280,16 @@ public class BTProtocol implements Protocol {
             int dataLen = getDataLen();
             int dataStartIndex = i + 3;// header+feature+len
             int dataEndIndex = dataStartIndex + dataLen;
-            if (dataLen > 0 && dataEndIndex < data.length) {
-                mDataBuffer = Arrays.copyOfRange(data, dataStartIndex, dataEndIndex);
+            if (dataLen > 0 && dataEndIndex < totalData.length) {
+                mDataBuffer = Arrays.copyOfRange(totalData, dataStartIndex, dataEndIndex);
             } else {
                 // errorCode = ERROR_DATA;
                 Log.e(TAG, "get real data failed ");
                 continue;
             }
 
-            int checksumIndex = i + 1 + mLen;
-            mChecksum = data[checksumIndex];
+            int checksumIndex = i + 1 + mLen;//header+len
+            mChecksum = totalData[checksumIndex];
             if (!checkSum()) {
                 // errorCode = ERROR_CHECKSUM;
                 Log.d(TAG, "checksum invalid");
