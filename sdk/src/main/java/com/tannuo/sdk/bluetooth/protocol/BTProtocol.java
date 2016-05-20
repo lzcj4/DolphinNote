@@ -4,7 +4,12 @@ import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.util.DataUtil;
+import com.tannuo.sdk.util.HexUtil;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -86,7 +91,7 @@ public class BTProtocol implements Protocol {
 //    0x73	        编号	        4字节
 //    示例(Hex)： 68  06  73  00000001  E2  标识码帧
 
-    private byte mLen;
+    private byte mPointLen;
     private byte mDataFeature;
     private byte mChangeDataFeature;
     private byte mUSBCode;
@@ -104,15 +109,15 @@ public class BTProtocol implements Protocol {
         mUSBCode = USB_DISABLED;
 
         mDataBuffer = new byte[256];
-        mLen = 0;
+        mPointLen = 0;
         mPoints = 0;
     }
 
     private int getDataLen() {
-        if (mLen < FEATURE_CHECKSUM_LEN) {
+        if (mPointLen < FEATURE_CHECKSUM_LEN) {
             throw new IllegalArgumentException("Protocol len must bigger than feature and checksum len");
         }
-        int result = mLen - FEATURE_CHECKSUM_LEN;
+        int result = mPointLen - FEATURE_CHECKSUM_LEN;
         return result;
     }
 
@@ -159,13 +164,13 @@ public class BTProtocol implements Protocol {
                 len = -1;
                 break;
         }
-        boolean result = len == mLen;
+        boolean result = len == mPointLen;
         return result;
     }
 
     private boolean checkSum() {
         int len = getDataLen();
-        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mLen);
+        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mPointLen);
         for (int i = 0; i < len; i++) {
             sum += mDataBuffer[i];
         }
@@ -173,7 +178,7 @@ public class BTProtocol implements Protocol {
     }
 
     void reset() {
-        mLen = 0;
+        mPointLen = 0;
         mDataFeature = 0;
         mChecksum = 0;
         mPoints = 0;
@@ -232,11 +237,61 @@ public class BTProtocol implements Protocol {
         return result;
     }
 
+    FileWriter mInWriter, mOutWriter;
+
+    public void createFileWriter() {
+        mInWriter = createFileWriter("d:/in.text");
+        mOutWriter = createFileWriter("d:/out.text");
+    }
+
+    public void closeWriter() {
+        if (null != mInWriter) {
+            try {
+                mInWriter.flush();
+                mInWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (null != mOutWriter) {
+            try {
+                mOutWriter.flush();
+                mOutWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private FileWriter createFileWriter(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            file.createNewFile();
+            FileWriter writer = new FileWriter(file);
+            return writer;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public int parse(byte[] data) {
         if (null == data || data.length == 0) {
             throw new IllegalArgumentException();
         }
+        String hexStr = HexUtil.byteToString(TAG, data);
+        try {
+            mInWriter.write(hexStr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         printData(data);
         this.reset();
         //  68 0C 02 07 09 F7 35 FE 5E DF 00 B4 00 A1
@@ -247,12 +302,13 @@ public class BTProtocol implements Protocol {
             lastContinueBytes = new byte[0];
         }
         int result = ERROR_NONE;
-
+        ArrayList<Byte> validData = new ArrayList<>();
         for (int i = 0; i < len; i++) {
             byte header = totalData[i];
+            validData.add(header);
             if (header != PROTOCOL_HEADER) {
                 // errorCode = ERROR_HEADER;
-                Log.e(TAG, "get invalid protocol header ");
+                //Log.e(TAG, "get invalid protocol header ");
                 continue;
             } else {
                 if (i == totalData.length - 1) {
@@ -261,19 +317,21 @@ public class BTProtocol implements Protocol {
                 }
             }
 
-            mLen = len > i + 1 ? totalData[i + 1] : 0;
-            if (mLen < FEATURE_CHECKSUM_LEN) {
+            mPointLen = len > i + 1 ? totalData[i + 1] : 0;
+            validData.add(totalData[i + 1]);
+            if (mPointLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
                 Log.e(TAG, "get invalid protocol  data len ");
                 continue;
             } else {
-                if (i + mLen >= len) {
+                if (i + 1 + mPointLen >= len) {
                     lastContinueBytes = Arrays.copyOfRange(totalData, i, len);
                     break;
                 }
             }
 
             mDataFeature = len > i + 2 ? totalData[i + 2] : 0;
+            validData.add(totalData[i + 2]);
             calcPoints();
             if (!lengthCheck()) {
                 //  errorCode = ERROR_DATA_FEATURE;
@@ -284,23 +342,35 @@ public class BTProtocol implements Protocol {
             int dataLen = getDataLen();
             int dataStartIndex = i + 3;// header+feature+len
             int dataEndIndex = dataStartIndex + dataLen;
-            if (dataLen > 0 && dataEndIndex < totalData.length) {
+            if (dataLen >= 0 && dataEndIndex < totalData.length) {
                 mDataBuffer = Arrays.copyOfRange(totalData, dataStartIndex, dataEndIndex);
+                for (byte b : mDataBuffer) {
+                    validData.add(b);
+                }
             } else {
                 // errorCode = ERROR_DATA;
                 Log.e(TAG, "get real data failed ");
                 continue;
             }
 
-            int checksumIndex = i + 1 + mLen;//header+len
+            int checksumIndex = i + 1 + mPointLen;//header+len
             mChecksum = totalData[checksumIndex];
+            validData.add(mChecksum);
             if (!checkSum()) {
                 // errorCode = ERROR_CHECKSUM;
                 Log.d(TAG, "checksum invalid");
                 continue;
             }
-
-            result = setScreenData();
+            hexStr = HexUtil.byteToString(TAG, validData);
+            try {
+                mOutWriter.write(hexStr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            validData.clear();
+            if (mDataBuffer.length > 0) {
+                result = setScreenData();
+            }
             i = checksumIndex;
         }
         return result;
@@ -316,7 +386,7 @@ public class BTProtocol implements Protocol {
         for (byte b : data) {
             sb.append(String.format("%02X ", b));
         }
-        Log.d(TAG, String.format("received data:%s", sb.toString()));
+        //Log.d(TAG, String.format("received data:%s", sb.toString()));
         // }
     }
 

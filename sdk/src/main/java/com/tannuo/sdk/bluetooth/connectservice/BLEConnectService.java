@@ -66,10 +66,8 @@ public class BLEConnectService extends ConnectServiceBase {
     }
 
     @Override
-    public int connect(String devName, String devAddr, String pwd) {
+    public int connect(String devName) {
         mDeviceName = devName;
-        mDeviceAddr = devAddr;
-        mDevicePassword = pwd;
         getBluetoothAdapter();
         if (null == mBTAdapter || !mBTAdapter.isEnabled()) {
             mTouchListener.onError(BL_ERROR_NOT_ENABLE);
@@ -161,8 +159,7 @@ public class BLEConnectService extends ConnectServiceBase {
             Log.d(TAG, String.format("BLE device scanned, name:%s , addr:%s", device.getName(), device.getAddress()));
             String name = device.getName();
             String addr = device.getAddress();
-            if ((!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) ||
-                    ((!TextUtils.isEmpty(mDeviceAddr) && !TextUtils.isEmpty(addr) && addr.equalsIgnoreCase(mDeviceAddr)))) {
+            if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
                 mDevice = device;
                 stopLeScan(mLeScanCallback);
                 connectGatt(device);

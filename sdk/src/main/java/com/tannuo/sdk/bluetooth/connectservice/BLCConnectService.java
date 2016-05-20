@@ -39,7 +39,7 @@ public class BLCConnectService extends ConnectServiceBase {
     }
 
     @Override
-    public int connect(String devName, String devAddr, String pwd) {
+    public int connect(String devName) {
         // Get the local Bluetooth adapter
         mBTAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBTAdapter.isEnabled()) {
@@ -48,8 +48,6 @@ public class BLCConnectService extends ConnectServiceBase {
         }
 
         mDeviceName = devName;
-        mDeviceAddr = devAddr;
-        mDevicePassword = pwd;
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -277,21 +275,12 @@ public class BLCConnectService extends ConnectServiceBase {
 
                 String name = device.getName();
                 String addr = device.getAddress();
-                if ((!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) ||
-                        ((!TextUtils.isEmpty(mDeviceAddr) && !TextUtils.isEmpty(addr) && addr.equalsIgnoreCase(mDeviceAddr)))) {
-                    if (TextUtils.isEmpty(mDeviceAddr)) {
-                        mDeviceAddr = device.getAddress();
-                    }
-
-                    if (TextUtils.isEmpty(mDeviceName)) {
-                        mDeviceName = device.getName();
-                    }
-
+                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
                     mDevice = device;
                     cancelDiscovery();
                     connect(device, true);
                     mContext.unregisterReceiver(mReceiver);
-                    Log.v(TAG, String.format("Discovery BLC device:%s , mac addr:%s", mDeviceName, mDeviceAddr));
+                    Log.v(TAG, String.format("Discovery BLC device:%s ", mDeviceName));
                 }
 
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
@@ -300,7 +289,6 @@ public class BLCConnectService extends ConnectServiceBase {
                     mTouchListener.onError(BL_ERROR_DEV_NOT_FOUND);
                 }
                 mDevice = null;
-                mDeviceAddr = null;
                 mContext.unregisterReceiver(mReceiver);
                 Log.v(TAG, String.format("Discovery BLC finished"));
             }

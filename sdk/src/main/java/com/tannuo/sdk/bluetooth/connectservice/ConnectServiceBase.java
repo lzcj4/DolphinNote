@@ -29,8 +29,6 @@ public abstract class ConnectServiceBase implements ConnectService {
     protected static final int BL_ERROR_NOT_ENABLE = 4;
 
     protected String mDeviceName = null;
-    protected String mDeviceAddr = null;
-    protected String mDevicePassword = null;
 
     protected TouchScreenListener mTouchListener;
     protected Context mContext;
@@ -48,7 +46,7 @@ public abstract class ConnectServiceBase implements ConnectService {
         mTouchListener = touchListener;
     }
 
-    public abstract int connect(String deviceName, String deviceAddr, String pwd);
+    public abstract int connect(String deviceName);
 
     public abstract int disconnect();
 
