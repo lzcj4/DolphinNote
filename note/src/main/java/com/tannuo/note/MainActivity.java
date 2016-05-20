@@ -20,7 +20,6 @@ import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
-import com.tannuo.sdk.bluetooth.connectservice.PQConnectService;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 import com.tannuo.sdk.util.DataLog;
 
@@ -71,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
                 imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
             });
         }
-
-        PQConnectService pqConnect = new PQConnectService();
-        pqConnect.connect(null);
     }
 
     private void testMetric() {

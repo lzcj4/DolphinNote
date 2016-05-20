@@ -33,7 +33,7 @@
         jar="D:\Projects\DolphinNote\note\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
         jumboMode="true"
         revision="23.0.3"
-        sha1="bf2b08ca1a48020eaff2341c3c3df7974dfe978c">
+        sha1="eb70c8729300d48dbdf3b53683c460dda9e1b59a">
         <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\instant-run_8207f01775e0c7f5103e8e57bfb64b0589dfa43c.jar" />
     </item>
     <item
@@ -72,6 +72,13 @@
         <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.3.0_515efaab6099d1da132cfec01787c5fde751a863.jar" />
     </item>
     <item
+        jar="D:\Projects\DolphinNote\note\build\intermediates\exploded-aar\DolphinNote\sdk\unspecified\jars\libs\dom4j-1.6.1.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="b8ceda82e926c45cc92d76a191767fc65cdef657">
+        <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\dom4j-1.6.1_969c011ed5fcf1dc96f0837351fe1eaba7b4d1be.jar" />
+    </item>
+    <item
         jar="C:\Users\Nick_PC\.gradle\caches\modules-2\files-2.1\com.jakewharton\butterknife\7.0.1\d5d13ea991eab0252e3710e5df3d6a9d4b21d461\butterknife-7.0.1.jar"
         jumboMode="true"
         revision="23.0.3"
@@ -82,7 +89,7 @@
         jar="D:\Projects\DolphinNote\note\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
         jumboMode="true"
         revision="23.0.3"
-        sha1="727e692014f7ec85844420ced1414fe423bd272d">
+        sha1="29348c6647bd3aa1523ba5d4a238fc5a64244e63">
         <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\instant-run-bootstrap_80591f675429732d39ed48c272d9c5a027f41c4a.jar" />
     </item>
     <item
@@ -119,6 +126,13 @@
         revision="23.0.3"
         sha1="4da5a4d697d32497c6f85567a5112e62fdfd0676">
         <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\internal_impl-23.3.0_72c8607e1a65f84fe8cdbe2509e5d76ac0cd83fe.jar" />
+    </item>
+    <item
+        jar="D:\Projects\DolphinNote\note\build\intermediates\exploded-aar\DolphinNote\sdk\unspecified\jars\libs\PQMTClientJava.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="a5af7fd94178b9de7c10b1501d42710c401b326e">
+        <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\PQMTClientJava_16caa05adc94e320796b1b326fc0dc63d33174f6.jar" />
     </item>
     <item
         jar="C:\Users\Nick_PC\.gradle\caches\modules-2\files-2.1\com.squareup.retrofit2\converter-gson\2.0.2\f8d87f15b94b8d74e7ccf61d7eedb558811cdb30\converter-gson-2.0.2.jar"
