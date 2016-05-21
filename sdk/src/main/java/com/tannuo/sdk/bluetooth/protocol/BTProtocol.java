@@ -91,16 +91,16 @@ public class BTProtocol implements Protocol {
 //    0x73	        编号	        4字节
 //    示例(Hex)： 68  06  73  00000001  E2  标识码帧
 
-    private byte mPointLen;
+    private int mPointLen;
     private byte mDataFeature;
     private byte mChangeDataFeature;
     private byte mUSBCode;
 
-    private byte mChecksum;
+    private int mChecksum;
     private int mPoints = 1;
     private TouchScreen mTouchScreen;
 
-    public byte[] mDataBuffer;
+    private int[] mDataBuffer;
 
     public BTProtocol(TouchScreen touchScreen) {
         mTouchScreen = touchScreen;
@@ -108,7 +108,7 @@ public class BTProtocol implements Protocol {
         mChangeDataFeature = FEATURE_DATA_5;
         mUSBCode = USB_DISABLED;
 
-        mDataBuffer = new byte[256];
+        mDataBuffer = new int[0];
         mPointLen = 0;
         mPoints = 0;
     }
@@ -170,11 +170,11 @@ public class BTProtocol implements Protocol {
 
     private boolean checkSum() {
         int len = getDataLen();
-        byte sum = (byte) (PROTOCOL_HEADER + mDataFeature + mPointLen);
+        int sum = PROTOCOL_HEADER + mDataFeature + mPointLen;
         for (int i = 0; i < len; i++) {
             sum += mDataBuffer[i];
         }
-        return mChecksum == sum;
+        return mChecksum == (sum & 0xFF);
     }
 
     void reset() {
@@ -286,11 +286,11 @@ public class BTProtocol implements Protocol {
             throw new IllegalArgumentException();
         }
         String hexStr = HexUtil.byteToString(TAG, data);
-        try {
-            mInWriter.write(hexStr);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mInWriter.write(hexStr);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         printData(data);
         this.reset();
@@ -317,7 +317,7 @@ public class BTProtocol implements Protocol {
                 }
             }
 
-            mPointLen = len > i + 1 ? totalData[i + 1] : 0;
+            mPointLen = len > i + 1 ? HexUtil.byteToUnsignedByte(totalData[i + 1]) : 0;
             validData.add(totalData[i + 1]);
             if (mPointLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
@@ -343,9 +343,11 @@ public class BTProtocol implements Protocol {
             int dataStartIndex = i + 3;// header+feature+len
             int dataEndIndex = dataStartIndex + dataLen;
             if (dataLen >= 0 && dataEndIndex < totalData.length) {
-                mDataBuffer = Arrays.copyOfRange(totalData, dataStartIndex, dataEndIndex);
-                for (byte b : mDataBuffer) {
-                    validData.add(b);
+                byte[] tempData = Arrays.copyOfRange(totalData, dataStartIndex, dataEndIndex);
+                mDataBuffer = new int[tempData.length];
+                for (int index = 0; index < tempData.length; index++) {
+                    mDataBuffer[index] = HexUtil.byteToUnsignedByte(tempData[index]);
+                    validData.add(tempData[index]);
                 }
             } else {
                 // errorCode = ERROR_DATA;
@@ -354,19 +356,19 @@ public class BTProtocol implements Protocol {
             }
 
             int checksumIndex = i + 1 + mPointLen;//header+len
-            mChecksum = totalData[checksumIndex];
-            validData.add(mChecksum);
+            mChecksum = HexUtil.byteToUnsignedByte(totalData[checksumIndex]);
+            validData.add(totalData[checksumIndex]);
             if (!checkSum()) {
                 // errorCode = ERROR_CHECKSUM;
                 Log.d(TAG, "checksum invalid");
                 continue;
             }
             hexStr = HexUtil.byteToString(TAG, validData);
-            try {
-                mOutWriter.write(hexStr);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                mOutWriter.write(hexStr);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             validData.clear();
             if (mDataBuffer.length > 0) {
                 result = setScreenData();

@@ -57,7 +57,7 @@ public class TouchScreen {
     }
 
     //
-    public void setPoint(int pointLen, byte[] buffer) {
+    public void setPoint(int pointLen, int[] buffer) {
         if (pointLen <= 0 || buffer == null || (buffer.length % 10) != 0) {
             throw new IllegalArgumentException("point length or data invalid");
         }
@@ -89,7 +89,7 @@ public class TouchScreen {
     }
 
     //
-    public void setIrTouchFeature(byte[] dataBuffer) {
+    public void setIrTouchFeature(int[] dataBuffer) {
         if (null == dataBuffer || dataBuffer.length != 9) {
             throw new IllegalArgumentException("Invalid data");
         }
@@ -149,8 +149,8 @@ public class TouchScreen {
     }
 
     public class TouchPoint {
-        public byte pointId;
-        public byte pointStatus;
+        public int pointId;
+        public int pointStatus;
         public int pointX;
         public int pointY;
         public int pointWidth;

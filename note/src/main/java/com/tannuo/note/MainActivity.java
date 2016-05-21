@@ -22,6 +22,7 @@ import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 import com.tannuo.sdk.util.DataLog;
+import com.tannuo.sdk.util.HexUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -242,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
 
     @Override
     public void onReceive(byte[] data) {
-        String str = getDataStr(data);
+        String str = HexUtil.byteToString(data) + "\r\n";
         rowIndex++;
         byteCount += data.length;
 
@@ -296,19 +297,5 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
             timeCounter = 0;
         }
         isStarted = false;
-    }
-
-    private String getDataStr(byte[] data) {
-        if (null == data || data.length == 0) {
-            return null;
-        }
-
-        //if (BuildConfig.DEBUG) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02X ", b));
-        }
-        sb.append("\r\n");
-        return sb.toString();
     }
 }

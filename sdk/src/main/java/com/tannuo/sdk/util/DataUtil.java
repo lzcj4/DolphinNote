@@ -13,7 +13,7 @@ public class DataUtil {
      * @param bytes
      * @return
      */
-    public static int bytesToIntLittleEndian(byte... bytes) {
+    public static int bytesToIntLittleEndian(int... bytes) {
         if (null == bytes || bytes.length == 0) {
             return 0;
         }
