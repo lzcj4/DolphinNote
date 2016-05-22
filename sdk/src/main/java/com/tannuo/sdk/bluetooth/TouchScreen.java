@@ -1,5 +1,7 @@
 package com.tannuo.sdk.bluetooth;
 
+import android.util.SparseArray;
+
 import com.tannuo.sdk.util.DataUtil;
 
 import java.util.ArrayList;
@@ -61,6 +63,9 @@ public class TouchScreen {
         if (pointLen <= 0 || buffer == null || (buffer.length % 10) != 0) {
             throw new IllegalArgumentException("point length or data invalid");
         }
+        SparseArray<TouchPoint> downMap = new SparseArray<>();
+        SparseArray<TouchPoint> upMap = new SparseArray<>();
+
         for (int i = 0; i < pointLen; i++) {
             int pos = i * 10;
             TouchPoint point = new TouchPoint();
@@ -77,14 +82,27 @@ public class TouchScreen {
                 point.pointColor = POINT_RED;
             } else if (area >= mRedMax) {
                 point.pointColor = POINT_WHITE;
-            } else
+            } else {
                 point.pointColor = POINT_BLACK;
+            }
 
-            ///TODO Point move ??
-            if (point.pointStatus == POINT_STATUS_DOWN)
-                mTouchDownList.add(point);
-            else
-                mTouchUpList.add(point);
+            if (point.pointStatus == POINT_STATUS_DOWN) {
+                downMap.put(point.pointId, point);
+            } else {
+                upMap.put(point.pointId, point);
+            }
+        }
+
+        if (downMap.size() > 0) {
+            for (int i = 0; i < downMap.size(); i++) {
+                mTouchDownList.add(downMap.valueAt(i));
+            }
+        }
+
+        if (upMap.size() > 0) {
+            for (int i = 0; i < upMap.size(); i++) {
+                mTouchUpList.add(upMap.valueAt(i));
+            }
         }
     }
 

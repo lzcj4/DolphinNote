@@ -36,6 +36,7 @@ public class MockConnectService implements ConnectService {
             super.onTouchUp(upPoints);
         }
     };
+
     private final TouchScreen mTouchScreen;
     private final TouchListener mTouchListener;
 
@@ -104,10 +105,7 @@ public class MockConnectService implements ConnectService {
         result.Mode = touchMode;
         List<TouchPoint> list = new ArrayList<>();
         for (TouchScreen.TouchPoint item : mTouchScreen.mTouchDownList) {
-            TouchPoint p = new TouchPoint(item.pointX,item.pointY);
-            p.Width = item.pointWidth;
-            p.Height = item.pointHeight;
-            p.Color = item.pointColor;
+            TouchPoint p = new TouchPoint(item);
             list.add(p);
         }
         result.Points = list;

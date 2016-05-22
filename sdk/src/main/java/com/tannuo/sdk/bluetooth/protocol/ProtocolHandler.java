@@ -50,7 +50,7 @@ public class ProtocolHandler {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
         mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
-        mDataLog =DataLog.getInstance();
+        mDataLog = DataLog.getInstance();
     }
 
     public void sendMessage(int what, Object obj) {
@@ -75,11 +75,11 @@ public class ProtocolHandler {
     }
 
     private static class ProtocolParseHandler extends Handler {
-        private WeakReference<ProtocolHandler> wrProtocolHanlder;
+        private WeakReference<ProtocolHandler> wrProtocolHandler;
 
         public ProtocolParseHandler(Looper looper, ProtocolHandler protocolHandler) {
             super(looper);
-            wrProtocolHanlder = new WeakReference<>(protocolHandler);
+            wrProtocolHandler = new WeakReference<>(protocolHandler);
         }
 
         public void handleMessage(Message msg) {
@@ -97,10 +97,10 @@ public class ProtocolHandler {
         }
 
         private void parse(byte[] data) {
-            if (null == data || data.length == 0 || wrProtocolHanlder.get() == null) {
+            if (null == data || data.length == 0 || wrProtocolHandler.get() == null) {
                 return;
             }
-            ProtocolHandler handler = wrProtocolHanlder.get();
+            ProtocolHandler handler = wrProtocolHandler.get();
             Protocol protocol = handler.mProtocol;
             ConnectService service = handler.mService;
             TouchScreenListener touchListener = handler.mTouchListener;
