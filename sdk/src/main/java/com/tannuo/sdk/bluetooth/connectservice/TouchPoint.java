@@ -52,13 +52,16 @@ public class TouchPoint {
 
     /**
      * Get scale X
+     *
      * @return
      */
     public float getX() {
         return getScaleX(this.x);
     }
+
     /**
      * Get scale Y
+     *
      * @return
      */
     public float getY() {
@@ -111,6 +114,20 @@ public class TouchPoint {
         return distance;
     }
 
+    public boolean isLongDistance(TouchPoint point) {
+        return distance(point) > 50;
+    }
+
+    private int rubberMaxSize = 2812 * 4993;  //80mm / 932mm * 32767,  80mm / 525mm * 32767
+    private int rubberMinSize = 1406 * 2496;  //40mm / 932mm * 32767,  40mm / 525mm * 32767
+    private int penMaxSize = 360 * 630;      //10mm / 932mm * 32767,  10mm / 525mm * 32767
+    private int penMinSize = 144 * 252;      //4mm / 932mm * 32767,  4mm / 525mm * 32767
+    private float penWidth = 4;               //pixel
+
+    public boolean isRubber() {
+        return getArea() >= rubberMinSize && getArea() <= rubberMaxSize || getArea() > rubberMaxSize;
+    }
+
     private static int canvasWidth, canvasHeight;
 
     public static void setCanvas(int width, int height) {
@@ -118,12 +135,12 @@ public class TouchPoint {
         canvasHeight = height;
     }
 
-    private static float getScaleX(int x) {
+    public static float getScaleX(int x) {
         float result = x / MAX_X * canvasWidth;
         return result;
     }
 
-    private static float getScaleY(int y) {
+    public static float getScaleY(int y) {
         float result = y / MAX_Y * canvasWidth;
         return result;
     }
