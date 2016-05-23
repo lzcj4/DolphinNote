@@ -45,7 +45,7 @@ public class DrawFragment extends Fragment {
     private Bitmap mBitmap;
     private ConnectService mConnectService;
     private Canvas mBmpCanvas;
-    private Paint mLinePaint, mBmpPaint;
+    private Paint mLinePaint, mBmpPaint, mRubberPaint;
     private int mPaintWidth, mPaintHeight;
     private float mWidthRatio, mHeightRatio;
 
@@ -80,23 +80,13 @@ public class DrawFragment extends Fragment {
 //            }
 //        });
 
-        mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mLinePaint.setStrokeWidth(STROKE_WIDTH);
-        // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-        mLinePaint.setStyle(Paint.Style.STROKE);
-        mLinePaint.setPathEffect(new CornerPathEffect(5));
-        mLinePaint.setColor(Color.WHITE);
-        //  mLinePaint.setDither(true);
-        mLinePaint.setStrokeJoin(Paint.Join.ROUND);
-        mLinePaint.setStrokeCap(Paint.Cap.ROUND);
+        mLinePaint = initialBrush();
 
-        mBmpPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBmpPaint.setStrokeWidth(STROKE_WIDTH);
-        //mBmpPaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-        mBmpPaint.setStyle(Paint.Style.STROKE);
-        mBmpPaint.setPathEffect(new CornerPathEffect(5));
-        mBmpPaint.setColor(Color.WHITE);
+        mBmpPaint = initialBrush();
         mBmpPaint.setAlpha(100);
+        mRubberPaint = initialBrush();
+        mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mRubberPaint.setColor(Color.BLACK);
 
         surfaceView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -113,6 +103,19 @@ public class DrawFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private Paint initialBrush() {
+        Paint result = new Paint(Paint.ANTI_ALIAS_FLAG);
+        result.setStrokeWidth(STROKE_WIDTH);
+        // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        result.setStyle(Paint.Style.STROKE);
+        result.setPathEffect(new CornerPathEffect(5));
+        result.setColor(Color.WHITE);
+        //  mLinePaint.setDither(true);
+        result.setStrokeJoin(Paint.Join.ROUND);
+        result.setStrokeCap(Paint.Cap.ROUND);
+        return result;
     }
 
     private void setPaintWidthAndHeight(int width, int height) {
@@ -229,36 +232,33 @@ public class DrawFragment extends Fragment {
     }
 
     private void drawLine(List<TouchPoint> points) {
-        Path path = new Path();
         if (lastPoint == null) {
             lastPoint = points.get(0);
         }
+        Path path = new Path();
         path.moveTo(lastPoint.getX(), lastPoint.getY());
-        boolean isFirst = true;
         int len = points.size();
 
         for (int i = 0; i < len; i++) {
             TouchPoint p = points.get(i);
             mLinePaint.setStrokeWidth(getPaintWidth(p));
-            double distance = p.distance(lastPoint);
-            if (distance > 50) {
-                Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s", lastPoint.getID(), p.getID(), distance));
+
+            if (p.isLongDistance(lastPoint)) {
+                Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
+                        lastPoint.getID(), p.getID(), p.distance(lastPoint)));
                 lastPoint = p;
-                mBmpCanvas.drawPoint(p.getX(), p.getY(), mLinePaint);
                 path.moveTo(p.getX(), p.getY());
                 continue;
             }
 
-            if (isFirst) {
-                path.lineTo(p.getX(), p.getY());
-                isFirst = false;
-            } else {
-                float cx = (lastPoint.getX() + p.getX()) / 2;
-                float cy = (lastPoint.getY() + p.getY()) / 2;
-                //path.quadTo(cx, cy, p.getX(), p.getY());
-                path.lineTo(p.getX(), p.getY());
-                path.moveTo(p.getX(), p.getY());
+            if (drawRubber(p)) {
+                continue;
             }
+//
+//            float cx = (lastPoint.getX() + p.getX()) / 2;
+//            float cy = (lastPoint.getY() + p.getY()) / 2;
+//            path.quadTo(cx, cy, p.getX(), p.getY());
+            path.lineTo(p.getX(), p.getY());
             lastPoint = p;
         }
 
@@ -268,11 +268,22 @@ public class DrawFragment extends Fragment {
         mSurfaceHolder.unlockCanvasAndPost(canvas);
     }
 
+    private boolean drawRubber(TouchPoint p) {
+        boolean result = false;
+        if (p.isRubber()) {
+            mBmpCanvas.drawCircle(p.getX(), p.getY(),
+                    TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4, mRubberPaint);
+            result = true;
+        }
+        return result;
+    }
+
     private void drawBitmap(Canvas canvas) {
         canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
     }
 
     int maxArea = 0;
+
     private float getPaintWidth(TouchPoint newPoint) {
         if (maxArea <= 0 && lastPoint != null) {
             maxArea = lastPoint.getArea();
