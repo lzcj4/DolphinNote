@@ -63,11 +63,11 @@ public class DrawFragment extends Fragment {
         mockConnectService = new MockConnectService(mTouchListener);
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mLinePaint.setStrokeWidth(PAINT_WIDTH);
-       // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         mLinePaint.setStyle(Paint.Style.STROKE);
         mLinePaint.setPathEffect(new CornerPathEffect(5));
         mLinePaint.setColor(Color.WHITE);
-      //  mLinePaint.setDither(true);
+        //  mLinePaint.setDither(true);
         mLinePaint.setStrokeJoin(Paint.Join.ROUND);
         mLinePaint.setStrokeCap(Paint.Cap.ROUND);
 
