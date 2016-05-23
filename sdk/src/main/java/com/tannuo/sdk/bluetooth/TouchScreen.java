@@ -3,6 +3,7 @@ package com.tannuo.sdk.bluetooth;
 import android.util.SparseArray;
 
 import com.tannuo.sdk.util.DataUtil;
+import com.tannuo.sdk.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 
 public class TouchScreen {
+    private final String TAG = this.getClass().getSimpleName();
     public static final int PAINTMODE_DOT_1 = 0;
     public static final int PAINTMODE_DOT_2 = 1;
     public static final int PAINTMODE_LINE_1 = 2;
@@ -58,7 +60,6 @@ public class TouchScreen {
         mTouchMoveList.clear();
     }
 
-    //
     public void setPoint(int pointLen, int[] buffer) {
         if (pointLen <= 0 || buffer == null || (buffer.length % 10) != 0) {
             throw new IllegalArgumentException("point length or data invalid");
@@ -76,7 +77,6 @@ public class TouchScreen {
             point.pointWidth = DataUtil.bytesToIntLittleEndian(buffer[pos + 6], buffer[pos + 7]);
             point.pointHeight = DataUtil.bytesToIntLittleEndian(buffer[pos + 8], buffer[pos + 9]);
             point.pointArea = point.pointWidth * point.pointHeight;
-
             float area = point.pointArea;
             if ((area > mRedMin) && (area < mRedMax)) {
                 point.pointColor = POINT_RED;
@@ -86,6 +86,7 @@ public class TouchScreen {
                 point.pointColor = POINT_BLACK;
             }
 
+            Logger.i(TAG, point.toString());
             if (point.pointStatus == POINT_STATUS_DOWN) {
                 downMap.put(point.pointId, point);
             } else {
@@ -175,6 +176,13 @@ public class TouchScreen {
         public int pointHeight;
         public int pointArea;
         public byte pointColor;
+
+
+        @Override
+        public String toString() {
+            return String.format("id:%s, x:%s, y:%s,  width:%s ,height:%s",
+                    pointId, pointX, pointY, pointWidth, pointHeight);
+        }
     }
 
 

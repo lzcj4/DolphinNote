@@ -42,10 +42,25 @@ public class TouchPoint {
         return width * height;
     }
 
+    public int getRawX() {
+        return x;
+    }
+
+    public int getRawY() {
+        return y;
+    }
+
+    /**
+     * Get scale X
+     * @return
+     */
     public float getX() {
         return getScaleX(this.x);
     }
-
+    /**
+     * Get scale Y
+     * @return
+     */
     public float getY() {
         return getScaleY(this.y);
     }

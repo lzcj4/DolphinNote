@@ -18,6 +18,7 @@
     </layouts>
   </component>
   <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="INFO" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
@@ -28,11 +29,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" afterPath="$PROJECT_DIR$/build/intermediates/dex-cache/cache.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/note/note.iml" afterPath="$PROJECT_DIR$/note/note.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java" afterPath="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/note/src/main/res/layout/fragment_draw.xml" afterPath="$PROJECT_DIR$/note/src/main/res/layout/fragment_draw.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/sdk.iml" afterPath="$PROJECT_DIR$/sdk/sdk.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/TouchPoint.java" afterPath="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/TouchPoint.java" />
     </list>
     <ignored path="DolphinNote.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -72,56 +72,73 @@
     <favorites_list name="DolphinNote" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6160305">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="DrawFragment.java" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.55774647">
-                  <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#4501#4502#0" expanded="true" />
-                    <element signature="e#4534#4535#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="MockConnectService.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/MockConnectService.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file leaf-file-name="DrawView.java" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawView.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="7.684507">
-                  <caret line="141" column="24" selection-start-line="141" selection-start-column="24" selection-end-line="141" selection-end-column="24" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                    <element signature="e#5131#5132#0" expanded="true" />
-                    <element signature="e#5177#5178#0" expanded="true" />
-                    <element signature="method#draw#0;class#DrawView#0" expanded="false" />
-                    <element signature="method#getPt#0;class#DrawView#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="DrawFragment.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="260" column="13" selection-start-line="260" selection-start-column="13" selection-end-line="260" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fragment_draw.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/note/src/main/res/layout/fragment_draw.xml">
+          <provider editor-type-id="android-designer">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-5.4098363">
+              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="54" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProtocolHandler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="100" column="23" selection-start-line="100" selection-start-column="23" selection-end-line="100" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TouchScreen.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MessageQueue.java" pinned="false" current-in-tab="false">
+        <entry file="file://D:/sdk/sources/android-23/android/os/MessageQueue.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DrawView.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawView.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-3.128">
+              <caret line="147" column="43" selection-start-line="147" selection-start-column="43" selection-end-line="147" selection-end-column="43" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -2693,13 +2710,14 @@
         <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/TouchPath.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/MockConnectService.java" />
-        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java" />
         <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/Logger.java" />
-        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/TouchPoint.java" />
         <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/Point.java" />
         <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawView.java" />
         <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/ZoomSurfaceView.java" />
+        <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/Smooth.java" />
+        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/TouchPoint.java" />
         <option value="$PROJECT_DIR$/note/src/main/res/layout/fragment_draw.xml" />
+        <option value="$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java" />
         <option value="$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java" />
       </list>
     </option>
@@ -2854,16 +2872,16 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
+      <pane id="ProjectPane" />
       <pane id="Scope" />
       <pane id="PackagesPane" />
-      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="SearchEverywhereHistoryKey" value="touchs&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java&#10;hex&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/util/HexUtil.java&#10;test&#9;PSI&#9;JAVA://com.tannuo.sdk.ProtocolParseTest&#10;bc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java&#10;moc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/MockConnectService.java&#10;blc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java&#10;pro&#9;FILE&#9;file://E:/GitHub/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" />
+    <property name="SearchEverywhereHistoryKey" value="blc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java&#10;moc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/MockConnectService.java&#10;touchs&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java&#10;hex&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/util/HexUtil.java&#10;test&#9;PSI&#9;JAVA://com.tannuo.sdk.ProtocolParseTest&#10;bc&#9;FILE&#9;file://D:/Projects/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java&#10;pro&#9;FILE&#9;file://E:/GitHub/DolphinNote/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java" />
     <property name="device.picker.selection" value="1e87042b" />
     <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHub/PortableGit_d76a6a98c9315931ec4927243517bc09e9b731a0/cmd/git.exe" />
     <property name="ToolWindowVersion Control.ShowToolbar" value="false" />
@@ -2877,6 +2895,7 @@
       <recent name="com.tannuo.note" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Projects\DolphinNote\note\src\main\java\com\tannuo\note\whiteboard" />
       <recent name="D:\Projects\DolphinNote\sdk\src\main\java\com\tannuo\sdk\bluetooth\connectservice" />
     </key>
   </component>
@@ -3221,7 +3240,7 @@
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5470086" sideWeight="0.53025717" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34358975" sideWeight="0.680916" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30940172" sideWeight="0.5740458" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1740458" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.32991454" sideWeight="0.4969743" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41367522" sideWeight="0.47125566" order="2" side_tool="false" content_ui="tabs" />
@@ -3230,19 +3249,19 @@
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22824427" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22824427" sideWeight="0.4929006" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32820514" sideWeight="0.49092284" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34358975" sideWeight="0.31908396" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22824427" sideWeight="0.5070994" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30940172" sideWeight="0.4259542" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32820514" sideWeight="0.49092284" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -3264,80 +3283,39 @@
           <line>69</line>
           <properties />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
+        <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/MainActivity.java</url>
           <line>95</line>
           <properties />
           <option name="timeStamp" value="56" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
+        <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/ServerAPI.java</url>
           <line>28</line>
           <properties />
           <option name="timeStamp" value="58" />
         </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java</url>
+          <line>164</line>
+          <properties />
+          <option name="timeStamp" value="102" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java</url>
+          <line>277</line>
+          <properties />
+          <option name="timeStamp" value="106" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="101" />
+      <option name="time" value="107" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="9" column="66" selection-start-line="9" selection-start-column="66" selection-end-line="9" selection-end-column="66" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/res/layout/content_main.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="120" column="34" selection-start-line="120" selection-start-column="25" selection-end-line="120" selection-end-column="34" />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/res/layout/activity_white_board.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#4501#4502#0" expanded="true" />
-            <element signature="e#4534#4535#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.19784173">
-          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreenListenerImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.9388489">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="android-dummy://D:/Projects/DolphinNote//Theme Editor">
       <provider selected="true" editor-type-id="themeEditor">
         <state theme-name="AppTheme" module-name="note" proportion="0.67" />
@@ -3389,13 +3367,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.1290324">
           <caret line="3" column="50" selection-start-line="3" selection-start-column="41" selection-end-line="3" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectServiceBase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3327338">
-          <caret line="38" column="30" selection-start-line="38" selection-start-column="30" selection-end-line="38" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -3482,13 +3453,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/HexUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="5" selection-start-line="26" selection-start-column="5" selection-end-line="26" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/sdk/sources/android-23/android/util/Log.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -3517,39 +3481,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="4.4624414">
-          <caret line="227" column="31" selection-start-line="227" selection-start-column="31" selection-end-line="227" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/DataLog.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.3638498">
           <caret line="117" column="16" selection-start-line="117" selection-start-column="16" selection-end-line="117" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/Protocol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/BTProtocol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="402" column="34" selection-start-line="402" selection-start-column="34" selection-end-line="402" selection-end-column="34" />
-          <folding>
-            <element signature="docComment;field#FEATURE_DATA_5#0;class#BTProtocol#0" expanded="false" />
-            <element signature="docComment;field#FEATURE_DATA_6#0;class#BTProtocol#0" expanded="false" />
-            <element signature="docComment;field#FEATURE_DATA_10#0;class#BTProtocol#0" expanded="false" />
-            <element signature="method#combineBytes#0;class#BTProtocol#0" expanded="false" />
-            <element signature="method#closeWriter#0;class#BTProtocol#0" expanded="false" />
-            <element signature="method#createFileWriter#1;class#BTProtocol#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3575,19 +3510,18 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.42616034">
           <caret line="162" column="0" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/note/src/main/res/layout/activity_white_board.xml">
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.65909094">
           <caret line="9" column="51" selection-start-line="9" selection-start-column="51" selection-end-line="9" selection-end-column="51" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/WhiteBoardActivity.java">
@@ -3612,90 +3546,180 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/ZoomSurfaceView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="30" selection-start-line="63" selection-start-column="30" selection-end-line="63" selection-end-column="30" />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreenListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2769784">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectServiceBase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2769784">
+          <caret line="13" column="66" selection-start-line="13" selection-start-column="52" selection-end-line="13" selection-end-column="66" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/BLCConnectService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2643885">
+          <caret line="279" column="38" selection-start-line="279" selection-start-column="38" selection-end-line="279" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/ConnectService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.32754344">
+          <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/Protocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38317758">
+          <caret line="9" column="8" selection-start-line="9" selection-start-column="8" selection-end-line="9" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/TouchPoint.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="118" column="75" selection-start-line="118" selection-start-column="75" selection-end-line="118" selection-end-column="75" />
+        <state vertical-scroll-proportion="0.432243">
+          <caret line="13" column="44" selection-start-line="13" selection-start-column="44" selection-end-line="13" selection-end-column="44" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java">
+    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/Smooth.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="91" column="16" selection-start-line="91" selection-start-column="16" selection-end-line="91" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/Point.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="112" column="31" selection-start-line="112" selection-start-column="31" selection-end-line="112" selection-end-column="31" />
+        <state vertical-scroll-proportion="8.17757">
+          <caret line="163" column="28" selection-start-line="163" selection-start-column="28" selection-end-line="163" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/connectservice/MockConnectService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.5140187">
+          <caret line="102" column="0" selection-start-line="102" selection-start-column="0" selection-end-line="113" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/ZoomSurfaceView.java">
+    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/Point.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="63" column="30" selection-start-line="63" selection-start-column="30" selection-end-line="63" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.48598132">
+          <caret line="31" column="17" selection-start-line="31" selection-start-column="17" selection-end-line="31" selection-end-column="17" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#731#732#0" expanded="true" />
+            <element signature="e#790#791#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/sdk/sources/android-23/android/util/SparseArray.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.13084112">
+          <caret line="216" column="16" selection-start-line="216" selection-start-column="16" selection-end-line="216" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/note/src/main/res/layout/fragment_draw.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.3114755">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
       <provider editor-type-id="android-designer">
         <state />
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="7.684507">
-          <caret line="141" column="24" selection-start-line="141" selection-start-column="24" selection-end-line="141" selection-end-column="24" />
+        <state vertical-scroll-proportion="-5.4098363">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/util/HexUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.31012657">
+          <caret line="37" column="25" selection-start-line="37" selection-start-column="25" selection-end-line="37" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/BTProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.59177214">
+          <caret line="402" column="34" selection-start-line="402" selection-start-column="34" selection-end-line="402" selection-end-column="34" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5131#5132#0" expanded="true" />
-            <element signature="e#5177#5178#0" expanded="true" />
-            <element signature="method#draw#0;class#DrawView#0" expanded="false" />
-            <element signature="method#getPt#0;class#DrawView#0" expanded="false" />
+            <element signature="docComment;field#FEATURE_DATA_5#0;class#BTProtocol#0" expanded="false" />
+            <element signature="docComment;field#FEATURE_DATA_6#0;class#BTProtocol#0" expanded="false" />
+            <element signature="docComment;field#FEATURE_DATA_10#0;class#BTProtocol#0" expanded="false" />
+            <element signature="method#combineBytes#0;class#BTProtocol#0" expanded="false" />
+            <element signature="method#closeWriter#0;class#BTProtocol#0" expanded="false" />
+            <element signature="method#createFileWriter#1;class#BTProtocol#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/protocol/ProtocolHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="100" column="23" selection-start-line="100" selection-start-column="23" selection-end-line="100" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/sdk/sources/android-23/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.42857143">
+          <caret line="464" column="29" selection-start-line="464" selection-start-column="29" selection-end-line="464" selection-end-column="29" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.55774647">
-          <caret line="116" column="0" selection-start-line="116" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="260" column="13" selection-start-line="260" selection-start-column="13" selection-end-line="260" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4501#4502#0" expanded="true" />
-            <element signature="e#4534#4535#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdk/src/main/java/com/tannuo/sdk/bluetooth/TouchScreen.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="95" column="0" selection-start-line="95" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/sdk/sources/android-23/android/os/MessageQueue.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/note/src/main/java/com/tannuo/note/whiteboard/DrawView.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.128">
+          <caret line="147" column="43" selection-start-line="147" selection-start-column="43" selection-end-line="147" selection-end-column="43" />
+          <folding />
         </state>
       </provider>
     </entry>
