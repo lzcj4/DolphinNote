@@ -141,7 +141,7 @@ public class TouchPoint {
     }
 
     public static float getScaleY(int y) {
-        float result = y / MAX_Y * canvasWidth;
+        float result = y / MAX_Y * canvasHeight;
         return result;
     }
 
