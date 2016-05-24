@@ -237,7 +237,8 @@ public class DrawFragment extends Fragment {
             lastPoint = points.get(0);
         }
         Path path = new Path();
-        path.moveTo(lastPoint.getX(), lastPoint.getY());
+        //  path.moveTo(lastPoint.getX(), lastPoint.getY());
+        DrawUtil.getInstance().moveTo(path, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
         int len = points.size();
 
         for (int i = 0; i < len; i++) {
@@ -248,7 +249,8 @@ public class DrawFragment extends Fragment {
                 Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
                         lastPoint.getID(), p.getID(), p.distance(lastPoint)));
                 lastPoint = p;
-                path.moveTo(p.getX(), p.getY());
+                DrawUtil.getInstance().moveTo(path, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+                //path.moveTo(p.getX(), p.getY());
                 continue;
             }
 
@@ -259,7 +261,8 @@ public class DrawFragment extends Fragment {
 //            float cx = (lastPoint.getX() + p.getX()) / 2;
 //            float cy = (lastPoint.getY() + p.getY()) / 2;
 //            path.quadTo(cx, cy, p.getX(), p.getY());
-            path.lineTo(p.getX(), p.getY());
+            // path.lineTo(p.getX(), p.getY());
+            DrawUtil.getInstance().lineTo(path, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
             lastPoint = p;
         }
 
@@ -272,8 +275,10 @@ public class DrawFragment extends Fragment {
     private boolean drawRubber(TouchPoint p) {
         boolean result = false;
         if (p.isRubber()) {
-            mBmpCanvas.drawCircle(p.getX(), p.getY(),
-                    TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4, mRubberPaint);
+//            mBmpCanvas.drawCircle(p.getX(), p.getY(),
+//                    TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4, mRubberPaint);
+            DrawUtil.getInstance().drawCircle(mBmpCanvas, p.getX(), p.getY(), TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4,
+                    mPaintWidth, mPaintHeight, mRubberPaint);
             result = true;
         }
         return result;
