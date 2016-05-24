@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
+import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.os.Build;
 import android.os.Bundle;
@@ -95,7 +96,6 @@ public class DrawFragment extends Fragment {
                 mPaintWidth = surfaceView.getWidth();
                 mPaintHeight = surfaceView.getHeight();
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
-
                 //mBmpCanvas.drawColor(Color.WHITE);
                 mConnectService.connect("HC-05");
                 //}
@@ -122,6 +122,7 @@ public class DrawFragment extends Fragment {
         TouchPoint.setCanvas(width, height);
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mBmpCanvas = new Canvas(mBitmap);
+        mBmpCanvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         mWidthRatio = width / TouchPoint.MAX_X;
         mHeightRatio = height / TouchPoint.MAX_Y;
         lastPointArray[2] = -1;
