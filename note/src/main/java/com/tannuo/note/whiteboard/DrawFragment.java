@@ -110,9 +110,9 @@ public class DrawFragment extends Fragment {
         result.setStrokeWidth(STROKE_WIDTH);
         // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         result.setStyle(Paint.Style.STROKE);
-        result.setPathEffect(new CornerPathEffect(5));
+        result.setPathEffect(new CornerPathEffect(STROKE_WIDTH / 2));
         result.setColor(Color.WHITE);
-        //  mLinePaint.setDither(true);
+        result.setDither(true);
         result.setStrokeJoin(Paint.Join.ROUND);
         result.setStrokeCap(Paint.Cap.ROUND);
         return result;
@@ -232,13 +232,15 @@ public class DrawFragment extends Fragment {
         mSurfaceHolder.unlockCanvasAndPost(canvas);
     }
 
+
+    Path mDrawPath = new Path();
     private void drawLine(List<TouchPoint> points) {
         if (lastPoint == null) {
             lastPoint = points.get(0);
         }
-        Path path = new Path();
-        //  path.moveTo(lastPoint.getX(), lastPoint.getY());
-        DrawUtil.getInstance().moveTo(path, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+
+        //  mDrawPath.moveTo(lastPoint.getX(), lastPoint.getY());
+        DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
         int len = points.size();
 
         for (int i = 0; i < len; i++) {
@@ -249,8 +251,8 @@ public class DrawFragment extends Fragment {
                 Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
                         lastPoint.getID(), p.getID(), p.distance(lastPoint)));
                 lastPoint = p;
-                DrawUtil.getInstance().moveTo(path, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
-                //path.moveTo(p.getX(), p.getY());
+                DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+                //mDrawPath.moveTo(p.getX(), p.getY());
                 continue;
             }
 
@@ -260,13 +262,13 @@ public class DrawFragment extends Fragment {
 //
 //            float cx = (lastPoint.getX() + p.getX()) / 2;
 //            float cy = (lastPoint.getY() + p.getY()) / 2;
-//            path.quadTo(cx, cy, p.getX(), p.getY());
-            // path.lineTo(p.getX(), p.getY());
-            DrawUtil.getInstance().lineTo(path, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
+//            mDrawPath.quadTo(cx, cy, p.getX(), p.getY());
+            // mDrawPath.lineTo(p.getX(), p.getY());
+            DrawUtil.getInstance().lineTo(mDrawPath, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
             lastPoint = p;
         }
-
-        mBmpCanvas.drawPath(path, mLinePaint);
+        mBmpCanvas.drawPath(mDrawPath, mLinePaint);
+        mDrawPath.reset();
         Canvas canvas = mSurfaceHolder.lockCanvas();
         drawBitmap(canvas);
         mSurfaceHolder.unlockCanvasAndPost(canvas);
