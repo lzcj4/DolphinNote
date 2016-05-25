@@ -4,10 +4,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
+import com.tannuo.sdk.util.Logger;
+
 /**
  * Created by Nick_PC on 2016/5/24.
  */
 public class DrawUtil {
+    private final String TAG = this.getClass().getSimpleName();
     final int ROTATE_STEP = 90;
     int rotateDegree = 0;
 
@@ -84,10 +87,12 @@ public class DrawUtil {
     public void moveTo(Path path, float x, float y, int w, int h) {
         Tuple<Float, Float> loc = getXY(x, y, w, h);
         path.moveTo(loc.getItem1(), loc.getItem2());
+        Logger.e(TAG,String.format("/---- move to X:%s , Y:%s",loc.getItem1(),loc.getItem2()));
     }
 
     public void lineTo(Path path, float x, float y, int w, int h) {
         Tuple<Float, Float> loc = getXY(x, y, w, h);
         path.lineTo(loc.getItem1(), loc.getItem2());
+        Logger.e(TAG,String.format("/+++ line to X:%s , Y:%s",loc.getItem1(),loc.getItem2()));
     }
 }
