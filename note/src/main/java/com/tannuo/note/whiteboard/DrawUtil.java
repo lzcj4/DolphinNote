@@ -9,7 +9,7 @@ import android.graphics.Path;
  */
 public class DrawUtil {
     final int ROTATE_STEP = 90;
-    int rotateDegree = 270;
+    int rotateDegree = 0;
 
     public static DrawUtil getInstance() {
         return InstanceHolder.instance;

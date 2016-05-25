@@ -104,7 +104,7 @@ public class MockConnectService implements ConnectService {
         TouchEvent result = new TouchEvent();
         result.Mode = touchMode;
         List<TouchPoint> list = new ArrayList<>();
-        for (TouchScreen.TouchPoint item : mTouchScreen.mTouchDownList) {
+        for (TouchScreen.TouchPoint item : points) {
             TouchPoint p = new TouchPoint(item);
             list.add(p);
         }

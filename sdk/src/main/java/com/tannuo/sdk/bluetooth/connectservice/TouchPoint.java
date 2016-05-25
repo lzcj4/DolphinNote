@@ -24,6 +24,11 @@ public class TouchPoint {
     private byte color;
     private int status;
 
+    public TouchPoint(int x,int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public TouchPoint(TouchScreen.TouchPoint point) {
         this.id = point.pointId;
         this.x = point.pointX;
