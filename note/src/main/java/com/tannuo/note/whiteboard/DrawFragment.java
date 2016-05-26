@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import com.tannuo.note.R;
-import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.connectservice.MockConnectService;
 import com.tannuo.sdk.bluetooth.connectservice.TouchEvent;
@@ -27,7 +26,6 @@ import com.tannuo.sdk.bluetooth.connectservice.TouchListener;
 import com.tannuo.sdk.bluetooth.connectservice.TouchPoint;
 import com.tannuo.sdk.util.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -84,7 +82,6 @@ public class DrawFragment extends Fragment {
         mLinePaint = initialBrush();
 
         mBmpPaint = initialBrush();
-        mBmpPaint.setAlpha(100);
         mRubberPaint = initialBrush();
         mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mRubberPaint.setColor(Color.BLACK);
@@ -106,16 +103,16 @@ public class DrawFragment extends Fragment {
     }
 
     private Paint initialBrush() {
-        Paint result = new Paint(Paint.ANTI_ALIAS_FLAG);
-        result.setStrokeWidth(STROKE_WIDTH);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        paint.setStrokeWidth(STROKE_WIDTH);
         // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
-        result.setStyle(Paint.Style.STROKE);
-        result.setPathEffect(new CornerPathEffect(STROKE_WIDTH / 2));
-        result.setColor(Color.WHITE);
-        result.setDither(true);
-        result.setStrokeJoin(Paint.Join.ROUND);
-        result.setStrokeCap(Paint.Cap.ROUND);
-        return result;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setPathEffect(new CornerPathEffect(STROKE_WIDTH / 2));
+        paint.setColor(Color.WHITE);
+        // result.setDither(true);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        return paint;
     }
 
     private void setPaintWidthAndHeight(int width, int height) {
@@ -125,23 +122,6 @@ public class DrawFragment extends Fragment {
         mBmpCanvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         mWidthRatio = width / TouchPoint.MAX_X;
         mHeightRatio = height / TouchPoint.MAX_Y;
-        lastPointArray[2] = -1;
-    }
-
-    private final int POINTS_NUM = 10;
-    private int[][] downPoints = new int[POINTS_NUM][3];
-    private int currentPointIndex = 0;
-
-    private TouchEvent getTouchEvent(int touchMode, List<TouchScreen.TouchPoint> points) {
-        TouchEvent result = new TouchEvent();
-        result.Mode = touchMode;
-        List<TouchPoint> list = new ArrayList<>();
-        for (TouchScreen.TouchPoint item : points) {
-            TouchPoint p = new TouchPoint(item);
-            list.add(p);
-        }
-        result.Points = list;
-        return result;
     }
 
     private TouchListener mTouchListener = (event) -> {
@@ -153,141 +133,67 @@ public class DrawFragment extends Fragment {
                 drawLine(event.Points);
                 break;
             case TouchEvent.UP:
-//                if (currentPointIndex > 0) {
-//                    int[][] remainPoints;
-//                    remainPoints = Arrays.copyOfRange(downPoints, 0, currentPointIndex);
-//                    setSmoothPoints(remainPoints);
-//                    drawLineSmoothly();
-//                    currentPointIndex = 0;
-//                }
                 touchUp(event.Points);
                 break;
         }
     };
 
     private void touchDown(List<TouchPoint> points) {
-//        for (TouchPoint item : points) {
-//            if (currentPointIndex < POINTS_NUM) {
-//                downPoints[currentPointIndex][0] = item.getRawX();
-//                downPoints[currentPointIndex][1] = item.getRawY();
-//                downPoints[currentPointIndex][2] = item.getID();
-//                currentPointIndex++;
-//                Log.v(TAG, "onTouchDown X " + item.getRawX() + " Y " + item.getRawY());
-//            }
-//            if (currentPointIndex == POINTS_NUM) {
-//                setSmoothPoints(downPoints);
-//                drawLineSmoothly();
-//                currentPointIndex = 0;
-//            }
-//        }
+
         drawLine(points);
     }
 
-    boolean isSmooth = false;
-    private int[][] pointSet;
-    private Smooth smooth = new Smooth();
-    boolean isSetPoints = false;
-
-    public void setSmoothPoints(int[][] points) {
-        pointSet = new int[points.length][];
-        if (isSmooth) {
-            pointSet = smooth.SmoothLine(points);
-            for (int i = 0; i < pointSet.length; i++) {
-                pointSet[i][0] = (int) (mPaintWidth - pointSet[i][0] * mWidthRatio);
-                pointSet[i][1] = (int) (pointSet[i][1] * mHeightRatio);
-            }
-        } else {
-            for (int i = 0; i < points.length; i++) {
-                pointSet[i] = new int[3];
-                pointSet[i][0] = (int) (points[i][0] * mWidthRatio);
-                pointSet[i][1] = (int) (points[i][1] * mHeightRatio);
-                pointSet[i][2] = points[i][2];
-            }
-        }
-        isSetPoints = true;
-    }
-
     TouchPoint lastPoint = null;
-    private int[] lastPointArray = new int[3];
-
-    protected void drawLineSmoothly() {
-        if (isSetPoints && pointSet != null) {
-            isSetPoints = false;
-            int len = pointSet.length;
-            if (lastPointArray[2] != -1 && lastPointArray[2] == pointSet[0][2])
-                mBmpCanvas.drawLine(pointSet[0][0], pointSet[0][1], lastPointArray[0], lastPointArray[1], mLinePaint);
-            for (int i = 0; i < len - 1; i++) {
-                if (pointSet[i][2] == pointSet[i + 1][2]) {
-                    mBmpCanvas.drawLine(pointSet[i][0], pointSet[i][1], pointSet[i + 1][0], pointSet[i + 1][1], mLinePaint);
-                }
-            }
-
-            lastPointArray[0] = pointSet[len - 1][0];
-            lastPointArray[1] = pointSet[len - 1][1];
-            lastPointArray[2] = pointSet[len - 1][2];
-        }
-
-        Canvas canvas = mSurfaceHolder.lockCanvas();
-        drawBitmap(canvas);
-        mSurfaceHolder.unlockCanvasAndPost(canvas);
-    }
-
-
     Path mDrawPath = new Path();
+
     private void drawLine(List<TouchPoint> points) {
         if (lastPoint == null) {
             lastPoint = points.get(0);
         }
 
-        //  mDrawPath.moveTo(lastPoint.getX(), lastPoint.getY());
         DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
         int len = points.size();
 
         for (int i = 0; i < len; i++) {
             TouchPoint p = points.get(i);
-            mLinePaint.setStrokeWidth(getPaintWidth(p));
+            float lineWidth = getPaintWidth(p);
+            mLinePaint.setStrokeWidth(lineWidth);
+            mLinePaint.setPathEffect(new CornerPathEffect(lineWidth / 2));
 
             if (p.isLongDistance(lastPoint)) {
                 Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
                         lastPoint.getID(), p.getID(), p.distance(lastPoint)));
                 lastPoint = p;
                 DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
-                //mDrawPath.moveTo(p.getX(), p.getY());
                 continue;
             }
 
             if (drawRubber(p)) {
                 continue;
             }
-//
-//            float cx = (lastPoint.getX() + p.getX()) / 2;
-//            float cy = (lastPoint.getY() + p.getY()) / 2;
-//            mDrawPath.quadTo(cx, cy, p.getX(), p.getY());
-            // mDrawPath.lineTo(p.getX(), p.getY());
             DrawUtil.getInstance().lineTo(mDrawPath, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
             lastPoint = p;
         }
         mBmpCanvas.drawPath(mDrawPath, mLinePaint);
         mDrawPath.reset();
-        Canvas canvas = mSurfaceHolder.lockCanvas();
-        drawBitmap(canvas);
-        mSurfaceHolder.unlockCanvasAndPost(canvas);
+        drawBitmap();
     }
 
     private boolean drawRubber(TouchPoint p) {
         boolean result = false;
         if (p.isRubber()) {
-//            mBmpCanvas.drawCircle(p.getX(), p.getY(),
-//                    TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4, mRubberPaint);
-            DrawUtil.getInstance().drawCircle(mBmpCanvas, p.getX(), p.getY(), TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4,
-                    mPaintWidth, mPaintHeight, mRubberPaint);
+            float r = TouchPoint.getScaleX(p.getWidth() + p.getHeight()) / 4;
+            DrawUtil.getInstance().drawCircle(mBmpCanvas, p.getX(), p.getY(),
+                    r, mPaintWidth, mPaintHeight, mRubberPaint);
             result = true;
         }
         return result;
     }
 
-    private void drawBitmap(Canvas canvas) {
+    private void drawBitmap() {
+        Canvas canvas = mSurfaceHolder.lockCanvas();
         canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
+        mSurfaceHolder.unlockCanvasAndPost(canvas);
     }
 
     int maxArea = 0;
