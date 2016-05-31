@@ -166,8 +166,8 @@ public class ZoomSurfaceView extends SurfaceView {
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {
 
-            // float x = detector.getFocusX();
-            // float y = detector.getFocusY();
+            // float xAxes = detector.getFocusX();
+            // float yAxes = detector.getFocusY();
 
             lastFocusX = -1;
             lastFocusY = -1;

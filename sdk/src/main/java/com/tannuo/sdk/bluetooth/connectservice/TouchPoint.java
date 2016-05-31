@@ -24,9 +24,10 @@ public class TouchPoint {
     private byte color;
     private int status;
 
-    public TouchPoint(int x,int y) {
+    public TouchPoint(int x, int y, int id) {
         this.x = x;
         this.y = y;
+        this.id = id;
     }
 
     public TouchPoint(TouchScreen.TouchPoint point) {

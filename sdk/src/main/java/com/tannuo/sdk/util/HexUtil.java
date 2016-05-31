@@ -1,7 +1,5 @@
 package com.tannuo.sdk.util;
 
-import android.util.Log;
-
 import java.util.List;
 
 /**
@@ -31,7 +29,7 @@ public class HexUtil {
             return null;
         }
         String result = byteToString(bytes);
-        Log.d(tag, String.format("data len=%s ,data detail:%s", bytes.length, result));
+        //Log.d(tag, String.format("data len=%s ,data detail:%s", bytes.length, result));
         return result;
     }
 
@@ -40,7 +38,7 @@ public class HexUtil {
             return null;
         }
         String result = byteToString(list);
-        Log.d(tag, String.format("data len=%s ,data detail:%s", list.size(), result));
+        // Log.d(tag, String.format("data len=%s ,data detail:%s", list.size(), result));
         return result;
     }
 

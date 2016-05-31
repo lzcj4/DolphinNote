@@ -10,6 +10,8 @@ import android.graphics.CornerPathEffect;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +21,10 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import com.tannuo.note.R;
+import com.tannuo.note.utility.WakeLock;
+import com.tannuo.sdk.bluetooth.TouchScreen;
+import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
+import com.tannuo.sdk.bluetooth.connectservice.BLCConnectService;
 import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.bluetooth.connectservice.MockConnectService;
 import com.tannuo.sdk.bluetooth.connectservice.TouchEvent;
@@ -26,6 +32,7 @@ import com.tannuo.sdk.bluetooth.connectservice.TouchListener;
 import com.tannuo.sdk.bluetooth.connectservice.TouchPoint;
 import com.tannuo.sdk.util.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -49,6 +56,7 @@ public class DrawFragment extends Fragment {
     private float mWidthRatio, mHeightRatio;
 
     private final float STROKE_WIDTH = 6.0f;
+    WakeLock mWakeLock;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -59,28 +67,26 @@ public class DrawFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         mSurfaceHolder = surfaceView.getHolder();
+        mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                mSurfaceHolder = holder;
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                mSurfaceHolder = null;
+            }
+        });
         //surfaceView.setBackgroundColor(Color.WHITE);
 
         mConnectService = new MockConnectService(mTouchListener);
-//        mConnectService = new BLCConnectService(this.getActivity(), new TouchScreenListenerImpl() {
-//            @Override
-//            public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
-//                mTouchListener.onTouch(getTouchEvent(TouchEvent.UP, upPoints));
-//            }
-//
-//            @Override
-//            public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
-//                mTouchListener.onTouch(getTouchEvent(TouchEvent.DOWN, downPoints));
-//            }
-//
-//            @Override
-//            public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
-//                mTouchListener.onTouch(getTouchEvent(TouchEvent.MOVE, movePoints));
-//            }
-//        });
-
+        // mConnectService=getDevice();
         mLinePaint = initialBrush();
-
         mBmpPaint = initialBrush();
         mRubberPaint = initialBrush();
         mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -94,12 +100,42 @@ public class DrawFragment extends Fragment {
                 mPaintHeight = surfaceView.getHeight();
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
                 //mBmpCanvas.drawColor(Color.WHITE);
-                mConnectService.connect("HC-05");
+                mConnectService.connect("IRMT03");
                 //}
             }
         });
-
+        mWakeLock = new WakeLock(this.getActivity());
+        mWakeLock.lockScreen();
         return view;
+    }
+
+    private ConnectService getDevice() {
+        return new BLCConnectService(this.getActivity(), new TouchScreenListenerImpl() {
+            @Override
+            public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
+                mTouchListener.onTouch(getTouchEvent(TouchEvent.UP, upPoints));
+            }
+
+            @Override
+            public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
+                mTouchListener.onTouch(getTouchEvent(TouchEvent.DOWN, downPoints));
+            }
+
+            @Override
+            public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
+                mTouchListener.onTouch(getTouchEvent(TouchEvent.MOVE, movePoints));
+            }
+
+            private TouchEvent getTouchEvent(int mode, final List<TouchScreen.TouchPoint> points) {
+                TouchEvent result = new TouchEvent();
+                result.Mode = mode;
+                result.Points = new ArrayList<>();
+                for (TouchScreen.TouchPoint p : points) {
+                    result.Points.add(new TouchPoint(p));
+                }
+                return result;
+            }
+        });
     }
 
     private Paint initialBrush() {
@@ -125,6 +161,11 @@ public class DrawFragment extends Fragment {
     }
 
     private TouchListener mTouchListener = (event) -> {
+        if (null == mSurfaceHolder) {
+            Logger.d(TAG, "Current surface view is destroied");
+            return;
+        }
+
         switch (event.Mode) {
             case TouchEvent.DOWN:
                 touchDown(event.Points);
@@ -138,9 +179,10 @@ public class DrawFragment extends Fragment {
         }
     };
 
+    LineSmooth lineSmooth = new LineSmooth();
     private void touchDown(List<TouchPoint> points) {
-
-        drawLine(points);
+        // drawLine(points);
+        lineSmooth.drawLine(points);
     }
 
     TouchPoint lastPoint = null;
@@ -159,10 +201,10 @@ public class DrawFragment extends Fragment {
             float lineWidth = getPaintWidth(p);
             mLinePaint.setStrokeWidth(lineWidth);
             mLinePaint.setPathEffect(new CornerPathEffect(lineWidth / 2));
+            Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
+                    lastPoint.getID(), p.getID(), p.distance(lastPoint)));
 
             if (p.isLongDistance(lastPoint)) {
-                Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
-                        lastPoint.getID(), p.getID(), p.distance(lastPoint)));
                 lastPoint = p;
                 DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
                 continue;
@@ -171,12 +213,21 @@ public class DrawFragment extends Fragment {
             if (drawRubber(p)) {
                 continue;
             }
-            DrawUtil.getInstance().lineTo(mDrawPath, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
-            lastPoint = p;
+
+            float dx = lastPoint.getX() - p.getX();
+            float dy = lastPoint.getY() - p.getY();
+            if (Math.abs(dx) >= 3 || Math.abs(dy) >= 3) {
+
+//                mDrawPath.quadTo((lastPoint.getX() + p.getX()) / 2, (lastPoint.getY() + p.getY()) / 2,
+//                        p.getX(), p.getY());
+                DrawUtil.getInstance().lineTo(mDrawPath, p.getX(), p.getY(), mPaintWidth, mPaintHeight);
+                lastPoint = p;
+            }
         }
+
         mBmpCanvas.drawPath(mDrawPath, mLinePaint);
-        mDrawPath.reset();
         drawBitmap();
+        mDrawPath.reset();
     }
 
     private boolean drawRubber(TouchPoint p) {
@@ -190,10 +241,28 @@ public class DrawFragment extends Fragment {
         return result;
     }
 
+    Rect mDirtyRect = new Rect();
+
     private void drawBitmap() {
-        Canvas canvas = mSurfaceHolder.lockCanvas();
-        canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
-        mSurfaceHolder.unlockCanvasAndPost(canvas);
+        if (null == mSurfaceHolder) {
+            return;
+        }
+        RectF rectF = new RectF();
+        mDrawPath.computeBounds(rectF, true);
+        Rect rect = new Rect();
+        rectF.round(rect);
+
+        Canvas canvas = null;
+        try {
+            canvas = mSurfaceHolder.lockCanvas(mDirtyRect);
+            //canvas = mSurfaceHolder.lockCanvas();
+            canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
+            //canvas.drawColor(Color.BLACK);
+            canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
+        } finally {
+            if (null != canvas)
+                mSurfaceHolder.unlockCanvasAndPost(canvas);
+        }
     }
 
     int maxArea = 0;
@@ -222,5 +291,55 @@ public class DrawFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+        mWakeLock.unlockAll();
+    }
+
+    private class LineSmooth {
+        Smooth mSmooth = new Smooth();
+        TouchPoint lastPoint;
+
+        private int[][] toPointArray(List<TouchPoint> points) {
+            int len = points.size();
+            int[][] result = new int[len][3];
+            for (int i = 0; i < len; i++) {
+                TouchPoint p = points.get(i);
+                result[i][0] = p.getRawX();
+                result[i][1] = p.getRawY();
+                result[i][2] = p.getID();
+            }
+            return result;
+        }
+
+        private List<TouchPoint> toTouchPoints(int[][] pointArray) {
+            int len = pointArray.length;
+            List<TouchPoint> result = new ArrayList<>();
+            for (int i = 0; i < len; i++) {
+                TouchPoint p = new TouchPoint(pointArray[i][0], pointArray[i][1], pointArray[i][2]);
+                result.add(p);
+            }
+            return result;
+        }
+
+        private void drawLine(List<TouchPoint> points) {
+            int[][] pointArray = toPointArray(points);
+            pointArray = mSmooth.smoothLine(pointArray);
+
+            List<TouchPoint> newPoints = toTouchPoints(pointArray);
+            TouchPoint firstPoint = newPoints.get(0);
+            int len = newPoints.size();
+            if (lastPoint != null && lastPoint.getID() == firstPoint.getID()) {
+                mBmpCanvas.drawLine(lastPoint.getX(), lastPoint.getY(), firstPoint.getX(), firstPoint.getY(), mLinePaint);
+            }
+            for (int i = 1; i < len; i++) {
+                if (newPoints.get(i - 1).getID() == newPoints.get(i).getID()) {
+                    mBmpCanvas.drawLine(newPoints.get(i - 1).getX(), newPoints.get(i - 1).getY()
+                            , newPoints.get(i).getX(), newPoints.get(i).getY(), mLinePaint);
+                }
+            }
+
+            drawBitmap();
+            lastPoint = newPoints.get(len - 1);
+        }
+
     }
 }

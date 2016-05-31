@@ -3,177 +3,175 @@ package com.tannuo.note.whiteboard;
 import java.util.Arrays;
 
 public class Smooth {
-    public int[] x;
+    public int[] xAxes;
+    public int[] yAxes;
+    public int[] ptnIds;
+
     private int _x0, _y0;
-    public int[] y;
-    public int[] ptn;
     private double DirectX, DirectY;
     public int Pts;
     public int PtsTrue;
     public double minDist, maxDist; //^2? the min of dist between x2 and x1
-    public double Dist;
+    public double currentDist;
     public int[][] interpolateArray;
     public int interpolateNum;
     private final String TAG = "Smooth";
 
     public Smooth() {
-        x = new int[3];
-        y = new int[3];
-        ptn = new int[3];
-        _x0 = x[0] = x[1] = x[1] = 0;
-        _y0 = y[0] = y[1] = y[2] = 0;
-        ptn[0] = ptn[1] = ptn[2] = -1;
+        xAxes = new int[3];
+        yAxes = new int[3];
+        ptnIds = new int[3];
+
+        _x0 = xAxes[0] = xAxes[1] = xAxes[1] = 0;
+        _y0 = yAxes[0] = yAxes[1] = yAxes[2] = 0;
+        ptnIds[0] = ptnIds[1] = ptnIds[2] = -1;
         Pts = 0;
         PtsTrue = 0;
         DirectX = DirectY = 0;
         minDist = 90000;
         maxDist = 1600000;
-        Dist = 0;
+        currentDist = 0;
         interpolateNum = 0;
         interpolateArray = new int[2][4];
     }
 
-    public int[][] SmoothLine(int[][] Points) {
-        int i, j, pindex = 0;
-        int[][] pointSet;
+    public int[][] smoothLine(int[][] linePoints) {
+        int index = 0, len = linePoints.length;
+        int[][] pointSet = new int[4 * len][];
 
-        pointSet = new int[4 * Points.length][];
-        for (i = 0; i < Points.length; i++) {
-            int state = callSmoothDistance(Points[i][0], Points[i][1], Points[i][2]);
+        for (int i = 0; i < len; i++) {
+            int state = callSmoothDistance(linePoints[i][0], linePoints[i][1], linePoints[i][2]);
             //Log.v(TAG,"The state is " + state);
             if (state == 0 || state == 4) {
-                pointSet[pindex] = new int[3];
-                pointSet[pindex][0] = x[2];
-                pointSet[pindex][1] = y[2];
-                pointSet[pindex][2] = Points[i][2];
-                pindex++;
+                pointSet[index] = new int[3];
+                pointSet[index][0] = xAxes[2];
+                pointSet[index][1] = yAxes[2];
+                pointSet[index][2] = linePoints[i][2];
+                index++;
+                continue;
             } else if (state == 1 || state == 3) {
-                for (j = 0; j < state; j++) {
-                    pointSet[pindex] = new int[3];
-                    pointSet[pindex][0] = interpolateArray[0][j];
-                    pointSet[pindex][1] = interpolateArray[1][j];
-                    pointSet[pindex][2] = Points[i][2];
-                    pindex++;
+                for (int j = 0; j < state; j++) {
+                    pointSet[index] = new int[3];
+                    pointSet[index][0] = interpolateArray[0][j];
+                    pointSet[index][1] = interpolateArray[1][j];
+                    pointSet[index][2] = linePoints[i][2];
+                    index++;
                 }
-                pointSet[pindex] = new int[3];
-                pointSet[pindex][0] = Points[i][0];
-                pointSet[pindex][1] = Points[i][1];
-                pointSet[pindex][2] = Points[i][2];
-                pindex++;
-            } else {
-                pointSet[pindex] = new int[3];
-                pointSet[pindex][0] = Points[i][0];
-                pointSet[pindex][1] = Points[i][1];
-                pointSet[pindex][2] = Points[i][2];
-                pindex++;
             }
-
+            pointSet[index] = new int[3];
+            pointSet[index][0] = linePoints[i][0];
+            pointSet[index][1] = linePoints[i][1];
+            pointSet[index][2] = linePoints[i][2];
+            index++;
         }
         int[][] newData;
-        newData = Arrays.copyOfRange(pointSet, 0, pindex);
+        newData = Arrays.copyOfRange(pointSet, 0, index);
         //Log.v(TAG,"The length of newData is " + newData.length);
         return newData;
     }
 
-    public int callSmoothDistance(int newX, int newY, int ptNum) {
+    public int callSmoothDistance(int newX, int newY, int newPId) {
         // 5: no update; 4: shortdistance;
         // 0: interpolate 0; 1: interpolate 1 3: interpolate 3
         if (Pts == 3) { // update
-            _x0 = x[0];
-            x[0] = x[1];
-            x[1] = x[2];
-            x[2] = newX;
-            _y0 = y[0];
-            y[0] = y[1];
-            y[1] = y[2];
-            y[2] = newY;
-            ptn[0] = ptn[1];
-            ptn[1] = ptn[2];
-            ptn[2] = ptNum;
+            _x0 = xAxes[0];
+            xAxes[0] = xAxes[1];
+            xAxes[1] = xAxes[2];
+            xAxes[2] = newX;
+
+            _y0 = yAxes[0];
+            yAxes[0] = yAxes[1];
+            yAxes[1] = yAxes[2];
+            yAxes[2] = newY;
+
+            ptnIds[0] = ptnIds[1];
+            ptnIds[1] = ptnIds[2];
+            ptnIds[2] = newPId;
             PtsTrue = 4;
 
-            if (ptn[2] == ptn[1]) {
-                Dist = (x[2] - x[1]) * (x[2] - x[1]) + (y[2] - y[1]) * (y[2] - y[1]);
-                if (Dist < maxDist) {
-                    SmoothShortDistance();
+            if (ptnIds[2] == ptnIds[1]) {
+                currentDist = (xAxes[2] - xAxes[1]) * (xAxes[2] - xAxes[1]) + (yAxes[2] - yAxes[1]) * (yAxes[2] - yAxes[1]);
+                if (currentDist < maxDist) {
+                    smoothShortDistance();
                     return 4;
                 } else {
-                    SmoothLongDistance();
+                    smoothLongDistance();
                     return interpolateNum;
                 }
             } else {
-                SmoothClear();
-                x[Pts] = newX;
-                y[Pts] = newY;
-                ptn[Pts] = ptNum;
+                reset();
+                xAxes[Pts] = newX;
+                yAxes[Pts] = newY;
+                ptnIds[Pts] = newPId;
                 Pts++;
                 return 5;
             }
 
         } else if (Pts == 2) {
-            x[Pts] = newX;
-            y[Pts] = newY;
-            ptn[Pts] = ptNum;
+            xAxes[Pts] = newX;
+            yAxes[Pts] = newY;
+            ptnIds[Pts] = newPId;
             Pts++;
 
-            if (ptn[Pts - 1] == ptn[Pts - 2]) {
-                Dist = (x[2] - x[1]) * (x[2] - x[1]) + (y[2] - y[1]) * (y[2] - y[1]);
-                if (Dist < maxDist) {
-                    double value = Math.sqrt((x[1] - x[0]) * (x[1] - x[0]) + (y[1] - y[0]) * (y[1] - y[0]));
-                    DirectX = (x[1] - x[0]) / value;
-                    DirectY = (y[1] - y[0]) / value;
-                    SmoothShortDistance();
+            if (ptnIds[Pts - 1] == ptnIds[Pts - 2]) {
+                currentDist = (xAxes[2] - xAxes[1]) * (xAxes[2] - xAxes[1]) + (yAxes[2] - yAxes[1]) * (yAxes[2] - yAxes[1]);
+                if (currentDist < maxDist) {
+                    double value = Math.sqrt((xAxes[1] - xAxes[0]) * (xAxes[1] - xAxes[0]) + (yAxes[1] - yAxes[0]) * (yAxes[1] - yAxes[0]));
+                    DirectX = (xAxes[1] - xAxes[0]) / value;
+                    DirectY = (yAxes[1] - yAxes[0]) / value;
+                    smoothShortDistance();
                     return 4;
                 } else {
-                    SmoothLongDistance();
+                    smoothLongDistance();
                     return interpolateNum;
                 }
             } else {
-                SmoothClear();
-                x[Pts] = newX;
-                y[Pts] = newY;
-                ptn[Pts] = ptNum;
+                reset();
+                xAxes[Pts] = newX;
+                yAxes[Pts] = newY;
+                ptnIds[Pts] = newPId;
                 Pts++;
                 return 5;
             }
         } else { // add
-            if (Pts == 1 && ptn[Pts - 1] != ptNum) {
-                SmoothClear();
+            if (Pts == 1 && ptnIds[Pts - 1] != newPId) {
+                reset();
             }
-            x[Pts] = newX;
-            y[Pts] = newY;
-            ptn[Pts] = ptNum;
+            xAxes[Pts] = newX;
+            yAxes[Pts] = newY;
+            ptnIds[Pts] = newPId;
             Pts++;
             return 5;
         }
     }
 
-    private void SmoothShortDistance() {
-        double Dist; //^2? the distance between x2 and x1
+    private void smoothShortDistance() {
+        double pointDistance; //^2? the distance between x2 and x1
         double detx, dety; // the vetor from x1 to x2
         double prox, proy;
         double alpha;
         double tmp;
-        Dist = (x[2] - x[1]) * (x[2] - x[1]) + (y[2] - y[1]) * (y[2] - y[1]);
-        if (Dist < minDist) {
-            x[2] = x[1];
-            y[2] = y[1];
+
+        pointDistance = (xAxes[2] - xAxes[1]) * (xAxes[2] - xAxes[1]) + (yAxes[2] - yAxes[1]) * (yAxes[2] - yAxes[1]);
+        if (pointDistance < minDist) {
+            xAxes[2] = xAxes[1];
+            yAxes[2] = yAxes[1];
         } else if (DirectX > 1) { // impossible
-            DirectX = x[2] - x[1];
-            DirectY = y[2] - y[1];
+            DirectX = xAxes[2] - xAxes[1];
+            DirectY = yAxes[2] - yAxes[1];
             tmp = Math.sqrt(DirectX * DirectX + DirectY * DirectY);
 
             DirectX = DirectX / tmp;
             DirectY = DirectY / tmp;
         } else {
-            detx = x[2] - x[1];
-            dety = y[2] - y[1];
+            detx = xAxes[2] - xAxes[1];
+            dety = yAxes[2] - yAxes[1];
 
             tmp = detx * DirectX + dety * DirectY;
             prox = tmp * DirectX - detx;
             proy = tmp * DirectY - dety;
 
-            alpha = Math.sqrt(minDist / Dist);
+            alpha = Math.sqrt(minDist / pointDistance);
             tmp = prox * prox + proy * proy;
             if (tmp == 0.0)
                 tmp = 0.8;
@@ -185,11 +183,11 @@ public class Smooth {
                     tmp = Math.sqrt(tmp);
             }
 
-            x[2] = x[2] + (int) (prox * tmp);
-            y[2] = y[2] + (int) (proy * tmp);
+            xAxes[2] = xAxes[2] + (int) (prox * tmp);
+            yAxes[2] = yAxes[2] + (int) (proy * tmp);
 
-            DirectX = x[2] - x[1];
-            DirectY = y[2] - y[1];
+            DirectX = xAxes[2] - xAxes[1];
+            DirectY = yAxes[2] - yAxes[1];
 
             tmp = Math.sqrt(DirectX * DirectX + DirectY * DirectY);
 
@@ -200,14 +198,14 @@ public class Smooth {
         }
     }
 
-    private void SmoothLongDistance() {
+    private void smoothLongDistance() {
         int a0, a1, a2, b0, b1, b2, t;
         int c0, c1, c2, xx, yy;
         int tmpPoints;
         int i;
         if (Pts > 1) {
-            xx = (x[2] - x[1]) * (x[2] - x[1]);
-            yy = (y[2] - y[1]) * (y[2] - y[1]);
+            xx = (xAxes[2] - xAxes[1]) * (xAxes[2] - xAxes[1]);
+            yy = (yAxes[2] - yAxes[1]) * (yAxes[2] - yAxes[1]);
             tmpPoints = (Math.round(xx + yy)) >> 20;  // /64*64 = 4096, 32768
             //Log.v(TAG,"interpolateNum is" + interpolateNum);
             if (tmpPoints < 1) {
@@ -222,22 +220,22 @@ public class Smooth {
             }
 
 //            if(Pts == 3 && PtsTrue == 4) {
-//                c0 = (int)(_x0 + x[0] + x[1] +x[2]);
-//                c1 = (int)(_x0 + 0*x[0] + x[1] +2*x[2]);
-//                c2 = (int)(_x0 + 0*x[0] + x[1] +4*x[2]);
+//                c0 = (int)(_x0 + xAxes[0] + xAxes[1] +xAxes[2]);
+//                c1 = (int)(_x0 + 0*xAxes[0] + xAxes[1] +2*xAxes[2]);
+//                c2 = (int)(_x0 + 0*xAxes[0] + xAxes[1] +4*xAxes[2]);
 //                a0 = (int)(0.55*c0 + 0.15*c1 - 0.25*c2);
 //                a1 = (int)(0.15*c0 + 0.45*c1 - 0.25*c2);
 //                a2 = (int)(-0.25*c0 - 0.25*c1 + 0.25*c2);
 //                xx = a0 + a1 + a2;
-//                c0 = (int)(_y0 + y[0] + y[1] +y[2]);
-//                c1 = (int)(_y0 + 0*y[0] + y[1] +2*y[2]);
-//                c2 = (int)(_y0 + 0*y[0] + y[1] +4*y[2]);
+//                c0 = (int)(_y0 + yAxes[0] + yAxes[1] +yAxes[2]);
+//                c1 = (int)(_y0 + 0*yAxes[0] + yAxes[1] +2*yAxes[2]);
+//                c2 = (int)(_y0 + 0*yAxes[0] + yAxes[1] +4*yAxes[2]);
 //                b0 = (int)(0.55*c0 + 0.15*c1 - 0.25*c2);
 //                b1 = (int)(0.15*c0 + 0.45*c1 - 0.25*c2);
 //                b2 = (int)(-0.25*c0 - 0.25*c1 + 0.25*c2);
 //                yy = b0 + b1 + b2;
-//                x[1] = xx;
-//                y[1] = yy;
+//                xAxes[1] = xx;
+//                yAxes[1] = yy;
 //
 //                for(i=1; i<=interpolateNum; i+=1) {
 //                    t=i/(int)(interpolateNum+1);
@@ -250,12 +248,12 @@ public class Smooth {
 //                }
 //            }
             if (Pts == 3) {
-                a0 = x[1];
-                a1 = (x[2] - x[0]) / 2;
-                a2 = (x[0] + x[2]) / 2 - x[1];
-                b0 = y[1];
-                b1 = (y[2] - y[0]) / 2;
-                b2 = (y[0] + y[2]) / 2 - y[1];
+                a0 = xAxes[1];
+                a1 = (xAxes[2] - xAxes[0]) / 2;
+                a2 = (xAxes[0] + xAxes[2]) / 2 - xAxes[1];
+                b0 = yAxes[1];
+                b1 = (yAxes[2] - yAxes[0]) / 2;
+                b2 = (yAxes[0] + yAxes[2]) / 2 - yAxes[1];
 //                Log.v("byt: interpolateNum", interpolateNum + "");
                 for (i = 1; i <= interpolateNum; i++) {
                     xx = a0 + a1 * i / (interpolateNum + 1) + a2 * i * i / (interpolateNum + 1) / (interpolateNum + 1);
@@ -268,15 +266,13 @@ public class Smooth {
         }
     }
 
-    private void SmoothClear() {
-        x[0] = x[1] = x[2] = 0;
-        y[0] = y[1] = y[2] = 0;
-        ptn[0] = ptn[1] = ptn[2] = -1;
+    private void reset() {
+        xAxes[0] = xAxes[1] = xAxes[2] = 0;
+        yAxes[0] = yAxes[1] = yAxes[2] = 0;
+        ptnIds[0] = ptnIds[1] = ptnIds[2] = -1;
         Pts = 0;
         DirectX = DirectY = 0;
         interpolateNum = 0;
         PtsTrue = 0;
     }
-
-
 }
