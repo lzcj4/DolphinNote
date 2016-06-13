@@ -45,49 +45,66 @@
             android:id="@+id/edtName"
             android:layout_width="100dp"
             android:layout_height="50dp"
-            android:text="HTBJ" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:text="RX:"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/txtCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="0"
-            android:textColor="#FF0000"
-            android:textSize="20dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="Bytes"
-            android:textSize="20dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/layoutInfo"
-        android:orientation="vertical">
+            android:text="H3" />
 
         <TextView
             android:id="@+id/txtDevice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/layoutInfo"
-            android:layout_marginTop="20dp" />
+            android:layout_marginLeft="10dp"
+            tools:text="连接状态" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layoutInfo"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RX:" />
+
+            <TextView
+                android:id="@+id/txtCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="0"
+                android:textColor="#FF0000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="字节" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="点状态：" />
+
+            <TextView
+                android:id="@+id/txtPointStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="数据完整"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView

@@ -20,9 +20,9 @@ public class BTServiceFactory implements ServiceFactory {
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private ServiceFactory getFactory() {
         ServiceFactory factory;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-//            factory = new BLEFactory();
-//        } else
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            factory = new BLEFactory();
+        } else
         {
             factory = new BLCFactory();
         }

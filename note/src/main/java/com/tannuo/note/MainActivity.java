@@ -2,6 +2,7 @@ package com.tannuo.note;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     TextView txtDuration;
     @Bind(R.id.txtScroll)
     ScrollView txtScroll;
+    @Bind(R.id.txtPointStatus)
+    TextView txtPointLen;
 
     private ConnectService mService;
 
@@ -71,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
                 imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
             });
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // disconnect();
     }
 
     private void testMetric() {
@@ -162,12 +171,6 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // disconnect();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -241,6 +244,8 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     int byteCount;
     boolean isStarted = false;
 
+    byte lastFeature = -1;
+
     @Override
     public void onReceive(byte[] data) {
         String str = HexUtil.byteToString(data) + "\r\n";
@@ -259,6 +264,24 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
             txtData.scrollTo(0, (int) txtData.getY());
             txtScroll.fullScroll(View.FOCUS_DOWN);
             txtCount.setText(String.valueOf(byteCount));
+
+            if (data.length > 3) {
+                byte len = data[1];
+                byte dataFeature = data[2];
+                if (lastFeature != dataFeature) {
+                    lastFeature = dataFeature;
+                    String[] statusStr = {"无状态和长宽", "无长宽", "数据完整"};
+                    if (dataFeature >= 0 && dataFeature <= 2) {
+                        txtPointLen.setText(statusStr[dataFeature]);
+                        if (dataFeature == 2) {
+                            txtPointLen.setTextColor(Color.BLACK);
+                        } else {
+                            txtPointLen.setTextColor(Color.RED);
+                        }
+                    } else {
+                    }
+                }
+            }
         });
     }
 

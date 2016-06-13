@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
@@ -11,6 +12,10 @@ import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
 import com.tannuo.sdk.util.DataLog;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -29,7 +34,6 @@ public class ProtocolHandler {
     private HandlerThread mProtocolThread;
     private ProtocolParseHandler mHandler;
     public static final int MESSAGE_PROTOCOL_PARSE = 1;
-    private DataLog mDataLog;
 
     public ProtocolHandler(ConnectService service, Protocol protocol,
                            TouchScreenListener touchListener) {
@@ -50,7 +54,6 @@ public class ProtocolHandler {
         mProtocolThread = new HandlerThread("protocol_handler_thread");
         mProtocolThread.start();
         mHandler = new ProtocolParseHandler(mProtocolThread.getLooper(), this);
-        mDataLog = DataLog.getInstance();
     }
 
     public void sendMessage(int what, Object obj) {
@@ -71,17 +74,32 @@ public class ProtocolHandler {
 
     public void stop() {
         mProtocolThread.quit();
-        mDataLog.close();
+        mHandler.stop();
+        DataLog.getInstance().close();
     }
 
     private static class ProtocolParseHandler extends Handler {
         private WeakReference<ProtocolHandler> wrProtocolHandler;
+        private Thread mParseThread;
+        private boolean mIsParsing = true;
 
         public ProtocolParseHandler(Looper looper, ProtocolHandler protocolHandler) {
             super(looper);
             wrProtocolHandler = new WeakReference<>(protocolHandler);
+
+            mParseThread = new Thread(() -> {
+                while (mIsParsing) {
+                    byte[] data = getFromCache();
+                    if (data.length > 0) {
+                        parse(data);
+                    }
+                }
+            });
+            mParseThread.setName("protoco l_parse_thread");
+            mParseThread.start();
         }
 
+        @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_PROTOCOL_PARSE:
@@ -89,10 +107,45 @@ public class ProtocolHandler {
                     if (null == buffer) {
                         return;
                     }
-                    parse(buffer);
+                    addToCache(buffer);
                     break;
                 default:
                     break;
+            }
+        }
+
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        List<byte[]> dataCache = new ArrayList<>();
+
+        private void addToCache(byte[] buffer) {
+            try {
+                lock.lock();
+                dataCache.add(buffer);
+                Log.e(this.getClass().getSimpleName(), String.format("/++ %s ++/", (dataCache.size())));
+                condition.signal();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        private byte[] getFromCache() {
+            try {
+                lock.lock();
+                byte[] data = new byte[0];
+                if (dataCache.size() > 0) {
+                    data = dataCache.remove(0);
+                    Log.e(this.getClass().getSimpleName(), String.format("/-- %s --/", (dataCache.size())));
+                } else {
+                    try {
+                        condition.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return data;
+            } finally {
+                lock.unlock();
             }
         }
 
@@ -105,7 +158,6 @@ public class ProtocolHandler {
             ConnectService service = handler.mService;
             TouchScreenListener touchListener = handler.mTouchListener;
 
-            handler.mDataLog.writeInData(data);
             if (handler.mDataReceive != null) {
                 handler.mDataReceive.onReceive(data);
             }
@@ -118,7 +170,6 @@ public class ProtocolHandler {
                     }
                     break;
                 case BTProtocol.STATUS_GET_DATA:
-                    handler.mDataLog.writeOutData(data);
                     TouchScreen touchScreen = protocol.getTouchScreen();
                     if (touchScreen.mTouchDownList.size() > 0) {
                         touchListener.onTouchDown(touchScreen.mTouchDownList);
@@ -134,6 +185,10 @@ public class ProtocolHandler {
                     }
                     break;
             }
+        }
+
+        public void stop() {
+            mIsParsing = false;
         }
     }
 }

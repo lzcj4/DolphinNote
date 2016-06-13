@@ -126,7 +126,7 @@ public class BLEConnectService extends ConnectServiceBase {
 //            return false;
 //        }
 
-        mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), false, mGattCallback);
+        mBluetoothGatt = device.connectGatt(mContext.getApplicationContext(), true, mGattCallback);
         // mIsGattConnected = true;
         return true;
     }
@@ -188,42 +188,46 @@ public class BLEConnectService extends ConnectServiceBase {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                List<BluetoothGattService> services = gatt.getServices();
-                for (BluetoothGattService service : services) {
-                    String uuid = service.getUuid().toString();
-                    if (!uuid.equalsIgnoreCase(UART_UUID)) {
-                        continue;
-                    }
-                    Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", UART_UUID));
-                    mGattService = service;
-                    Map<String, String> grounp = new HashMap<String, String>();
-                    grounp.put("name", GattAttributes.lookup(uuid, "unknow"));
-                    grounp.put("Uuid", uuid);
-                    List<BluetoothGattCharacteristic> gattCharacteristics = service.getCharacteristics();
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                return;
+            }
 
-                    for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
-                        uuid = gattCharacteristic.getUuid().toString();
-                        if (uuid.equalsIgnoreCase(UART_UUID_TX)) {
-                            mGattTXChara = gattCharacteristic;
-                            Log.d(TAG, String.format("-- BLE BluetoothGattCallback write only characteristic found :%s", UART_UUID_TX));
-                        } else if (uuid.equalsIgnoreCase(UART_UUID_RX)) {
-                            int proper;
-                            mGattRXChara = gattCharacteristic;
-                            proper = mGattRXChara.getProperties();
-                            Log.d(TAG, String.format("-- BLE BluetoothGattCallback read only characteristic found :%s", UART_UUID_RX));
-                            if (0 != (proper &
-                                    (BluetoothGattCharacteristic.PROPERTY_NOTIFY |
-                                            BluetoothGattCharacteristic.PROPERTY_INDICATE))
-                                    ) {
-                                mBluetoothGatt.setCharacteristicNotification(mGattRXChara, true);
-                                BluetoothGattDescriptor descriptor = mGattRXChara.getDescriptor(
-                                        UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
-                                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                                mBluetoothGatt.writeDescriptor(descriptor);
-                            }
-                            //Log.v(TAG,"RX GET");
+            List<BluetoothGattService> services = gatt.getServices();
+            for (BluetoothGattService service : services) {
+                String uuid = service.getUuid().toString();
+//                if (!uuid.equalsIgnoreCase(UART_UUID)) {
+//                    continue;
+//                }
+                if (!uuid.equalsIgnoreCase("0000ffe0-0000-1000-8000-00805f9b34fb")) {
+                    continue;
+                }
+                Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", UART_UUID));
+                mGattService = service;
+                Map<String, String> grounp = new HashMap<String, String>();
+                grounp.put("name", GattAttributes.lookup(uuid, "unknow"));
+                grounp.put("Uuid", uuid);
+                List<BluetoothGattCharacteristic> gattCharacteristics = service.getCharacteristics();
+
+                for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+                    uuid = gattCharacteristic.getUuid().toString();
+                    if (uuid.equalsIgnoreCase(UART_UUID_TX)) {
+                        mGattTXChara = gattCharacteristic;
+                        Log.d(TAG, String.format("-- BLE BluetoothGattCallback write only characteristic found :%s", UART_UUID_TX));
+                        // } else if (uuid.equalsIgnoreCase(UART_UUID_RX)) {
+                    } else if (uuid.equalsIgnoreCase("0000ffe1-0000-1000-8000-00805f9b34fb")) {
+                        int proper;
+                        mGattRXChara = gattCharacteristic;
+                        proper = mGattRXChara.getProperties();
+                        Log.d(TAG, String.format("-- BLE BluetoothGattCallback read only characteristic found :%s", UART_UUID_RX));
+                        if (0 != (proper &
+                                (BluetoothGattCharacteristic.PROPERTY_NOTIFY | BluetoothGattCharacteristic.PROPERTY_INDICATE))) {
+                            mBluetoothGatt.setCharacteristicNotification(mGattRXChara, true);
+                            BluetoothGattDescriptor descriptor = mGattRXChara.getDescriptor(
+                                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            mBluetoothGatt.writeDescriptor(descriptor);
                         }
+                        //Log.v(TAG,"RX GET");
                     }
                 }
             }

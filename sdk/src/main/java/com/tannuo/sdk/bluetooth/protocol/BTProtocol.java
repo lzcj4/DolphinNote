@@ -3,12 +3,10 @@ package com.tannuo.sdk.bluetooth.protocol;
 import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
+import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
 import com.tannuo.sdk.util.HexUtil;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,15 +33,15 @@ public class BTProtocol implements Protocol {
     /**
      * Data feature with 5 bytes data
      */
-    private static final int FEATURE_DATA_5 = 0;
+    private static final int FEATURE_DATA_5 = 0x00;
     /**
      * Data feature with 6 bytes data
      */
-    private static final int FEATURE_DATA_6 = 1;
+    private static final int FEATURE_DATA_6 = 0x01;
     /**
      * Data feature with 10 bytes data
      */
-    private static final int FEATURE_DATA_10 = 2;
+    private static final int FEATURE_DATA_10 = 0x02;
 
     private static final int FEATURE_DATA_5_LEN = 5;
     private static final int FEATURE_DATA_6_LEN = 6;
@@ -97,7 +95,7 @@ public class BTProtocol implements Protocol {
     private byte mUSBCode;
 
     private int mChecksum;
-    private int mPoints = 1;
+    private int mPointNum = 1;
     private TouchScreen mTouchScreen;
 
     private int[] mDataBuffer;
@@ -110,7 +108,7 @@ public class BTProtocol implements Protocol {
 
         mDataBuffer = new int[0];
         mPointLen = 0;
-        mPoints = 0;
+        mPointNum = 0;
     }
 
     private int getDataLen() {
@@ -122,31 +120,31 @@ public class BTProtocol implements Protocol {
     }
 
     private int calcPoints() {
-        mPoints = 0;
+        mPointNum = 0;
         if (mDataFeature == FEATURE_DATA_5) {
-            mPoints = getDataLen() / FEATURE_DATA_5_LEN;
+            mPointNum = getDataLen() / FEATURE_DATA_5_LEN;
         } else if (mDataFeature == FEATURE_DATA_6) {
-            mPoints = getDataLen() / FEATURE_DATA_6_LEN;
+            mPointNum = getDataLen() / FEATURE_DATA_6_LEN;
         } else if (mDataFeature == FEATURE_DATA_10) {
-            mPoints = getDataLen() / FEATURE_DATA_10_LEN;
+            mPointNum = getDataLen() / FEATURE_DATA_10_LEN;
         } else {
             // throw new IllegalArgumentException("Invalid data feature");
         }
-        mTouchScreen.setNumOfPoints(mPoints);
-        return mPoints;
+        mTouchScreen.setNumOfPoints(mPointNum);
+        return mPointNum;
     }
 
     private boolean lengthCheck() {
         int len;
         switch (mDataFeature) {
             case FEATURE_DATA_5:
-                len = FEATURE_CHECKSUM_LEN + mPoints * FEATURE_DATA_5_LEN;
+                len = FEATURE_CHECKSUM_LEN + mPointNum * FEATURE_DATA_5_LEN;
                 break;
             case FEATURE_DATA_6:
-                len = FEATURE_CHECKSUM_LEN + mPoints * FEATURE_DATA_6_LEN;
+                len = FEATURE_CHECKSUM_LEN + mPointNum * FEATURE_DATA_6_LEN;
                 break;
             case FEATURE_DATA_10:
-                len = FEATURE_CHECKSUM_LEN + mPoints * FEATURE_DATA_10_LEN;
+                len = FEATURE_CHECKSUM_LEN + mPointNum * FEATURE_DATA_10_LEN;
                 break;
             case FEATURE_SCREEN:
                 len = FEATURE_CHECKSUM_LEN + 9;
@@ -181,7 +179,7 @@ public class BTProtocol implements Protocol {
         mPointLen = 0;
         mDataFeature = 0;
         mChecksum = 0;
-        mPoints = 0;
+        mPointNum = 0;
 
         Arrays.fill(mDataBuffer, (byte) 0);
         mTouchScreen.reset();
@@ -237,62 +235,15 @@ public class BTProtocol implements Protocol {
         return result;
     }
 
-    FileWriter mInWriter, mOutWriter;
-
-    public void createFileWriter() {
-        mInWriter = createFileWriter("d:/in.text");
-        mOutWriter = createFileWriter("d:/out.text");
-    }
-
-    public void closeWriter() {
-        if (null != mInWriter) {
-            try {
-                mInWriter.flush();
-                mInWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (null != mOutWriter) {
-            try {
-                mOutWriter.flush();
-                mOutWriter.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    private FileWriter createFileWriter(String path) {
-        File file = new File(path);
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            file.createNewFile();
-            FileWriter writer = new FileWriter(file);
-            return writer;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
     public int parse(byte[] data) {
         if (null == data || data.length == 0) {
             throw new IllegalArgumentException();
         }
-        String hexStr = HexUtil.byteToString(TAG, data);
-//        try {
-//            mInWriter.write(hexStr);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
-        printData(data);
+        DataLog.getInstance().writeInData(data);
+        DataLog.getInstance().writeInLineData(data);
         this.reset();
         //  68 0C 02 07 09 F7 35 FE 5E DF 00 B4 00 A1
         byte[] totalData = combineBytes(lastContinueBytes, data);
@@ -363,12 +314,8 @@ public class BTProtocol implements Protocol {
                 Log.d(TAG, "checksum invalid");
                 continue;
             }
-            hexStr = HexUtil.byteToString(TAG, validData);
-//            try {
-//                mOutWriter.write(hexStr);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+
+            DataLog.getInstance().writeOutData(validData);
             validData.clear();
             if (mDataBuffer.length > 0) {
                 result = setScreenData();
@@ -376,20 +323,6 @@ public class BTProtocol implements Protocol {
             i = checksumIndex;
         }
         return result;
-    }
-
-    private void printData(byte[] data) {
-        if (null == data || data.length == 0) {
-            return;
-        }
-
-        //if (BuildConfig.DEBUG) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02X ", b));
-        }
-        //Log.d(TAG, String.format("received data:%s", sb.toString()));
-        // }
     }
 
     private int setScreenData() {
@@ -400,7 +333,7 @@ public class BTProtocol implements Protocol {
                 result = STATUS_CHANGE_DATA_FEATURE;
                 break;
             case BTProtocol.FEATURE_DATA_10:
-                mTouchScreen.setPoint(mPoints, this.mDataBuffer);
+                mTouchScreen.setPoint(mPointNum, this.mDataBuffer);
                 result = STATUS_GET_DATA;
                 break;
             case BTProtocol.FEATURE_SCREEN:

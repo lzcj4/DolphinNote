@@ -41,7 +41,7 @@ public class ProtocolParseTest {
 //            mProtocol.handlerIncomeData(data[i].length, data[i]);
 //        }
 
-        mProtocol.createFileWriter();
+        //   mProtocol.createFileWriter();
         while (true) {
             try {
                 String line = mReader.readLine();
@@ -63,7 +63,7 @@ public class ProtocolParseTest {
                 e.printStackTrace();
             }
         }
-        mProtocol.closeWriter();
+        //  mProtocol.closeWriter();
     }
 }
 
