@@ -24,12 +24,11 @@ import com.tannuo.note.R;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
-import com.tannuo.sdk.bluetooth.connectservice.BLCConnectService;
-import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
-import com.tannuo.sdk.bluetooth.connectservice.MockConnectService;
-import com.tannuo.sdk.bluetooth.connectservice.TouchEvent;
-import com.tannuo.sdk.bluetooth.connectservice.TouchListener;
-import com.tannuo.sdk.bluetooth.connectservice.TouchPoint;
+import com.tannuo.sdk.bluetooth.device.BLCDevice;
+import com.tannuo.sdk.bluetooth.device.IDevice;
+import com.tannuo.sdk.bluetooth.device.TouchEvent;
+import com.tannuo.sdk.bluetooth.device.TouchListener;
+import com.tannuo.sdk.bluetooth.device.TouchPoint;
 import com.tannuo.sdk.util.Logger;
 
 import java.util.ArrayList;
@@ -42,14 +41,13 @@ import butterknife.ButterKnife;
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
-public class DrawFragment extends Fragment {
+public class DrawFragment extends Fragment implements TouchListener{
     private final String TAG = this.getClass().getSimpleName();
     @Bind(R.id.surfaceView)
     android.view.SurfaceView surfaceView;
 
     private SurfaceHolder mSurfaceHolder;
     private Bitmap mBitmap;
-    private ConnectService mConnectService;
     private Canvas mBmpCanvas;
     private Paint mLinePaint, mBmpPaint, mRubberPaint;
     private int mPaintWidth, mPaintHeight;
@@ -84,8 +82,6 @@ public class DrawFragment extends Fragment {
         });
         //surfaceView.setBackgroundColor(Color.WHITE);
 
-        mConnectService = new MockConnectService(mTouchListener);
-        // mConnectService=getDevice();
         mLinePaint = initialBrush();
         mBmpPaint = initialBrush();
         mRubberPaint = initialBrush();
@@ -99,9 +95,6 @@ public class DrawFragment extends Fragment {
                 mPaintWidth = surfaceView.getWidth();
                 mPaintHeight = surfaceView.getHeight();
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
-                //mBmpCanvas.drawColor(Color.WHITE);
-                mConnectService.connect("IRMT03");
-                //}
             }
         });
         mWakeLock = new WakeLock(this.getActivity());
@@ -109,21 +102,21 @@ public class DrawFragment extends Fragment {
         return view;
     }
 
-    private ConnectService getDevice() {
-        return new BLCConnectService(this.getActivity(), new TouchScreenListenerImpl() {
+    private IDevice getDevice() {
+        return new BLCDevice(this.getActivity(), new TouchScreenListenerImpl() {
             @Override
             public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
-                mTouchListener.onTouch(getTouchEvent(TouchEvent.UP, upPoints));
+                onTouched(getTouchEvent(TouchEvent.UP, upPoints));
             }
 
             @Override
             public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
-                mTouchListener.onTouch(getTouchEvent(TouchEvent.DOWN, downPoints));
+                onTouched(getTouchEvent(TouchEvent.DOWN, downPoints));
             }
 
             @Override
             public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
-                mTouchListener.onTouch(getTouchEvent(TouchEvent.MOVE, movePoints));
+                onTouched(getTouchEvent(TouchEvent.MOVE, movePoints));
             }
 
             private TouchEvent getTouchEvent(int mode, final List<TouchScreen.TouchPoint> points) {
@@ -160,7 +153,8 @@ public class DrawFragment extends Fragment {
         mHeightRatio = height / TouchPoint.MAX_Y;
     }
 
-    private TouchListener mTouchListener = (event) -> {
+    @Override
+    public void onTouched(TouchEvent event) {
         if (null == mSurfaceHolder) {
             Logger.d(TAG, "Current surface view is destroied");
             return;
@@ -177,9 +171,10 @@ public class DrawFragment extends Fragment {
                 touchUp(event.Points);
                 break;
         }
-    };
+    }
 
     LineSmooth lineSmooth = new LineSmooth();
+
     private void touchDown(List<TouchPoint> points) {
         // drawLine(points);
         lineSmooth.drawLine(points);

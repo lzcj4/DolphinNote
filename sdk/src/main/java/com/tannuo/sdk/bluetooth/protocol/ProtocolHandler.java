@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
+import com.tannuo.sdk.bluetooth.device.IDevice;
 import com.tannuo.sdk.util.DataLog;
 
 import java.lang.ref.WeakReference;
@@ -26,7 +26,7 @@ public class ProtocolHandler {
         void onReceive(byte[] data);
     }
 
-    private final ConnectService mService;
+    private final IDevice mService;
     private final Protocol mProtocol;
     private final TouchScreenListener mTouchListener;
     private OnDataReceive mDataReceive;
@@ -35,7 +35,7 @@ public class ProtocolHandler {
     private ProtocolParseHandler mHandler;
     public static final int MESSAGE_PROTOCOL_PARSE = 1;
 
-    public ProtocolHandler(ConnectService service, Protocol protocol,
+    public ProtocolHandler(IDevice service, Protocol protocol,
                            TouchScreenListener touchListener) {
         if (null == service || null == protocol || null == touchListener) {
             throw new IllegalArgumentException();
@@ -155,7 +155,7 @@ public class ProtocolHandler {
             }
             ProtocolHandler handler = wrProtocolHandler.get();
             Protocol protocol = handler.mProtocol;
-            ConnectService service = handler.mService;
+            IDevice service = handler.mService;
             TouchScreenListener touchListener = handler.mTouchListener;
 
             if (handler.mDataReceive != null) {

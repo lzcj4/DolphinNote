@@ -1,8 +1,8 @@
 package com.tannuo.note;
 
 import android.annotation.TargetApi;
+import android.app.FragmentTransaction;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,14 +13,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.connectservice.BTServiceFactory;
-import com.tannuo.sdk.bluetooth.connectservice.ConnectService;
+import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
+import com.tannuo.sdk.bluetooth.device.BTDeviceFactory;
+import com.tannuo.sdk.bluetooth.device.IDevice;
+import com.tannuo.sdk.bluetooth.device.TouchEvent;
+import com.tannuo.sdk.bluetooth.device.TouchPoint;
 import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
@@ -32,6 +34,7 @@ import org.greenrobot.eventbus.meta.SubscriberInfo;
 import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -41,12 +44,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements TouchScreenListener, ProtocolHandler.OnDataReceive {
+public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
     @Bind(R.id.edtName)
     EditText edtName;
-    @Bind(R.id.txtData)
-    TextView txtData;
     @Bind(R.id.txtCount)
     TextView txtCount;
     @Bind(R.id.txtDevice)
@@ -55,12 +56,12 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     TextView txtStartDate;
     @Bind(R.id.txtDuration)
     TextView txtDuration;
-    @Bind(R.id.txtScroll)
-    ScrollView txtScroll;
     @Bind(R.id.txtPointStatus)
     TextView txtPointLen;
 
-    private ConnectService mService;
+    LogFragment mLogFragment;
+    private IDevice mService;
+    private TouchScreenListener mTouchScreenListener;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -74,38 +75,16 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
                 imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
             });
         }
+        mTouchScreenListener = new TouchListener();
+        mLogFragment = new LogFragment();
+        FragmentTransaction trans = getFragmentManager().beginTransaction();
+        trans.add(R.id.layout_data, mLogFragment).commit();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // disconnect();
-    }
-
-    private void testMetric() {
-        DisplayMetrics dMetrics = new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(dMetrics);
-        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
-    }
-
-    private void testEnentBus() {
-        EventBus.builder().addIndex(new SubscriberInfoIndex() {
-            @Override
-            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
-                return null;
-            }
-        }).installDefaultEventBus();
-
-        EventBus.getDefault().register(this);
-        EventBus.getDefault().post("test");
-
-        ServerAPI api = new ServerAPI();
-        api.getServerConfig();
-    }
-
-    @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)
-    public void handleEvent(Object obj) {
-
     }
 
     @Override
@@ -137,11 +116,9 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
 
     private void connect() {
         if (null == mService) {
-
             txtDevice.setText("正在连接.......");
-            BTServiceFactory factory = new BTServiceFactory();
-//            mService = factory.get(this, new TouchScreenListenerImpl());
-            mService = factory.get(this, this);
+            BTDeviceFactory factory = new BTDeviceFactory();
+            mService = factory.get(this, this.mTouchScreenListener);
             mService.connect(getDeviceName());
         }
     }
@@ -162,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
     }
 
     private void clear() {
+        mLogFragment.clearData();
         this.txtCount.setText("0");
-        this.txtData.setText("");
         DataLog.getInstance().restart();
         rowIndex = 0;
         byteCount = 0;
@@ -192,105 +169,103 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onGestureGet(int gestureNo) {
-        Log.v(TAG, "gesture " + gestureNo);
-    }
+    private class TouchListener extends TouchScreenListenerImpl implements ProtocolHandler.OnDataReceive {
+        private TouchEvent getTouchEvent(int mode, final List<TouchScreen.TouchPoint> points) {
+            TouchEvent result = new TouchEvent();
+            result.Mode = mode;
+            result.Points = new ArrayList<>();
+            for (TouchScreen.TouchPoint p : points) {
+                result.Points.add(new TouchPoint(p));
+            }
+            return result;
+        }
 
-    @Override
-    public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
-        Log.v(TAG, "onTouchUp  ");
-    }
+        @Override
+        public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
+            super.onTouchUp(upPoints);
+            getTouchEvent(TouchEvent.UP, upPoints);
+        }
 
-    @Override
-    public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
-        Log.v(TAG, "onTouchDown  ");
-    }
+        @Override
+        public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
+            super.onTouchDown(downPoints);
+            getTouchEvent(TouchEvent.DOWN, downPoints);
+        }
 
-    @Override
-    public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
-        Log.v(TAG, "onTouchMove  ");
-    }
+        @Override
+        public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
+            super.onTouchMove(movePoints);
+            getTouchEvent(TouchEvent.MOVE, movePoints);
+        }
 
-    @Override
-    public void onSnapshot(int snapshot) {
-        Log.v(TAG, "snapshot " + snapshot);
-    }
+        @Override
+        public void onError(int errorCode) {
+            Log.v(TAG, "onError " + errorCode);
+            MainActivity.this.runOnUiThread(() -> {
+                disconnect();
+                txtDevice.setText("设备连接失败");
+            });
+        }
 
-    @Override
-    public void onIdGet(long touchScreenID) {
-        Log.v(TAG, "Id" + touchScreenID);
-    }
+        @Override
+        public void onBLConnected() {
+            MainActivity.this.runOnUiThread(() -> {
+                txtDevice.setText(String.format("当前设备:%s", MainActivity.this.getDeviceName()));
+                Toast.makeText(MainActivity.this, String.format("Connected:%s", MainActivity.this.getDeviceName()), Toast.LENGTH_SHORT).show();
+            });
+        }
 
-    @Override
-    public void onError(int errorCode) {
-        Log.v(TAG, "onError " + errorCode);
-        this.runOnUiThread(() -> {
-            disconnect();
-            txtDevice.setText("设备连接失败");
-        });
+        @Override
+        public void onReceive(byte[] data) {
+            String str = HexUtil.byteToString(data) + "\r\n";
+            rowIndex++;
+            byteCount += data.length;
+            synchronized (this) {
+                if (!isStarted) {
+                    isStarted = true;
+                    startDate = new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                    txtStartDate.setText(sdf.format(startDate));
+                    startTimer();
+                }
+            }
+            mLogFragment.appendData(str);
+            txtCount.setText(String.valueOf(byteCount));
 
-    }
-
-    @Override
-    public void onBLConnected() {
-        this.runOnUiThread(() -> {
-            txtDevice.setText(String.format("当前设备:%s", this.getDeviceName()));
-            Toast.makeText(this, String.format("Connected:%s", this.getDeviceName()), Toast.LENGTH_SHORT).show();
-        });
+//            MainActivity.this.runOnUiThread(() -> {
+//                mLogFragment.appendData(str);
+//                txtCount.setText(String.valueOf(byteCount));
+//
+//                if (data.length > 3) {
+//                    byte len = data[1];
+//                    byte dataFeature = data[2];
+//                    if (lastFeature != dataFeature) {
+//                        lastFeature = dataFeature;
+//                        String[] statusStr = {"无状态和长宽", "无长宽", "数据完整"};
+//                        if (dataFeature >= 0 && dataFeature <= 2) {
+//                            txtPointLen.setText(statusStr[dataFeature]);
+//                            if (dataFeature == 2) {
+//                                txtPointLen.setTextColor(Color.BLACK);
+//                            } else {
+//                                txtPointLen.setTextColor(Color.RED);
+//                            }
+//                        } else {
+//                        }
+//                    }
+//                }
+//            });
+        }
     }
 
     int rowIndex;
     int byteCount;
     boolean isStarted = false;
-
     byte lastFeature = -1;
-
-    @Override
-    public void onReceive(byte[] data) {
-        String str = HexUtil.byteToString(data) + "\r\n";
-        rowIndex++;
-        byteCount += data.length;
-
-        this.runOnUiThread(() -> {
-            if (!isStarted) {
-                isStarted = true;
-                startDate = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                txtStartDate.setText(sdf.format(startDate));
-                startTimer();
-            }
-            txtData.append(str);
-            txtData.scrollTo(0, (int) txtData.getY());
-            txtScroll.fullScroll(View.FOCUS_DOWN);
-            txtCount.setText(String.valueOf(byteCount));
-
-            if (data.length > 3) {
-                byte len = data[1];
-                byte dataFeature = data[2];
-                if (lastFeature != dataFeature) {
-                    lastFeature = dataFeature;
-                    String[] statusStr = {"无状态和长宽", "无长宽", "数据完整"};
-                    if (dataFeature >= 0 && dataFeature <= 2) {
-                        txtPointLen.setText(statusStr[dataFeature]);
-                        if (dataFeature == 2) {
-                            txtPointLen.setTextColor(Color.BLACK);
-                        } else {
-                            txtPointLen.setTextColor(Color.RED);
-                        }
-                    } else {
-                    }
-                }
-            }
-        });
-    }
-
     Date startDate;
     Timer timer;
     int timeCounter = 0;
 
     private void startTimer() {
-        stopTimer();
         timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
@@ -320,5 +295,32 @@ public class MainActivity extends AppCompatActivity implements TouchScreenListen
             timeCounter = 0;
         }
         isStarted = false;
+    }
+
+
+    private void testMetric() {
+        DisplayMetrics dMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(dMetrics);
+        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
+    }
+
+    private void testEnentBus() {
+        EventBus.builder().addIndex(new SubscriberInfoIndex() {
+            @Override
+            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
+                return null;
+            }
+        }).installDefaultEventBus();
+
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post("test");
+
+        ServerAPI api = new ServerAPI();
+        api.getServerConfig();
+    }
+
+    @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)
+    public void handleEvent(Object obj) {
+
     }
 }
