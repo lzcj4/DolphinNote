@@ -19,6 +19,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
@@ -65,17 +66,17 @@ public class MainActivity extends AppCompatActivity {
     TextView txtPointLen;
     @Bind(R.id.txt_Bytes)
     TextView txtBytes;
-
-    LogFragment mLogFragment;
-    DrawFragment mDrawFragment;
-    Fragment mCurrentFragment;
-
-    IDevice mService;
-    TouchScreenListener mTouchScreenListener;
     @Bind(R.id.radio_log)
     RadioButton radioLog;
     @Bind(R.id.radio_draw)
     RadioButton radioDraw;
+
+    LogFragment mLogFragment;
+    DrawFragment mDrawFragment;
+    Fragment mCurrentFragment;
+    IDevice mService;
+    TouchScreenListener mTouchScreenListener;
+    WakeLock mWakeLock;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -116,11 +117,16 @@ public class MainActivity extends AppCompatActivity {
                     .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mDrawFragment;
         });
+
+        mWakeLock = new WakeLock(this);
+        mWakeLock.lockScreen();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        mWakeLock.unlockAll();
         // disconnect();
     }
 

@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import com.tannuo.note.R;
-import com.tannuo.note.utility.WakeLock;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
 import com.tannuo.sdk.bluetooth.device.BLCDevice;
@@ -54,7 +53,6 @@ public class DrawFragment extends Fragment implements TouchListener {
     private float mWidthRatio, mHeightRatio;
 
     private final float STROKE_WIDTH = 6.0f;
-    WakeLock mWakeLock;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -97,8 +95,6 @@ public class DrawFragment extends Fragment implements TouchListener {
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
             }
         });
-        mWakeLock = new WakeLock(this.getActivity());
-        mWakeLock.lockScreen();
         return view;
     }
 
@@ -289,7 +285,6 @@ public class DrawFragment extends Fragment implements TouchListener {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
-        mWakeLock.unlockAll();
     }
 
     private class LineSmooth {

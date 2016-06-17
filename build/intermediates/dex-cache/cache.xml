@@ -1,3 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
 
+    <item
+        jar="D:\Projects\DolphinNote\note\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        revision="23.0.3"
+        sha1="6d1e898fc5c5f0b64419974ea73f8f40edf25cc2">
+        <dex dex="D:\Projects\DolphinNote\note\build\intermediates\pre-dexed\debug\instant-run-bootstrap_80591f675429732d39ed48c272d9c5a027f41c4a.jar" />
+    </item>
+
+</items>
