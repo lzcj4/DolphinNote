@@ -44,9 +44,8 @@ public class LogFragment extends Fragment implements TouchListener {
 
     public void appendData(String data) {
         txtData.append(data);
-        txtData.setText(data);
-        // txtData.scrollTo(0, (int) txtData.getY());
-        //txtScroll.fullScroll(View.FOCUS_DOWN);
+        txtData.scrollTo(0, (int) txtData.getY());
+        txtScroll.fullScroll(View.FOCUS_DOWN);
     }
 
     public void clearData() {

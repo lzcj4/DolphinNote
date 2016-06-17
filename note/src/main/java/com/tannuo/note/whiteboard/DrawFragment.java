@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
  * A simple {@link Fragment} subclass.
  * create an instance of this fragment.
  */
-public class DrawFragment extends Fragment implements TouchListener{
+public class DrawFragment extends Fragment implements TouchListener {
     private final String TAG = this.getClass().getSimpleName();
     @Bind(R.id.surfaceView)
     android.view.SurfaceView surfaceView;
@@ -250,6 +250,9 @@ public class DrawFragment extends Fragment implements TouchListener{
         Canvas canvas = null;
         try {
             canvas = mSurfaceHolder.lockCanvas(mDirtyRect);
+            if (null == canvas) {
+                return;
+            }
             //canvas = mSurfaceHolder.lockCanvas();
             canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
             //canvas.drawColor(Color.BLACK);

@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@id/btnDisconnect"
-            android:text="清零"
+            android:text="清空"
             android:textColor="#0000FF" />
     </LinearLayout>
 
@@ -47,7 +47,7 @@
 
         <EditText
             android:id="@+id/edtName"
-            android:layout_width="100dp"
+            android:layout_width="60dp"
             android:layout_height="50dp"
             android:text="H3" />
 
@@ -58,6 +58,28 @@
             android:layout_below="@id/layoutInfo"
             android:layout_marginLeft="10dp"
             tools:text="连接状态" />
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="日志" />
+
+            <RadioButton
+                android:id="@+id/radio_draw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="画板" />
+        </RadioGroup>
     </LinearLayout>
 
     <LinearLayout
@@ -113,36 +135,59 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="开始时间：" />
+                android:text="起始：" />
 
             <TextView
                 android:id="@+id/txtStartDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:text=""
+                tools:text="14:20:02" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
+                android:layout_marginLeft="10dp"
                 android:text="时长：" />
 
             <TextView
                 android:id="@+id/txtDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:text=""
+                android:textColor="#FFFF0000"
+                tools:text="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="速率：" />
+
+            <TextView
+                android:id="@+id/txt_Bytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFF0000"
+                tools:text="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="字节/秒" />
         </LinearLayout>
 
     </LinearLayout>
-
 
     <RelativeLayout
         android:id="@+id/layout_data"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="5dp"
+        android:layout_weight="1">
 
     </RelativeLayout>
+
 
 </LinearLayout>

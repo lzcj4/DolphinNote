@@ -1,8 +1,10 @@
 package com.tannuo.note;
 
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tannuo.note.whiteboard.DrawFragment;
 import com.tannuo.sdk.bluetooth.TouchScreen;
 import com.tannuo.sdk.bluetooth.TouchScreenListener;
 import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
@@ -45,7 +49,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
-    private final String TAG = "MainActivity";
+    private final String TAG = this.getClass().getSimpleName();
+
     @Bind(R.id.edtName)
     EditText edtName;
     @Bind(R.id.txtCount)
@@ -58,10 +63,19 @@ public class MainActivity extends AppCompatActivity {
     TextView txtDuration;
     @Bind(R.id.txtPointStatus)
     TextView txtPointLen;
+    @Bind(R.id.txt_Bytes)
+    TextView txtBytes;
 
     LogFragment mLogFragment;
-    private IDevice mService;
-    private TouchScreenListener mTouchScreenListener;
+    DrawFragment mDrawFragment;
+    Fragment mCurrentFragment;
+
+    IDevice mService;
+    TouchScreenListener mTouchScreenListener;
+    @Bind(R.id.radio_log)
+    RadioButton radioLog;
+    @Bind(R.id.radio_draw)
+    RadioButton radioDraw;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -77,8 +91,31 @@ public class MainActivity extends AppCompatActivity {
         }
         mTouchScreenListener = new TouchListener();
         mLogFragment = new LogFragment();
-        FragmentTransaction trans = getFragmentManager().beginTransaction();
+        final FragmentTransaction trans = getFragmentManager().beginTransaction();
         trans.add(R.id.layout_data, mLogFragment).commit();
+        mCurrentFragment = mLogFragment;
+
+        radioLog.setOnCheckedChangeListener((view, isChecked) -> {
+            if (!isChecked) {
+                return;
+            }
+            FragmentTransaction trans1 = getFragmentManager().beginTransaction();
+            trans1.replace(R.id.layout_data, mLogFragment)
+                    .addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
+            mCurrentFragment = mLogFragment;
+        });
+        radioDraw.setOnCheckedChangeListener((view, isChecked) -> {
+            if (!isChecked) {
+                return;
+            }
+            if (mDrawFragment == null) {
+                mDrawFragment = new DrawFragment();
+            }
+            FragmentTransaction trans1 = getFragmentManager().beginTransaction();
+            trans1.replace(R.id.layout_data, mDrawFragment)
+                    .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
+            mCurrentFragment = mDrawFragment;
+        });
     }
 
     @Override
@@ -120,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
             BTDeviceFactory factory = new BTDeviceFactory();
             mService = factory.get(this, this.mTouchScreenListener);
             mService.connect(getDeviceName());
+            isStarted = true;
         }
     }
 
@@ -132,18 +170,23 @@ public class MainActivity extends AppCompatActivity {
             mService.disconnect();
             mService = null;
             txtDevice.setText("");
-//            txtStartDate.setText("");
-//            txtDuration.setText("");
+
+            isStarted = false;
             stopTimer();
         }
     }
 
     private void clear() {
-        mLogFragment.clearData();
+        if (mCurrentFragment == mLogFragment) {
+            mLogFragment.clearData();
+        }
         this.txtCount.setText("0");
         DataLog.getInstance().restart();
         rowIndex = 0;
         byteCount = 0;
+        txtStartDate.setText("");
+        txtDuration.setText("");
+        txtBytes.setText("");
         stopTimer();
     }
 
@@ -183,19 +226,28 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
             super.onTouchUp(upPoints);
-            getTouchEvent(TouchEvent.UP, upPoints);
+            if (mCurrentFragment == mDrawFragment) {
+                TouchEvent event = getTouchEvent(TouchEvent.UP, upPoints);
+                mDrawFragment.onTouched(event);
+            }
         }
 
         @Override
         public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
             super.onTouchDown(downPoints);
-            getTouchEvent(TouchEvent.DOWN, downPoints);
+            if (mCurrentFragment == mDrawFragment) {
+                TouchEvent event = getTouchEvent(TouchEvent.DOWN, downPoints);
+                mDrawFragment.onTouched(event);
+            }
         }
 
         @Override
         public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
             super.onTouchMove(movePoints);
-            getTouchEvent(TouchEvent.MOVE, movePoints);
+            if (mCurrentFragment == mDrawFragment) {
+                TouchEvent event = getTouchEvent(TouchEvent.MOVE, movePoints);
+                mDrawFragment.onTouched(event);
+            }
         }
 
         @Override
@@ -211,7 +263,8 @@ public class MainActivity extends AppCompatActivity {
         public void onBLConnected() {
             MainActivity.this.runOnUiThread(() -> {
                 txtDevice.setText(String.format("当前设备:%s", MainActivity.this.getDeviceName()));
-                Toast.makeText(MainActivity.this, String.format("Connected:%s", MainActivity.this.getDeviceName()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, String.format("Connected:%s", MainActivity.this.getDeviceName()),
+                        Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -220,54 +273,59 @@ public class MainActivity extends AppCompatActivity {
             String str = HexUtil.byteToString(data) + "\r\n";
             rowIndex++;
             byteCount += data.length;
-            synchronized (this) {
-                if (!isStarted) {
-                    isStarted = true;
-                    startDate = new Date();
-                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                    txtStartDate.setText(sdf.format(startDate));
-                    startTimer();
-                }
-            }
-            mLogFragment.appendData(str);
-            txtCount.setText(String.valueOf(byteCount));
 
-//            MainActivity.this.runOnUiThread(() -> {
-//                mLogFragment.appendData(str);
-//                txtCount.setText(String.valueOf(byteCount));
-//
-//                if (data.length > 3) {
-//                    byte len = data[1];
-//                    byte dataFeature = data[2];
-//                    if (lastFeature != dataFeature) {
-//                        lastFeature = dataFeature;
-//                        String[] statusStr = {"无状态和长宽", "无长宽", "数据完整"};
-//                        if (dataFeature >= 0 && dataFeature <= 2) {
-//                            txtPointLen.setText(statusStr[dataFeature]);
-//                            if (dataFeature == 2) {
-//                                txtPointLen.setTextColor(Color.BLACK);
-//                            } else {
-//                                txtPointLen.setTextColor(Color.RED);
-//                            }
-//                        } else {
-//                        }
-//                    }
-//                }
-//            });
+            MainActivity.this.runOnUiThread(() -> {
+                if (!isStarted) {
+                    return;
+                }
+                synchronized (this) {
+                    if (timer == null) {
+                        startDate = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                        txtStartDate.setText(sdf.format(startDate));
+                        startTimer();
+                    }
+                }
+
+                if (mCurrentFragment == mLogFragment) {
+                    mLogFragment.appendData(str);
+                }
+                txtCount.setText(String.valueOf(byteCount));
+
+                if (data.length > 3) {
+                    byte len = data[1];
+                    byte dataFeature = data[2];
+                    if (lastFeature != dataFeature) {
+                        lastFeature = dataFeature;
+                        String[] statusStr = {"无状态和长宽", "无长宽", "数据完整"};
+                        if (dataFeature >= 0 && dataFeature <= 2) {
+                            txtPointLen.setText(statusStr[dataFeature]);
+                            if (dataFeature == 2) {
+                                txtPointLen.setTextColor(Color.BLACK);
+                            } else {
+                                txtPointLen.setTextColor(Color.RED);
+                            }
+                        } else {
+                        }
+                    }
+                }
+            });
         }
     }
 
     int rowIndex;
     int byteCount;
-    boolean isStarted = false;
+    boolean isStarted = true;
     byte lastFeature = -1;
     Date startDate;
     Timer timer;
+    TimerTask task;
     int timeCounter = 0;
+    int lastBytCount = 0;
 
     private void startTimer() {
         timer = new Timer();
-        TimerTask task = new TimerTask() {
+        task = new TimerTask() {
             @Override
             public void run() {
                 Date dtNow = new Date();
@@ -277,10 +335,13 @@ public class MainActivity extends AppCompatActivity {
 //                Date dt = calendar.getTime();
                 Date dt = new Date(duration);
                 timeCounter++;
+                int dataCount = byteCount - lastBytCount;
+                lastBytCount = byteCount;
                 runOnUiThread(() -> {
 //                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
 //                    txtDuration.setText(sdf.format(dt));
                     txtDuration.setText(String.format("%s 秒", timeCounter));
+                    txtBytes.setText(String.valueOf(dataCount));
                 });
 
             }
@@ -291,10 +352,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopTimer() {
         if (null != timer) {
+            task.cancel();
             timer.cancel();
+            task = null;
+            timer = null;
             timeCounter = 0;
         }
-        isStarted = false;
     }
 
 

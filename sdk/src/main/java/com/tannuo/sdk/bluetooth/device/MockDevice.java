@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
@@ -36,6 +37,8 @@ public class MockDevice implements IDevice {
         mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
     }
 
+    private boolean isRunning = true;
+
     private void mockReader() {
         BufferedReader reader = null;
         File file = new File("/sdcard/point_data/data.txt");
@@ -47,7 +50,7 @@ public class MockDevice implements IDevice {
             }
         }
 
-        while (true) {
+        while (isRunning) {
             try {
                 String line = reader.readLine();
                 if (null == line) {
@@ -92,8 +95,10 @@ public class MockDevice implements IDevice {
 
     @Override
     public int connect(String deviceName) {
+        isRunning = true;
         Observable.create((s) -> mockReader())
-                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((s) -> {
                 });
         mTouchListener.onBLConnected();
@@ -102,6 +107,7 @@ public class MockDevice implements IDevice {
 
     @Override
     public int disconnect() {
+        isRunning = false;
         return 0;
     }
 

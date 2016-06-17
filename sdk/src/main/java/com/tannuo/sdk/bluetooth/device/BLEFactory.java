@@ -13,7 +13,7 @@ import com.tannuo.sdk.bluetooth.TouchScreenListener;
 public class BLEFactory implements IDeviceFactory {
     @Override
     public IDevice get(Context context, TouchScreenListener touchListener) {
-        return new MockDevice(touchListener);
-        // return new BLEDevice(context, touchListener);
+        //return new MockDevice(touchListener);
+        return new BLEDevice(context, touchListener);
     }
 }
