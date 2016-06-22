@@ -35,7 +35,7 @@ public class BLCDevice extends DeviceBase {
     public BLCDevice(Context context, TouchScreenListener touchListener) {
         super(context, touchListener);
         mProtocol = new BTProtocol(new TouchScreen(600, 2000));
-        mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
+        mHandler = new ProtocolHandler(this, mProtocol, mDeviceListener);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class BLCDevice extends DeviceBase {
         // Get the local Bluetooth adapter
         mBTAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBTAdapter.isEnabled()) {
-            mTouchListener.onError(BL_ERROR_NOT_ENABLE);
+            mDeviceListener.onError(BL_ERROR_NOT_ENABLE);
             return BL_STATE_BL_NOT_ENABLE;
         }
 
@@ -114,17 +114,17 @@ public class BLCDevice extends DeviceBase {
     }
 
     private void connectFailed() {
-        mTouchListener.onError(BL_ERROR_CONN_FAILED);
+        mDeviceListener.onError(BL_ERROR_CONN_FAILED);
         this.reset();
     }
 
     private void connectSucceed() {
         setState(BL_STATE_CONNECTED);
-        mTouchListener.onBLConnected();
+        mDeviceListener.onBLConnected();
     }
 
     private void connectionLost() {
-        mTouchListener.onError(BL_ERROR_CONN_LOST);
+        mDeviceListener.onError(BL_ERROR_CONN_LOST);
         this.reset();
     }
 
@@ -286,7 +286,7 @@ public class BLCDevice extends DeviceBase {
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (mDevice == null) {
                     Log.v(TAG, "No Device Named " + mDeviceName + " Found");
-                    mTouchListener.onError(BL_ERROR_DEV_NOT_FOUND);
+                    mDeviceListener.onError(BL_ERROR_DEV_NOT_FOUND);
                 }
                 mDevice = null;
                 mContext.unregisterReceiver(mReceiver);

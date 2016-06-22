@@ -30,7 +30,7 @@ public abstract class DeviceBase implements IDevice {
 
     protected String mDeviceName = null;
 
-    protected TouchScreenListener mTouchListener;
+    protected TouchScreenListener mDeviceListener;
     protected Context mContext;
     protected BluetoothAdapter mBTAdapter;
     protected BluetoothDevice mDevice;
@@ -43,7 +43,7 @@ public abstract class DeviceBase implements IDevice {
             throw new IllegalArgumentException("DeviceBase construct failed");
         }
         mContext = context;
-        mTouchListener = touchListener;
+        mDeviceListener = touchListener;
     }
 
     public abstract int connect(String deviceName);

@@ -43,8 +43,12 @@ public class LogFragment extends Fragment implements TouchListener {
     }
 
     public void appendData(String data) {
+        if (txtData.getLineCount() > 30) {
+            txtData.setText("");
+        }
         txtData.append(data);
-        txtData.scrollTo(0, (int) txtData.getY());
+        int lineHeight = txtData.getLineHeight() * txtData.getLineCount() - txtData.getBottom() - txtData.getTop();
+        txtData.scrollTo(0, lineHeight);
         txtScroll.fullScroll(View.FOCUS_DOWN);
     }
 

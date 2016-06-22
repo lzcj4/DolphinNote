@@ -49,7 +49,7 @@
             android:id="@+id/edtName"
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:text="H3" />
+            android:text="HC-05" />
 
         <TextView
             android:id="@+id/txtDevice"

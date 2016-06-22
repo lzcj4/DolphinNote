@@ -62,7 +62,7 @@ public class BLEDevice extends DeviceBase {
         mLeScanCallback = new LeScanCallbackImpl();
         mGattCallback = new BluetoothGattCallbackImpl();
         mProtocol = new BTProtocol(new TouchScreen(8000, 20000));
-        mHandler = new ProtocolHandler(this, mProtocol, mTouchListener);
+        mHandler = new ProtocolHandler(this, mProtocol, mDeviceListener);
     }
 
     @Override
@@ -70,14 +70,14 @@ public class BLEDevice extends DeviceBase {
         mDeviceName = devName;
         getBluetoothAdapter();
         if (null == mBTAdapter || !mBTAdapter.isEnabled()) {
-            mTouchListener.onError(BL_ERROR_NOT_ENABLE);
+            mDeviceListener.onError(BL_ERROR_NOT_ENABLE);
             return BL_STATE_BL_NOT_ENABLE;
         }
 
         mHandler.postDelayed(() -> {
             stopLeScan(mLeScanCallback);
             if (null == mDevice) {
-                mTouchListener.onError(BL_ERROR_DEV_NOT_FOUND);
+                mDeviceListener.onError(BL_ERROR_DEV_NOT_FOUND);
             }
         }, TIMER_INTERVAL);
 
@@ -176,12 +176,12 @@ public class BLEDevice extends DeviceBase {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d(TAG, String.format("++ BLE BluetoothGattCallback connection connected"));
                 mIsGattConnected = true;
-                mTouchListener.onBLConnected();
+                mDeviceListener.onBLConnected();
                 mBluetoothGatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, String.format("-- BLE BluetoothGattCallback connection disconnected"));
                 mIsGattConnected = false;
-                mTouchListener.onError(BL_ERROR_CONN_LOST);
+                mDeviceListener.onError(BL_ERROR_CONN_LOST);
             }
         }
 
