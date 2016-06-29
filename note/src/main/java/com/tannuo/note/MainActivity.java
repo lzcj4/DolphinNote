@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,6 +21,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
 import com.tannuo.sdk.bluetooth.TouchScreen;
@@ -144,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         }, 0 * 1000);
     }
 
-    @OnClick({R.id.btnConnect, R.id.btnDisconnect, R.id.btnClear})
+    @OnClick({R.id.btnConnect, R.id.btnDisconnect, R.id.btnClear, R.id.btn_qr_code})
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
@@ -154,6 +158,28 @@ public class MainActivity extends AppCompatActivity {
             this.disconnect();
         } else if (id == R.id.btnClear) {
             this.clear();
+        } else if (id == R.id.btn_qr_code) {
+            IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+            intentIntegrator.setOrientationLocked(false);
+            intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+            intentIntegrator.initiateScan();
+            lastScan = SystemClock.currentThreadTimeMillis();
+        }
+    }
+
+    long lastScan = 0;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IntentIntegrator.REQUEST_CODE) {
+            long duration = SystemClock.currentThreadTimeMillis() - lastScan;
+            Log.e(TAG, String.format("/**** QRCode scans elapsed:%s ms ****/", duration));
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            Log.i(TAG, result.toString());
+            String content = result.getContents();
+            edtName.setText(content);
+            Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
         }
     }
 

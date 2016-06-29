@@ -275,7 +275,7 @@ public class BLCDevice extends DeviceBase {
 
                 String name = device.getName();
                 String addr = device.getAddress();
-                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+                    if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
                     mDevice = device;
                     cancelDiscovery();
                     connect(device, true);

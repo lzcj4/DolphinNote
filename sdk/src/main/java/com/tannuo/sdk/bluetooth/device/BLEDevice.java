@@ -112,7 +112,7 @@ public class BLEDevice extends DeviceBase {
 
     private void stopLeScan(BluetoothAdapter.LeScanCallback callback) {
         if (null != mBTAdapter) {
-            mBTAdapter.stopLeScan(callback);
+            //mBTAdapter.stopLeScan(callback);
         }
     }
 
