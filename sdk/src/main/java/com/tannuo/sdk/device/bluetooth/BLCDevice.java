@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -50,7 +49,7 @@ public class BLCDevice extends DeviceBase {
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(mReceiver, filter);
+        mContext.registerReceiver(mReceiver, filter);
         this.cancelDiscovery();
         mBTAdapter.startDiscovery();
         return BL_STATE_READY;
@@ -275,21 +274,21 @@ public class BLCDevice extends DeviceBase {
 
                 String name = device.getName();
                 String addr = device.getAddress();
-                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+                // if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.startsWith(mDeviceName)) {
                     mDevice = device;
                     cancelDiscovery();
                     connect(device, true);
-                    LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
+                    mContext.unregisterReceiver(mReceiver);
                     Log.v(TAG, String.format("Discovery BLC device:%s ", mDeviceName));
                 }
-
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (mDevice == null) {
                     Log.v(TAG, "No Device Named " + mDeviceName + " Found");
                     mDeviceListener.onError(BL_ERROR_DEV_NOT_FOUND);
                 }
                 mDevice = null;
-                LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
+                mContext.unregisterReceiver(mReceiver);
                 Log.v(TAG, String.format("Discovery BLC finished"));
             }
         }

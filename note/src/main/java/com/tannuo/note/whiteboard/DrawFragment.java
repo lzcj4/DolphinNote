@@ -130,26 +130,22 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                 List<TouchPoint> upPoints = new ArrayList<>();
                 List<TouchPoint> points = touchEvent.getPoints();
                 for (TouchPoint point : points) {
-                    switch (point.getAction()) {
-                        case TouchPoint.ACTION_DOWN:
-                            downPoints.add(point);
-                            break;
-                        case TouchPoint.ACTION_MOVE:
-                            movePoints.add(point);
-                            break;
-                        case TouchPoint.ACTION_UP:
-                            upPoints.add(point);
-                            break;
+                    if (point.getIsDown()) {
+                        downPoints.add(point);
+                    } else if (point.getIsMove()) {
+                        movePoints.add(point);
+                    } else if (point.getIsUp()) {
+                        upPoints.add(point);
                     }
                 }
                 if (!downPoints.isEmpty()) {
                     touchDown(downPoints);
                 }
                 if (!movePoints.isEmpty()) {
-                    drawLine(downPoints);
+                    drawLine(movePoints);
                 }
                 if (!upPoints.isEmpty()) {
-                    touchUp(downPoints);
+                    touchUp(upPoints);
                 }
                 break;
 
@@ -187,16 +183,16 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         for (int i = 0; i < len; i++) {
             TouchPoint p = points.get(i);
             float lineWidth = getPaintWidth(p);
-            mLinePaint.setStrokeWidth(lineWidth);
-            mLinePaint.setPathEffect(new CornerPathEffect(lineWidth / 2));
+//            mLinePaint.setStrokeWidth(lineWidth);
+//            mLinePaint.setPathEffect(new CornerPathEffect(lineWidth / 2));
             Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
                     lastPoint.getId(), p.getId(), p.distance(lastPoint)));
 
-            if (p.isLongDistance(lastPoint)) {
-                lastPoint = p;
-                DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
-                continue;
-            }
+//            if (p.isLongDistance(lastPoint)) {
+//                lastPoint = p;
+//                DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+//                continue;
+//            }
 
             if (drawRubber(p)) {
                 continue;

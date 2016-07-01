@@ -6,6 +6,16 @@ import java.security.InvalidParameterException;
  * Created by Nick_PC on 2016/7/1.
  */
 public class BTProtocolFactory implements IProtocolFactory {
+
+    private static IProtocolFactory instance;
+
+    public static IProtocolFactory getInstance() {
+        if (instance == null) {
+            instance = new BTProtocolFactory();
+        }
+        return instance;
+    }
+
     @Override
     public IProtocol get(int type) {
         IProtocol result = null;
