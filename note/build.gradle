@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.neenbedankt.android-apt'
+
+apt {
+    arguments {
+        eventBusIndex "com.tannuo.note.MyEventBusIndex"
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -28,8 +35,14 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':sdk')
 
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.jakewharton:butterknife:7.0.1'
-
+    apt 'org.greenrobot:eventbus-annotation-processor:3.0.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.android.support:support-v4:23.4.0'
+
+    compile 'com.journeyapps:zxing-android-embedded:3.3.0@aar'
+    compile 'com.google.zxing:core:3.2.1'
+    compile 'com.android.support:appcompat-v7:23.1.0'
 }

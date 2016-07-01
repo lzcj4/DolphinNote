@@ -1,12 +1,14 @@
 package com.tannuo.sdk.util;
 
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.List;
 
 /**
  * Created by Nick_PC on 2016/5/5.
@@ -16,30 +18,39 @@ public class DataLog {
     private static final String TAG = "DataLog";
     private static final String DATA_FOLDER = "BTData";
     private static final String DATA_IN_FILE = "In.txt";
+    private static final String DATA_IN_LINE_FILE = "In_Line.txt";
     private static final String DATA_OUT_FILE = "Out.txt";
 
     private OutputStreamWriter mInWriter;
+    private OutputStreamWriter mInLineWriter;
     private OutputStreamWriter mOutWriter;
 
-    private static DataLog instance;
-
-    public DataLog()  {
-        createFiles();
-        instance = this;
+    public static DataLog getInstance() {
+        return InstanceHolder.instance;
     }
 
-    private void createFiles(){
+    private DataLog() {
+        createFiles();
+    }
+
+    private static class InstanceHolder {
+        private static DataLog instance = new DataLog();
+    }
+
+    private void createFiles() {
         try {
             File dataFolder = getDataFolder();
             if (null != dataFolder) {
                 mInWriter = createDataFile(dataFolder, DATA_IN_FILE);
+                mInLineWriter = createDataFile(dataFolder, DATA_IN_LINE_FILE);
                 mOutWriter = createDataFile(dataFolder, DATA_OUT_FILE);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
-    private static File getDataFolder() throws  IllegalAccessException{
+
+    private static File getDataFolder() throws IllegalAccessException {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             throw new IllegalAccessException("External storage is not mounted");
         }
@@ -47,20 +58,23 @@ public class DataLog {
         File rootFolder = Environment.getExternalStorageDirectory();
         if (null != rootFolder && rootFolder.exists()) {
             File dataFolder = new File(rootFolder, String.format("/%s/", DATA_FOLDER));
-            if (!dataFolder.exists() && dataFolder.mkdirs())
+            if (!dataFolder.exists()) {
+                if (dataFolder.mkdirs()) {
+                    result = dataFolder;
+                } else {
+                    Log.e(TAG, "create btdata folder failed");
+                }
+            } else {
                 result = dataFolder;
+            }
         }
         return result;
     }
 
 
-    public static void clear() {
-        if (instance == null) {
-            return;
-        }
-
-        instance.close();
-        instance.createFiles();
+    public void restart() {
+        this.close();
+        this.createFiles();
     }
 
     private static OutputStreamWriter createDataFile(File parentFolder, String fileName) {
@@ -82,7 +96,7 @@ public class DataLog {
     }
 
     private void write(OutputStreamWriter writer, String data) {
-        if (writer != null) {
+        if (writer != null && !TextUtils.isEmpty(data)) {
             try {
                 writer.append(data);
                 writer.flush();
@@ -92,12 +106,14 @@ public class DataLog {
         }
     }
 
-    private void write(OutputStreamWriter writer, byte[] data) {
+    private void write(OutputStreamWriter writer, byte[] data, boolean isAppend) {
         StringBuilder sb = new StringBuilder();
         for (byte item : data) {
             sb.append(String.format("%02X ", item));
         }
-        //sb.append("\r\n");
+        if (!isAppend) {
+            sb.append("\r\n");
+        }
         write(writer, sb.toString());
     }
 
@@ -106,35 +122,46 @@ public class DataLog {
     }
 
     public void writeInData(byte[] data) {
-        write(mInWriter, data);
+        write(mInWriter, data, true);
+    }
+
+    public void writeInLineData(byte[] data) {
+        write(mInLineWriter, data, false);
     }
 
     public void writeOutData(String data) {
         write(mOutWriter, data);
     }
 
+    public void writeOutData(List<Byte> data) {
+        byte[] bytes = new byte[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            bytes[i] = data.get(i);
+        }
+        write(mOutWriter, bytes, false);
+    }
+
     public void writeOutData(byte[] data) {
-        write(mOutWriter, data);
+        write(mOutWriter, data, true);
+    }
+
+    private static void closeStreamWriter(OutputStreamWriter writer) {
+        if (null != writer) {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void close() {
-        if (null != mInWriter) {
-            try {
-                mInWriter.close();
-                mInWriter = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (null != mOutWriter) {
-            try {
-                mOutWriter.close();
-                mOutWriter = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        closeStreamWriter(mInWriter);
+        closeStreamWriter(mInLineWriter);
+        closeStreamWriter(mOutWriter);
+        mInWriter = null;
+        mInLineWriter = null;
+        mOutWriter = null;
     }
 }
 
