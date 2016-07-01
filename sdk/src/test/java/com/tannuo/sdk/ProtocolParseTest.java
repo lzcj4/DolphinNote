@@ -1,7 +1,7 @@
 package com.tannuo.sdk;
 
-import com.tannuo.sdk.bluetooth.TouchScreen;
-import com.tannuo.sdk.bluetooth.protocol.BTProtocol;
+import com.tannuo.sdk.device.protocol.JYProtocol;
+import com.tannuo.sdk.device.protocol.JYTouchScreen;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import java.io.IOException;
  * Created by Nick_PC on 2016/5/20.
  */
 public class ProtocolParseTest {
-    private BTProtocol mProtocol;
+    private JYProtocol mProtocol;
     private BufferedReader mReader;
 
     @Before
@@ -31,8 +31,8 @@ public class ProtocolParseTest {
             }
         }
 
-        TouchScreen mScreen = new TouchScreen(0, 0);
-        mProtocol = new BTProtocol(mScreen);
+        JYTouchScreen mScreen = new JYTouchScreen(0, 0);
+        mProtocol = new JYProtocol(mScreen);
     }
 
     @Test

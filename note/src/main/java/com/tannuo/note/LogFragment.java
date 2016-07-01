@@ -9,9 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.tannuo.sdk.bluetooth.device.TouchEvent;
-import com.tannuo.sdk.bluetooth.device.TouchListener;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -19,8 +16,7 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LogFragment extends Fragment implements TouchListener {
-
+public class LogFragment extends Fragment {
 
     @Bind(R.id.txtData)
     TextView txtData;
@@ -56,8 +52,4 @@ public class LogFragment extends Fragment implements TouchListener {
         this.txtData.setText("");
     }
 
-    @Override
-    public void onTouched(TouchEvent event) {
-
-    }
 }

@@ -25,14 +25,12 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
-import com.tannuo.sdk.bluetooth.TouchScreen;
-import com.tannuo.sdk.bluetooth.TouchScreenListener;
-import com.tannuo.sdk.bluetooth.TouchScreenListenerImpl;
-import com.tannuo.sdk.bluetooth.device.BTDeviceFactory;
-import com.tannuo.sdk.bluetooth.device.IDevice;
-import com.tannuo.sdk.bluetooth.device.TouchEvent;
-import com.tannuo.sdk.bluetooth.device.TouchPoint;
-import com.tannuo.sdk.bluetooth.protocol.ProtocolHandler;
+import com.tannuo.sdk.device.TouchDeviceImpl;
+import com.tannuo.sdk.device.bluetooth.BTDeviceFactory;
+import com.tannuo.sdk.device.bluetooth.IDevice;
+import com.tannuo.sdk.device.TouchEvent;
+import com.tannuo.sdk.device.protocol.ProtocolHandler;
+import com.tannuo.sdk.device.TouchDeviceListener;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
 
@@ -43,9 +41,7 @@ import org.greenrobot.eventbus.meta.SubscriberInfo;
 import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     DrawFragment mDrawFragment;
     Fragment mCurrentFragment;
     IDevice mService;
-    TouchScreenListener mTouchScreenListener;
+    TouchDeviceListener mTouchDeviceListener;
     WakeLock mWakeLock;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -94,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(edtName.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
             });
         }
-        mTouchScreenListener = new TouchListener();
+        mTouchDeviceListener = new TouchDeviceListenerImpl();
         mLogFragment = new LogFragment();
         final FragmentTransaction trans = getFragmentManager().beginTransaction();
         trans.add(R.id.layout_data, mLogFragment).commit();
@@ -129,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         mWakeLock.unlockAll();
         // disconnect();
     }
@@ -187,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
         if (null == mService) {
             txtDevice.setText("正在连接.......");
             BTDeviceFactory factory = new BTDeviceFactory();
-            mService = factory.get(this, this.mTouchScreenListener);
+            mService = factory.get(this, this.mTouchDeviceListener);
             mService.connect(getDeviceName());
             isStarted = true;
         }
@@ -244,41 +239,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class TouchListener extends TouchScreenListenerImpl implements ProtocolHandler.OnDataReceive {
-        private TouchEvent getTouchEvent(int mode, final List<TouchScreen.TouchPoint> points) {
-            TouchEvent result = new TouchEvent();
-            result.Mode = mode;
-            result.Points = new ArrayList<>();
-            for (TouchScreen.TouchPoint p : points) {
-                result.Points.add(new TouchPoint(p));
-            }
-            return result;
-        }
+    private class TouchDeviceListenerImpl
+            extends TouchDeviceImpl
+            implements ProtocolHandler.DataListener {
 
         @Override
-        public void onTouchUp(List<TouchScreen.TouchPoint> upPoints) {
-            super.onTouchUp(upPoints);
+        public void onTouchEvent(TouchEvent touchEvent) {
             if (mCurrentFragment == mDrawFragment) {
-                TouchEvent event = getTouchEvent(TouchEvent.UP, upPoints);
-                mDrawFragment.onTouched(event);
-            }
-        }
-
-        @Override
-        public void onTouchDown(List<TouchScreen.TouchPoint> downPoints) {
-            super.onTouchDown(downPoints);
-            if (mCurrentFragment == mDrawFragment) {
-                TouchEvent event = getTouchEvent(TouchEvent.DOWN, downPoints);
-                mDrawFragment.onTouched(event);
-            }
-        }
-
-        @Override
-        public void onTouchMove(List<TouchScreen.TouchPoint> movePoints) {
-            super.onTouchMove(movePoints);
-            if (mCurrentFragment == mDrawFragment) {
-                TouchEvent event = getTouchEvent(TouchEvent.MOVE, movePoints);
-                mDrawFragment.onTouched(event);
+                mDrawFragment.onTouchEvent(touchEvent);
             }
         }
 
@@ -292,11 +260,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBLConnected() {
+        public void onConnected() {
             MainActivity.this.runOnUiThread(() -> {
                 txtDevice.setText(String.format("当前设备:%s", MainActivity.this.getDeviceName()));
                 Toast.makeText(MainActivity.this, String.format("Connected:%s", MainActivity.this.getDeviceName()),
                         Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        @Override
+        public void onDisconnected() {
+            MainActivity.this.runOnUiThread(() -> {
+                disconnect();
+                txtDevice.setText("设备连接失败");
             });
         }
 
@@ -362,9 +338,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 Date dtNow = new Date();
                 long duration = dtNow.getTime() - startDate.getTime();
-//                Calendar calendar = Calendar.getInstance(Locale.CHINA);
-//                calendar.setTimeInMillis(duration);
-//                Date dt = calendar.getTime();
                 Date dt = new Date(duration);
                 timeCounter++;
                 int dataCount = byteCount - lastBytCount;

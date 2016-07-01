@@ -1,6 +1,6 @@
 package com.tannuo.note.whiteboard;
 
-import com.tannuo.sdk.bluetooth.device.TouchPoint;
+import com.tannuo.sdk.device.TouchPoint;
 
 import java.util.List;
 

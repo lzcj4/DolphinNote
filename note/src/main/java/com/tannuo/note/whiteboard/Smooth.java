@@ -3,6 +3,7 @@ package com.tannuo.note.whiteboard;
 import java.util.Arrays;
 
 public class Smooth {
+    private final String TAG = this.getClass().getSimpleName();
     public int[] xAxes;
     public int[] yAxes;
     public int[] ptnIds;
@@ -15,7 +16,6 @@ public class Smooth {
     public double currentDist;
     public int[][] interpolateArray;
     public int interpolateNum;
-    private final String TAG = "Smooth";
 
     public Smooth() {
         xAxes = new int[3];
