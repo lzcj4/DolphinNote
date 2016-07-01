@@ -1,7 +1,7 @@
 ## JADX
 
 [![Build Status](https://travis-ci.org/skylot/jadx.png?branch=master)](https://travis-ci.org/skylot/jadx)
-[![Build Status](https://drone.io/github.com/skylot/jadx/status.png)](https://drone.io/github.com/skylot/jadx/latest)
+[![Build Status](https://drone.io/github.com/skylot/jadx/action.png)](https://drone.io/github.com/skylot/jadx/latest)
 [![Coverage Status](https://coveralls.io/repos/skylot/jadx/badge.png)](https://coveralls.io/r/skylot/jadx)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/2166/badge.svg)](https://scan.coverity.com/projects/2166)
 [![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)

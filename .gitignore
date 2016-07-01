@@ -15,6 +15,7 @@ out/
 
 # Gradle files
 .gradle/
+.idea/
 build/
 
 # Local configuration file (sdk path, etc)
@@ -37,3 +38,15 @@ captures/
 
 # Keystore files
 *.jks
+*.lock
+.gradle/2.10/taskArtifacts/cache.properties.lock
+*.bin
+.gradle/2.10/taskArtifacts/fileHashes.bin
+*.bin
+*.bin
+*.lock
+.gradle/2.10/taskArtifacts/fileHashes.bin
+*.bin
+.gradle/2.10/taskArtifacts/cache.properties.lock
+.gradle/2.10/taskArtifacts/outputFileStates.bin
+*.bin
