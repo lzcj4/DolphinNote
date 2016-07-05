@@ -122,7 +122,7 @@ public class ProtocolHandler {
             try {
                 lock.lock();
                 dataCache.add(buffer);
-                Log.d(this.getClass().getSimpleName(), String.format("/++ %s ++/", (dataCache.size())));
+                Log.d(this.getClass().getSimpleName(), String.format("/++ after add size: %s ++/", (dataCache.size())));
                 condition.signal();
             } finally {
                 lock.unlock();
@@ -135,7 +135,7 @@ public class ProtocolHandler {
                 byte[] data = new byte[0];
                 if (dataCache.size() > 0) {
                     data = dataCache.remove(0);
-                    Log.d(this.getClass().getSimpleName(), String.format("/-- %s --/", (dataCache.size())));
+                    Log.d(this.getClass().getSimpleName(), String.format("/--after remove size: %s --/", (dataCache.size())));
                 } else {
                     try {
                         condition.await();

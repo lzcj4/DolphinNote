@@ -14,23 +14,7 @@ import java.util.List;
 /**
  * Created by nick on 2016/4/23.
  */
-public class JYProtocol implements IProtocol {
-    private final String TAG = this.getClass().getSimpleName();
-
-    public static final int STATUS_CHANGE_DATA_FEATURE = 1;
-    public static final int STATUS_GET_DATA = 2;
-    public static final int STATUS_GET_GESTURE = 3;
-    public static final int STATUS_GET_SNAPSHOT = 4;
-    public static final int STATUS_GET_IDENTI = 5;
-    public static final int STATUS_GET_SCREEN_FEATURE = 6;
-
-    private static final int ERROR_NONE = 0;
-    private static final int ERROR_HEADER = -1;
-    private static final int ERROR_DATA = -2;
-    private static final int ERROR_DATA_LENGTH = -3;
-    private static final int ERROR_DATA_FEATURE = -4;
-    private static final int ERROR_CHECKSUM = -5;
-
+public class JYProtocol extends ProtocolBase {
     /**
      * Data feature with 5 bytes data
      */
@@ -63,6 +47,10 @@ public class JYProtocol implements IProtocol {
     private static final int PROTOCOL_HEADER = 0x68;
     private static final int PROTOCOL_MAX_LENGTH = 40;
     private static final int FEATURE_CHECKSUM_LEN = 2;
+
+    public final static byte ACTION_DOWN = 0x07;
+    public final static byte ACTION_MOVE = 0x01;/// TODO: 2016/7/1   undefined move action code
+    public final static byte ACTION_UP = 0x04;
 
     private static final byte[] PACKAGE_ENABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, 0x00, (byte) 0xEB};
     private static final byte[] PACKAGE_DISABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, (byte) 0xAA, (byte) 0x95};
@@ -110,6 +98,7 @@ public class JYProtocol implements IProtocol {
         mDataBuffer = new int[0];
         mPointLen = 0;
         mPointNum = 0;
+        TouchPoint.setActions(ACTION_DOWN, ACTION_MOVE, ACTION_UP);
     }
 
     private int getDataLen() {
@@ -176,7 +165,8 @@ public class JYProtocol implements IProtocol {
         return mChecksum == (sum & 0xFF);
     }
 
-    void reset() {
+    @Override
+    protected void reset() {
         mPointLen = 0;
         mDataFeature = 0;
         mChecksum = 0;
@@ -212,31 +202,6 @@ public class JYProtocol implements IProtocol {
             return null;
     }
 
-    byte[] lastContinueBytes = new byte[0];
-
-    private byte[] combineBytes(byte[] data1, byte[] data2) {
-        byte[] result = new byte[0];
-        if (null == data1 && null == data2) {
-            return result;
-        }
-        if (null == data2) {
-            result = data1;
-        }
-
-        if (null == data1) {
-            result = data2;
-        }
-
-        if (null != data1 && null != data2) {
-            result = new byte[data1.length + data2.length];
-            System.arraycopy(data1, 0, result, 0, data1.length);
-            System.arraycopy(data2, 0, result, data1.length, data2.length);
-        }
-
-        return result;
-    }
-
-
     @Override
     public int parse(byte[] data) {
         if (null == data || data.length == 0) {
@@ -247,11 +212,11 @@ public class JYProtocol implements IProtocol {
         DataLog.getInstance().writeInLineData(data);
         this.reset();
         //  68 0C 02 07 09 F7 35 FE 5E DF 00 B4 00 A1
-        byte[] totalData = combineBytes(lastContinueBytes, data);
+        byte[] totalData = combineBytes(lastUnhandledBytes, data);
         int len = totalData.length;
 
-        if (lastContinueBytes.length != 0) {
-            lastContinueBytes = new byte[0];
+        if (lastUnhandledBytes.length != 0) {
+            lastUnhandledBytes = new byte[0];
         }
         int result = ERROR_NONE;
         ArrayList<Byte> validData = new ArrayList<>();
@@ -264,7 +229,7 @@ public class JYProtocol implements IProtocol {
                 continue;
             } else {
                 if (i == totalData.length - 1) {
-                    lastContinueBytes = new byte[]{PROTOCOL_HEADER};
+                    lastUnhandledBytes = new byte[]{PROTOCOL_HEADER};
                     break;
                 }
             }
@@ -277,7 +242,7 @@ public class JYProtocol implements IProtocol {
                 continue;
             } else {
                 if (i + 1 + mPointLen >= len) {
-                    lastContinueBytes = Arrays.copyOfRange(totalData, i, len);
+                    lastUnhandledBytes = Arrays.copyOfRange(totalData, i, len);
                     break;
                 }
             }
@@ -299,7 +264,7 @@ public class JYProtocol implements IProtocol {
                 mDataBuffer = new int[tempData.length];
                 for (int index = 0; index < tempData.length; index++) {
                     mDataBuffer[index] = HexUtil.byteToUnsignedByte(tempData[index]);
-                    validData.add(tempData[index]);
+                     validData.add(tempData[index]);
                 }
             } else {
                 // errorCode = ERROR_DATA;

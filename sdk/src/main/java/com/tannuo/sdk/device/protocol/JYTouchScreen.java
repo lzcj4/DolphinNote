@@ -57,7 +57,7 @@ public class JYTouchScreen {
         for (int i = 0; i < pointLen; i++) {
             int pos = i * 10;
             TouchPoint point = new TouchPoint();
-            point.setAction(buffer[pos]);
+            point.setActionByDevice(buffer[pos]);
             point.setId(buffer[pos + 1]);
             point.setX(DataUtil.bytesToIntLittleEndian(buffer[pos + 2], buffer[pos + 3]));
             point.setY(DataUtil.bytesToIntLittleEndian(buffer[pos + 4], buffer[pos + 5]));
