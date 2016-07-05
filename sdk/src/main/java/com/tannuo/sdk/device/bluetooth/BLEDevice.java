@@ -39,6 +39,10 @@ public class BLEDevice extends DeviceBase {
      */
     private static final int TIMER_INTERVAL = 10 * 1000;
 
+    private String mUART_Uuid = UART_UUID;
+    private String mUART_TX_Uuid = UART_UUID_TX;
+    private String mUART_RX_Uuid = UART_UUID_RX;
+
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattService mGattService;
     /**

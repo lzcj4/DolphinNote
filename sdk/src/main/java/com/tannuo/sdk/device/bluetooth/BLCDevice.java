@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -29,6 +28,7 @@ public class BLCDevice extends DeviceBase {
     // Unique UUID for this application
     private static final UUID SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    private UUID mSpp_Uuid = SPP_UUID;
     private DataThread mThread;
     private int mState;
 
@@ -49,7 +49,7 @@ public class BLCDevice extends DeviceBase {
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(mReceiver, filter);
+        mContext.registerReceiver(mReceiver, filter);
         this.cancelDiscovery();
         mBTAdapter.startDiscovery();
         return BL_STATE_READY;
@@ -163,10 +163,12 @@ public class BLCDevice extends DeviceBase {
             boolean result = false;
             try {
                 cancelDiscovery();
-                mSocket = mDevice.createRfcommSocketToServiceRecord(SPP_UUID);
+                mSocket = mDevice.createRfcommSocketToServiceRecord(mSpp_Uuid);
                 Log.d(TAG, "Create Socket...");
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                connectFailed();
+                return false;
             }
 
             try {
@@ -183,7 +185,6 @@ public class BLCDevice extends DeviceBase {
                 connectFailed();
             }
             return result;
-
         }
 
         private boolean getStream() {
@@ -273,21 +274,21 @@ public class BLCDevice extends DeviceBase {
 
                 String name = device.getName();
                 String addr = device.getAddress();
-                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+                //if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+                if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.startsWith(mDeviceName)) {
                     mDevice = device;
                     cancelDiscovery();
                     connect(device, true);
-                    LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
+                    mContext.unregisterReceiver(mReceiver);
                     Log.v(TAG, String.format("Discovery BLC device:%s ", mDeviceName));
                 }
-
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (mDevice == null) {
                     Log.v(TAG, "No Device Named " + mDeviceName + " Found");
                     mDeviceListener.onError(BL_ERROR_DEV_NOT_FOUND);
                 }
                 mDevice = null;
-                LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
+                mContext.unregisterReceiver(mReceiver);
                 Log.v(TAG, String.format("Discovery BLC finished"));
             }
         }

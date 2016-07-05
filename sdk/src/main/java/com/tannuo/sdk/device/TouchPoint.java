@@ -1,19 +1,37 @@
 package com.tannuo.sdk.device;
 
+import com.tannuo.sdk.device.protocol.JYProtocol;
+import com.tannuo.sdk.util.Logger;
+
+import java.security.InvalidParameterException;
+
 /**
  * Created by Nick_PC on 2016/5/20.
  */
 public class TouchPoint {
+    private final String TAG = this.getClass().getSimpleName();
+
     public static final byte COLOR_BLACK = 0;
     public static final byte COLOR_RED = 1;
     public static final byte COLOR_WHITE = 2;
 
-    public static final byte ACTION_DOWN =0x07;
-    public static final byte ACTION_MOVE = 0x01;/// TODO: 2016/7/1   undefined move action code
-    public static final byte ACTION_UP = 0x04;
-
     public static final float MAX_X = 32767.0F;
     public static final float MAX_Y = 32767.0F;
+
+    private static byte action_down = JYProtocol.ACTION_DOWN;
+    private static byte action_move = JYProtocol.ACTION_MOVE;
+    private static byte action_up = JYProtocol.ACTION_UP;
+
+    ///Due to CVT down and up action are the same code
+    public static final byte ACTION_DOWN = 0;
+    public static final byte ACTION_MOVE = 1;
+    public static final byte ACTION_UP = 2;
+
+    public static void setActions(byte actionDown, byte actionMove, byte actionUp) {
+        action_down = actionDown;
+        action_move = actionMove;
+        action_up = actionUp;
+    }
 
     private int id;
     private int x;
@@ -24,13 +42,12 @@ public class TouchPoint {
     private int action;
 
     public TouchPoint() {
-
     }
 
-    public TouchPoint(int x, int y, int id) {
+    public TouchPoint(int id, int x, int y) {
+        this.id = id;
         this.x = x;
         this.y = y;
-        this.id = id;
     }
 
     public int getId() {
@@ -109,10 +126,32 @@ public class TouchPoint {
 
     public void setAction(int action) {
         this.action = action;
+        Logger.i(TAG, String.format("current point action is:%s", action));
     }
+
+    public void setActionByDevice(int action) {
+        if (action == action_down) {
+            this.action = ACTION_DOWN;
+        } else if (action == action_move) {
+            this.action = ACTION_MOVE;
+        } else if (action == action_up) {
+            this.action = ACTION_UP;
+        } else {
+            throw new InvalidParameterException();
+        }
+    }
+
 
     public boolean getIsDown() {
         return this.action == ACTION_DOWN;
+    }
+
+    public boolean getIsMove() {
+        return this.action == ACTION_MOVE;
+    }
+
+    public boolean getIsUp() {
+        return this.action == ACTION_UP;
     }
 
     public double distance(TouchPoint point) {
@@ -155,6 +194,6 @@ public class TouchPoint {
     @Override
     public String toString() {
         return String.format("Id:%s ,action:%s , x:%s ,y:%s ,width:%s ,height:%s,area:%s",
-                getId(), getAction(), getX(), getY(), getWidth(), getHeight(), getArea());
+                getId(), getAction(), getRawX(), getRawX(), getWidth(), getHeight(), getArea());
     }
 }
