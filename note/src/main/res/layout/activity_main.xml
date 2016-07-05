@@ -54,7 +54,7 @@
             android:id="@+id/edtName"
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:text="AB" />
+            android:text="HTBJ" />
 
         <TextView
             android:id="@+id/txtDevice"

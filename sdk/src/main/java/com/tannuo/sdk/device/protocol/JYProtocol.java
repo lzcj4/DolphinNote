@@ -264,7 +264,7 @@ public class JYProtocol extends ProtocolBase {
                 mDataBuffer = new int[tempData.length];
                 for (int index = 0; index < tempData.length; index++) {
                     mDataBuffer[index] = HexUtil.byteToUnsignedByte(tempData[index]);
-                    validData.add(tempData[index]);
+                     validData.add(tempData[index]);
                 }
             } else {
                 // errorCode = ERROR_DATA;

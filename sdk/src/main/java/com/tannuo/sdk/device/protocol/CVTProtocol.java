@@ -5,6 +5,7 @@ import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -84,6 +85,7 @@ public class CVTProtocol extends ProtocolBase {
                 }
                 lastPoint = point;
             }
+            Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
             if (index < len) {
                 int pointLen = totalData[index++];
                 byte checkSum = totalData[index++];

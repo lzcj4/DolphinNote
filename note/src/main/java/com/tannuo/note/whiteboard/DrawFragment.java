@@ -49,6 +49,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     private float mWidthRatio, mHeightRatio;
 
     private final float STROKE_WIDTH = 6.0f;
+    private final float OFFSET = 1.f;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -165,8 +166,8 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     LineSmooth lineSmooth = new LineSmooth();
 
     private void touchDown(List<TouchPoint> points) {
-        // drawLine(points);
-        lineSmooth.drawLine(points);
+        drawLine(points);
+        //lineSmooth.drawLine(points);
     }
 
     TouchPoint lastPoint = null;
@@ -185,8 +186,9 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             float lineWidth = getPaintWidth(p);
 //            mLinePaint.setStrokeWidth(lineWidth);
 //            mLinePaint.setPathEffect(new CornerPathEffect(lineWidth / 2));
-            Logger.e(TAG, String.format("Id1:%s to Id2:%s, len:%s",
-                    lastPoint.getId(), p.getId(), p.distance(lastPoint)));
+            Logger.i(TAG, String.format("Id1:%s x0=%s,y0=%s to Id2:%s, x1=%s ,y1=%s  len:%s",
+                    lastPoint.getId(), lastPoint.getX(), lastPoint.getY(),
+                    p.getId(), p.getX(), p.getY(), p.distance(lastPoint)));
 
 //            if (p.isLongDistance(lastPoint)) {
 //                lastPoint = p;
@@ -200,7 +202,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
             float dx = lastPoint.getX() - p.getX();
             float dy = lastPoint.getY() - p.getY();
-            if (Math.abs(dx) >= 3 || Math.abs(dy) >= 3) {
+            if (Math.abs(dx) >= OFFSET || Math.abs(dy) >= OFFSET) {
 
 //                mDrawPath.quadTo((lastPoint.getX() + p.getX()) / 2, (lastPoint.getY() + p.getY()) / 2,
 //                        p.getX(), p.getY());

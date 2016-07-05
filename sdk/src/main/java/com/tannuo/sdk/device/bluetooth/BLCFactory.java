@@ -13,8 +13,10 @@ import com.tannuo.sdk.device.protocol.ProtocolType;
 public class BLCFactory implements IDeviceFactory {
     @Override
     public IDevice get(Context context, TouchDeviceListener listener) {
-       // IProtocol protocol = BTProtocolFactory.getInstance().get(ProtocolType.JY);
-        IProtocol protocol = BTProtocolFactory.getInstance().get(ProtocolType.CVT);
+        // return new MockDevice(listener);
+
+        IProtocol protocol = BTProtocolFactory.getInstance().get(ProtocolType.JY);
+        // IProtocol protocol = BTProtocolFactory.getInstance().get(ProtocolType.CVT);
         return new BLCDevice(context, listener, protocol);
     }
 }
