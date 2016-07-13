@@ -37,7 +37,7 @@ public class BLCDevice extends DeviceBase {
     }
 
     @Override
-    public int connect(String devName) {
+    public int connect(String name) {
         // Get the local Bluetooth adapter
         mBTAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBTAdapter.isEnabled()) {
@@ -45,7 +45,7 @@ public class BLCDevice extends DeviceBase {
             return BL_STATE_BL_NOT_ENABLE;
         }
 
-        mDeviceName = devName;
+        mDeviceName = name;
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);

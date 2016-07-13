@@ -49,7 +49,7 @@ public abstract class DeviceBase implements IDevice {
         mHandler = new ProtocolHandler(this, mProtocol, listener);
     }
 
-    public abstract int connect(String deviceName);
+    public abstract int connect(String name);
 
     public abstract int disconnect();
 

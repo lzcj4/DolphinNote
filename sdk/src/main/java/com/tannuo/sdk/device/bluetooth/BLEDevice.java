@@ -66,8 +66,8 @@ public class BLEDevice extends DeviceBase {
     }
 
     @Override
-    public int connect(String devName) {
-        mDeviceName = devName;
+    public int connect(String name) {
+        mDeviceName = name;
         getBluetoothAdapter();
         if (null == mBTAdapter || !mBTAdapter.isEnabled()) {
             mDeviceListener.onError(BL_ERROR_NOT_ENABLE);

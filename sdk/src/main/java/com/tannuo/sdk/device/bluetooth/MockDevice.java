@@ -90,7 +90,7 @@ public class MockDevice implements IDevice {
     }
 
     @Override
-    public int connect(String deviceName) {
+    public int connect(String name) {
         isRunning = true;
         Observable.create((s) -> mockReader())
                 .subscribeOn(Schedulers.io())

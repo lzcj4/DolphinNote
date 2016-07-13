@@ -13,7 +13,7 @@ public class DataUtil {
      * @param bytes
      * @return
      */
-    public static int bytesToIntLittleEndian(int... bytes) {
+    public static int bytesToIntLittleEndian(byte... bytes) {
         if (null == bytes || bytes.length == 0) {
             return 0;
         }
@@ -24,7 +24,8 @@ public class DataUtil {
         int len = bytes.length - 1;
         int result = 0;
         for (int i = len; i >= 0; i--) {
-            result += bytes[i] << 8 * i;
+            int b = byteToUnsignedByte(bytes[i]);
+            result += b << 8 * i;
         }
         return result;
     }
