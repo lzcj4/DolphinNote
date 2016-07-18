@@ -73,10 +73,12 @@ public class CVTProtocol extends ProtocolBase {
                     index += POINT_BYTES - 1;
                     continue;
                 }
-                point.setActionByDevice(action);
-                point.setId(totalData[index++]);
-                point.setX(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));
-                point.setY(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));
+                point.setActionByDevice(action); // byte:0
+                point.setId(totalData[index++]);// byte:1
+                point.setX(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:2,3
+                point.setY(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:4,5
+                point.setWidth(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
+                point.setHeight(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
 
                 mPoints.add(point);
                 if (lastPoint != null && lastPoint.getIsMove() &&

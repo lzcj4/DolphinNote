@@ -86,7 +86,7 @@ public class CVTUsbProtocol extends ProtocolBase {
             }
             // Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
             int frameEnd = totalData[index++];
-            Logger.i(TAG, "get frame end ");
+            Logger.i(TAG, "getFactory frame end ");
 
             i = index;
         }

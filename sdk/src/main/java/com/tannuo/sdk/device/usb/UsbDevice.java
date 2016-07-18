@@ -11,6 +11,7 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -78,7 +79,7 @@ public class UsbDevice extends DeviceBase {
     private class DeviceThread extends Thread {
         private boolean isRunning = true;
 
-        @TargetApi(18)
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
         @Override
         public void run() {
             int interfCount = mDevice.getInterfaceCount();
@@ -95,13 +96,20 @@ public class UsbDevice extends DeviceBase {
             }
 
             UsbDeviceConnection usbConn = mUsbManager.openDevice(mDevice);
-            if (usbConn.claimInterface(inter, true)) {
-                //usbConn.bulkTransfer()
+            boolean isClaimInterf = usbConn.claimInterface(inter, true);
+            if (!isClaimInterf) {
+                Logger.e(TAG, "UsbDeviceConnection.claimInterface failed");
             }
             int len = endPoint.getMaxPacketSize();
             byte[] buffer = new byte[len];
-            while (isRunning) {
-                int readLen = usbConn.bulkTransfer(endPoint, buffer, 0, len, 100);
+
+            while (isClaimInterf && isRunning) {
+                int readLen = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    readLen = usbConn.bulkTransfer(endPoint, buffer, 0, len, 5);
+                } else {
+                    readLen = usbConn.bulkTransfer(endPoint, buffer, len, 5);
+                }
                 if (readLen > 0) {
                     byte[] data = Arrays.copyOfRange(buffer, 0, readLen);
                     mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);
@@ -115,6 +123,7 @@ public class UsbDevice extends DeviceBase {
         public void cancel() {
             this.isRunning = false;
         }
+
     }
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";

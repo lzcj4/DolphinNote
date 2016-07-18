@@ -7,17 +7,8 @@ import java.security.InvalidParameterException;
  */
 public class BTProtocolFactory implements IProtocolFactory {
 
-    private static IProtocolFactory instance;
-
-    public static IProtocolFactory getInstance() {
-        if (instance == null) {
-            instance = new BTProtocolFactory();
-        }
-        return instance;
-    }
-
     @Override
-    public IProtocol get(int type) {
+    public IProtocol getProtocol(int type) {
         IProtocol result = null;
         switch (type) {
             case ProtocolType.JY:

@@ -192,14 +192,14 @@ public class BLCDevice extends DeviceBase {
             try {
                 mInStream = mSocket.getInputStream();
             } catch (Exception e) {
-                Log.e(TAG, "get BLC input stream failed", e);
+                Log.e(TAG, "getFactory BLC input stream failed", e);
                 result = false;
             }
 
             try {
                 mOutStream = mSocket.getOutputStream();
             } catch (Exception e) {
-                Log.e(TAG, "get BLC output stream failed", e);
+                Log.e(TAG, "getFactory BLC output stream failed", e);
                 result = false;
             }
             return result;

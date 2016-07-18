@@ -80,7 +80,7 @@ public class PQProtocol extends ProtocolBase {
             // Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
             int frameEnd = totalData[index++];
             if (frameEnd == FRAME_END) {
-                Logger.i(TAG, "get frame end ");
+                Logger.i(TAG, "getFactory frame end ");
             }
             i = index;
         }

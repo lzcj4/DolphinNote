@@ -179,17 +179,18 @@ public class JYProtocol extends ProtocolBase {
 
     @Override
     public byte[] getCmd() {
-        if (mChangeDataFeature == FEATURE_DATA_5) {
-            mChangeDataFeature = FEATURE_DATA_6;
-            return PACKAGE_FEATURE_DATA_6;
-        } else if (mChangeDataFeature == FEATURE_DATA_6) {
-            mChangeDataFeature = FEATURE_DATA_10;
-            return PACKAGE_FEATURE_DATA_10;
-        } else if (mChangeDataFeature == FEATURE_DATA_10) {
-            mChangeDataFeature = FEATURE_DATA_5;
-            return PACKAGE_FEATURE_DATA_5;
-        } else
-            return null;
+        return PACKAGE_FEATURE_DATA_10;
+//        if (mChangeDataFeature == FEATURE_DATA_5) {
+//            mChangeDataFeature = FEATURE_DATA_6;
+//            return PACKAGE_FEATURE_DATA_6;
+//        } else if (mChangeDataFeature == FEATURE_DATA_6) {
+//            mChangeDataFeature = FEATURE_DATA_10;
+//            return PACKAGE_FEATURE_DATA_10;
+//        } else if (mChangeDataFeature == FEATURE_DATA_10) {
+//            mChangeDataFeature = FEATURE_DATA_5;
+//            return PACKAGE_FEATURE_DATA_5;
+//        } else
+//            return null;
     }
 
     private byte[] changeUsbStatus() {
@@ -226,7 +227,7 @@ public class JYProtocol extends ProtocolBase {
             validData.add(header);
             if (header != PROTOCOL_HEADER) {
                 // errorCode = ERROR_HEADER;
-                //Log.e(TAG, "get invalid protocol header ");
+                //Log.e(TAG, "getFactory invalid protocol header ");
                 continue;
             } else {
                 if (i == totalData.length - 1) {
@@ -239,7 +240,7 @@ public class JYProtocol extends ProtocolBase {
             validData.add(totalData[i + 1]);
             if (mPointLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
-                Log.e(TAG, "get invalid protocol  data len ");
+                Log.e(TAG, "getFactory invalid protocol  data len ");
                 continue;
             } else {
                 if (i + 1 + mPointLen >= len) {
@@ -253,7 +254,7 @@ public class JYProtocol extends ProtocolBase {
             calcPoints();
             if (!lengthCheck()) {
                 //  errorCode = ERROR_DATA_FEATURE;
-                Log.e(TAG, "get data feature and calc point len failed ");
+                Log.e(TAG, "getFactory data feature and calc point len failed ");
                 continue;
             }
 
@@ -270,7 +271,7 @@ public class JYProtocol extends ProtocolBase {
                 }
             } else {
                 // errorCode = ERROR_DATA;
-                Log.e(TAG, "get real data failed ");
+                Log.e(TAG, "getFactory real data failed ");
                 continue;
             }
 
