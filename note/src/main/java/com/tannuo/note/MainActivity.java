@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
         if (null == mDevice) {
             int conn = SettingPref.getInstance().getConnection();
             int prot = SettingPref.getInstance().getProtocol();
+            int vendorId = SettingPref.getInstance().getVendor();
             IDeviceFactory factory = DeviceFactory.getInstance().getDeviceFactory(conn);
             IProtocol protocol = ProtocolFactory.getInstance().getFactory(conn).getProtocol(prot);
             if (factory == null || protocol == null) {
@@ -246,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             txtDevice.setText("正在连接.......");
-            mDevice = factory.get(this, this.mTouchDeviceListener, protocol);
+            mDevice = factory.get(this, this.mTouchDeviceListener, protocol, vendorId);
             mDevice.connect(getDeviceName());
             isStarted = true;
         }

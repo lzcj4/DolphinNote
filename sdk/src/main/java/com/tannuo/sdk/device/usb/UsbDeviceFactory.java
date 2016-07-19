@@ -12,8 +12,16 @@ import com.tannuo.sdk.device.protocol.IProtocol;
  */
 public class UsbDeviceFactory implements IDeviceFactory {
     @Override
-    public IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol) {
-        UsbDevice device = new UsbDevice(context, listener, protocol);
-        return device;
+    public IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol, int vendorId) {
+//        switch (vendorId) {
+//            case DeviceFactory.VENDOR_Mock:
+//                return new MockDevice(listener, protocol);
+//            default:
+//                return new BLEDevice(context, listener, protocol);
+//        }
+        switch (vendorId) {
+            default:
+                return new UsbDevice(context, listener, protocol);
+        }
     }
 }

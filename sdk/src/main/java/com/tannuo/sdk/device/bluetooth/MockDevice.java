@@ -1,17 +1,18 @@
 package com.tannuo.sdk.device.bluetooth;
 
+import com.tannuo.sdk.device.TouchDeviceListener;
 import com.tannuo.sdk.device.TouchEvent;
+import com.tannuo.sdk.device.TouchPoint;
 import com.tannuo.sdk.device.protocol.IProtocol;
-import com.tannuo.sdk.device.protocol.JYTouchScreen;
 import com.tannuo.sdk.device.protocol.JYProtocol;
 import com.tannuo.sdk.device.protocol.ProtocolHandler;
-import com.tannuo.sdk.device.TouchDeviceListener;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,12 +26,10 @@ public class MockDevice implements IDevice {
     private final IProtocol mProtocol;
     private final TouchDeviceListener mListener;
 
-    private final JYTouchScreen mTouchScreen;
     private ProtocolHandler.DataListener mDataListener;
 
-    public MockDevice(TouchDeviceListener listener) {
-        mTouchScreen = new JYTouchScreen(600, 2000);
-        mProtocol = new JYProtocol(mTouchScreen);
+    public MockDevice(TouchDeviceListener listener, IProtocol protocol) {
+        mProtocol = protocol;
         mListener = listener;
         if (listener instanceof ProtocolHandler.DataListener) {
             mDataListener = (ProtocolHandler.DataListener) listener;
@@ -72,10 +71,11 @@ public class MockDevice implements IDevice {
                 int code = mProtocol.parse(data);
                 switch (code) {
                     case JYProtocol.STATUS_GET_DATA:
-                        if (!mTouchScreen.mPoints.isEmpty()) {
+                        List<TouchPoint> points = mProtocol.getPoints();
+                        if (!points.isEmpty()) {
                             TouchEvent event = new TouchEvent();
                             event.setAction(TouchEvent.ACTION_TOUCH);
-                            event.setPoints(mTouchScreen.mPoints);
+                            event.setPoints(points);
                             mListener.onTouchEvent(event);
                         }
                         break;

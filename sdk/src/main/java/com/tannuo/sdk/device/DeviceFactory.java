@@ -14,6 +14,31 @@ public class DeviceFactory {
     public static final int DEVICE_BLE = 1;
     public static final int DEVICE_USB = 2;
 
+    /**
+     * 模拟
+     */
+    public static final int VENDOR_Mock = -1;
+    /**
+     * 四海胜电
+     */
+    public static final int VENDOR_SHSD = 0;
+    /**
+     * 飞易通
+     */
+    public static final int VENDOR_FYT = 1;
+    /**
+     * 馒头科技
+     */
+    public static final int VENDOR_MT = 2;
+    /**
+     * 博通
+     */
+    public static final int VENDOR_BT = 3;
+    /**
+     * 中易腾达
+     */
+    public static final int VENDOR_ZYTD = 4;
+
     private static class InstanceHolder {
         static DeviceFactory instance = new DeviceFactory();
     }

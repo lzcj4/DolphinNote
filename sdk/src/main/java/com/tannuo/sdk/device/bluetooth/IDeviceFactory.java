@@ -15,7 +15,8 @@ public interface IDeviceFactory {
      * @param context
      * @param listener
      * @param protocol
+     * @param vendorId
      * @return
      */
-    IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol);
+    IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol, int vendorId);
 }

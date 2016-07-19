@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 public class SettingPref {
     private final String PREF_CONNECTION = "pref_connection";
     private final String PREF_PROTOCOL = "pref_protocol";
+    private final String PREF_VENDOR = "pref_vendor";
     private Context mContext;
 
     private static class InstanceHolder {
@@ -35,6 +36,15 @@ public class SettingPref {
 
     public void setConnection(int value) {
         setInt(PREF_CONNECTION, value);
+    }
+
+    public int getVendor() {
+        return getInt(PREF_VENDOR);
+    }
+
+    public void setVendor(int value) {
+        setInt(PREF_VENDOR, value);
+
     }
 
     public int getProtocol() {

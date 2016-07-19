@@ -13,9 +13,9 @@ import com.tannuo.sdk.device.protocol.IProtocol;
 public class BTDeviceFactory implements IDeviceFactory {
 
     @Override
-    public IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol) {
+    public IDevice get(Context context, TouchDeviceListener listener, IProtocol protocol, int vendorId) {
         IDeviceFactory factory = getFactory();
-        IDevice result = factory.get(context, listener, protocol);
+        IDevice result = factory.get(context, listener, protocol, vendorId);
         return result;
     }
 
@@ -24,8 +24,7 @@ public class BTDeviceFactory implements IDeviceFactory {
         IDeviceFactory factory;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             factory = new BLEFactory();
-        } else
-        {
+        } else {
             factory = new BLCFactory();
         }
         return factory;

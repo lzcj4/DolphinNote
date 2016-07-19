@@ -118,6 +118,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         this.addPreferencesFromResource(R.xml.pref_general);
         bindPreferenceSummaryToValue(findPreference("pref_connection"));
         bindPreferenceSummaryToValue(findPreference("pref_protocol"));
+        bindPreferenceSummaryToValue(findPreference("pref_vendor"));
     }
 
     @Override

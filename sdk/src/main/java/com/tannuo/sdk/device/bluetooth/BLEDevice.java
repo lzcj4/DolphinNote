@@ -19,9 +19,7 @@ import com.tannuo.sdk.device.TouchDeviceListener;
 import com.tannuo.sdk.device.protocol.IProtocol;
 import com.tannuo.sdk.device.protocol.ProtocolHandler;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,14 +32,17 @@ public class BLEDevice extends DeviceBase {
     private static final String UART_UUID_TX = "0000f1f1-0000-1000-8000-00805f9b34fb";
     private static final String UART_UUID_RX = "0000f1f2-0000-1000-8000-00805f9b34fb";
 
+    private static final String UART_UUID_NOTIFY_DESC = "00002902-0000-1000-8000-00805f9b34fb";
+
     /**
      * Unit: ms
      */
-    private static final int TIMER_INTERVAL = 10 * 1000;
+    private static final int TIMER_INTERVAL = 60 * 1000;
 
-    private String mUART_Uuid = UART_UUID;
-    private String mUART_TX_Uuid = UART_UUID_TX;
-    private String mUART_RX_Uuid = UART_UUID_RX;
+    protected String mUART_Uuid = UART_UUID;
+    protected String mUART_TX_Uuid = UART_UUID_TX;
+    protected String mUART_RX_Uuid = UART_UUID_RX;
+    protected String mUART_Notify_Desc = UART_UUID_NOTIFY_DESC;
 
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattService mGattService;
@@ -112,7 +113,7 @@ public class BLEDevice extends DeviceBase {
 
     private void stopLeScan(BluetoothAdapter.LeScanCallback callback) {
         if (null != mBTAdapter) {
-            //mBTAdapter.stopLeScan(callback);
+            // mBTAdapter.stopLeScan(callback);
         }
     }
 
@@ -143,7 +144,8 @@ public class BLEDevice extends DeviceBase {
 
     @Override
     public void write(byte[] data) {
-        if (null != mGattTXChara && null != mBluetoothGatt &&
+        if (null != mGattTXChara &&
+                null != mBluetoothGatt &&
                 null != data) {
             mGattTXChara.setValue(data);
             mBluetoothGatt.writeCharacteristic(mGattTXChara);
@@ -159,7 +161,8 @@ public class BLEDevice extends DeviceBase {
             Log.d(TAG, String.format("BLE device scanned, name:%s , addr:%s", device.getName(), device.getAddress()));
             String name = device.getName();
             String addr = device.getAddress();
-            if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+            //   if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.equalsIgnoreCase(mDeviceName)) {
+            if (!TextUtils.isEmpty(mDeviceName) && !TextUtils.isEmpty(name) && name.contains(mDeviceName)) {
                 mDevice = device;
                 stopLeScan(mLeScanCallback);
                 connectGatt(device);
@@ -195,39 +198,29 @@ public class BLEDevice extends DeviceBase {
             List<BluetoothGattService> services = gatt.getServices();
             for (BluetoothGattService service : services) {
                 String uuid = service.getUuid().toString();
-//                if (!uuid.equalsIgnoreCase(UART_UUID)) {
-//                    continue;
-//                }
-                if (!uuid.equalsIgnoreCase("0000ffe0-0000-1000-8000-00805f9b34fb")) {
+                if (!uuid.equalsIgnoreCase(mUART_Uuid)) {
                     continue;
                 }
-                Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", UART_UUID));
+                Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", mUART_Uuid));
                 mGattService = service;
-                Map<String, String> grounp = new HashMap<String, String>();
-                grounp.put("name", BLEGattAttributes.lookup(uuid, "unknow"));
-                grounp.put("Uuid", uuid);
                 List<BluetoothGattCharacteristic> gattCharacteristics = service.getCharacteristics();
 
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                     uuid = gattCharacteristic.getUuid().toString();
-                    if (uuid.equalsIgnoreCase(UART_UUID_TX)) {
+                    Log.d(TAG, String.format("-- BLE BluetoothGattCallback char discovered :%s", uuid));
+                    int proper = gattCharacteristic.getProperties();
+                    if ((proper & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0) {
                         mGattTXChara = gattCharacteristic;
-                        Log.d(TAG, String.format("-- BLE BluetoothGattCallback write only characteristic found :%s", UART_UUID_TX));
-                        // } else if (uuid.equalsIgnoreCase(UART_UUID_RX)) {
-                    } else if (uuid.equalsIgnoreCase("0000ffe1-0000-1000-8000-00805f9b34fb")) {
-                        int proper;
-                        mGattRXChara = gattCharacteristic;
-                        proper = mGattRXChara.getProperties();
-                        Log.d(TAG, String.format("-- BLE BluetoothGattCallback read only characteristic found :%s", UART_UUID_RX));
-                        if (0 != (proper &
-                                (BluetoothGattCharacteristic.PROPERTY_NOTIFY | BluetoothGattCharacteristic.PROPERTY_INDICATE))) {
-                            mBluetoothGatt.setCharacteristicNotification(mGattRXChara, true);
-                            BluetoothGattDescriptor descriptor = mGattRXChara.getDescriptor(
-                                    UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+                    }
+                    int charProps = BluetoothGattCharacteristic.PROPERTY_NOTIFY | BluetoothGattCharacteristic.PROPERTY_INDICATE;
+                    if (0 != (proper & charProps)) {
+                        mBluetoothGatt.setCharacteristicNotification(gattCharacteristic, true);
+                        BluetoothGattDescriptor descriptor = gattCharacteristic.getDescriptor(UUID.fromString(mUART_Notify_Desc));
+                        if (null != descriptor) {
                             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                             mBluetoothGatt.writeDescriptor(descriptor);
+                            Log.d(TAG, String.format("++ BLE BluetoothGattCallback set notify enabled :%s", uuid));
                         }
-                        //Log.v(TAG,"RX GET");
                     }
                 }
             }

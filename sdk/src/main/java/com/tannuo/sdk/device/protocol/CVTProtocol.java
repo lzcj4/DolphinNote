@@ -18,7 +18,7 @@ public class CVTProtocol extends ProtocolBase {
     private final byte HEADER_RESERVED = 0x02;
     private final byte FRAME_BYTES = 43;
     private final byte FRAME_POINTS = 6;
-    private final byte POINT_BYTES = 6;
+    private final byte POINT_BYTES = 10;
 
     private final byte ACTION_DOWN = 0x02;
     private final byte ACTION_MOVE = 0x03;
@@ -83,7 +83,7 @@ public class CVTProtocol extends ProtocolBase {
                 mPoints.add(point);
                 if (lastPoint != null && lastPoint.getIsMove() &&
                         action == ACTION_UP) {
-                    point.setAction(ACTION_UP);
+                    point.setAction(TouchPoint.ACTION_UP);
                 }
                 lastPoint = point;
             }

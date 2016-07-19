@@ -174,6 +174,9 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     Path mDrawPath = new Path();
 
     private void drawLine(List<TouchPoint> points) {
+        if (null == mBmpCanvas) {
+            return;
+        }
         if (lastPoint == null) {
             lastPoint = points.get(0);
         }
@@ -214,7 +217,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         mBmpCanvas.drawPath(mDrawPath, mLinePaint);
         drawBitmap();
         mDrawPath.reset();
-    }
+}
 
     private boolean drawRubber(TouchPoint p) {
         boolean result = false;
@@ -282,52 +285,52 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         ButterKnife.unbind(this);
     }
 
-    private class LineSmooth {
-        Smooth mSmooth = new Smooth();
-        TouchPoint lastPoint;
+private class LineSmooth {
+    Smooth mSmooth = new Smooth();
+    TouchPoint lastPoint;
 
-        private int[][] toPointArray(List<TouchPoint> points) {
-            int len = points.size();
-            int[][] result = new int[len][3];
-            for (int i = 0; i < len; i++) {
-                TouchPoint p = points.get(i);
-                result[i][0] = p.getRawX();
-                result[i][1] = p.getRawY();
-                result[i][2] = p.getId();
-            }
-            return result;
+    private int[][] toPointArray(List<TouchPoint> points) {
+        int len = points.size();
+        int[][] result = new int[len][3];
+        for (int i = 0; i < len; i++) {
+            TouchPoint p = points.get(i);
+            result[i][0] = p.getRawX();
+            result[i][1] = p.getRawY();
+            result[i][2] = p.getId();
         }
-
-        private List<TouchPoint> toTouchPoints(int[][] pointArray) {
-            int len = pointArray.length;
-            List<TouchPoint> result = new ArrayList<>();
-            for (int i = 0; i < len; i++) {
-                TouchPoint p = new TouchPoint(pointArray[i][0], pointArray[i][1], pointArray[i][2]);
-                result.add(p);
-            }
-            return result;
-        }
-
-        private void drawLine(List<TouchPoint> points) {
-            int[][] pointArray = toPointArray(points);
-            pointArray = mSmooth.smoothLine(pointArray);
-
-            List<TouchPoint> newPoints = toTouchPoints(pointArray);
-            TouchPoint firstPoint = newPoints.get(0);
-            int len = newPoints.size();
-            if (lastPoint != null && lastPoint.getId() == firstPoint.getId()) {
-                mBmpCanvas.drawLine(lastPoint.getX(), lastPoint.getY(), firstPoint.getX(), firstPoint.getY(), mLinePaint);
-            }
-            for (int i = 1; i < len; i++) {
-                if (newPoints.get(i - 1).getId() == newPoints.get(i).getId()) {
-                    mBmpCanvas.drawLine(newPoints.get(i - 1).getX(), newPoints.get(i - 1).getY()
-                            , newPoints.get(i).getX(), newPoints.get(i).getY(), mLinePaint);
-                }
-            }
-
-            drawBitmap();
-            lastPoint = newPoints.get(len - 1);
-        }
-
+        return result;
     }
+
+    private List<TouchPoint> toTouchPoints(int[][] pointArray) {
+        int len = pointArray.length;
+        List<TouchPoint> result = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            TouchPoint p = new TouchPoint(pointArray[i][0], pointArray[i][1], pointArray[i][2]);
+            result.add(p);
+        }
+        return result;
+    }
+
+    private void drawLine(List<TouchPoint> points) {
+        int[][] pointArray = toPointArray(points);
+        pointArray = mSmooth.smoothLine(pointArray);
+
+        List<TouchPoint> newPoints = toTouchPoints(pointArray);
+        TouchPoint firstPoint = newPoints.get(0);
+        int len = newPoints.size();
+        if (lastPoint != null && lastPoint.getId() == firstPoint.getId()) {
+            mBmpCanvas.drawLine(lastPoint.getX(), lastPoint.getY(), firstPoint.getX(), firstPoint.getY(), mLinePaint);
+        }
+        for (int i = 1; i < len; i++) {
+            if (newPoints.get(i - 1).getId() == newPoints.get(i).getId()) {
+                mBmpCanvas.drawLine(newPoints.get(i - 1).getX(), newPoints.get(i - 1).getY()
+                        , newPoints.get(i).getX(), newPoints.get(i).getY(), mLinePaint);
+            }
+        }
+
+        drawBitmap();
+        lastPoint = newPoints.get(len - 1);
+    }
+
+}
 }

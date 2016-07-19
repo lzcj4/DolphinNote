@@ -94,12 +94,17 @@ public class UsbDevice extends DeviceBase {
                     break;
                 }
             }
+            if (null == endPoint) {
+                Logger.e(TAG, "Can't get USB in endpoint ,usb device connect failed");
+                return;
+            }
 
             UsbDeviceConnection usbConn = mUsbManager.openDevice(mDevice);
             boolean isClaimInterf = usbConn.claimInterface(inter, true);
             if (!isClaimInterf) {
                 Logger.e(TAG, "UsbDeviceConnection.claimInterface failed");
             }
+
             int len = endPoint.getMaxPacketSize();
             byte[] buffer = new byte[len];
 

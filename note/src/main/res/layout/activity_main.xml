@@ -59,7 +59,7 @@
                 android:id="@+id/edtName"
                 android:layout_width="60dp"
                 android:layout_height="50dp"
-                android:text="H3" />
+                android:text="ITON-BLE" />
 
             <TextView
                 android:id="@+id/txtDevice"
