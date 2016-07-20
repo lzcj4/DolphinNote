@@ -3,6 +3,7 @@ package com.tannuo.note;
 import android.app.Application;
 
 import com.facebook.stetho.Stetho;
+import com.tannuo.note.utility.SettingPref;
 import com.tencent.bugly.Bugly;
 
 /**
@@ -13,6 +14,8 @@ public class MyApplication extends Application {
     public void onCreate() {
         Stetho.initializeWithDefaults(this);
         Bugly.init(getApplicationContext(), "900036739", false);
+        SettingPref.getInstance().initial(this);
+        int con = SettingPref.getInstance().getConnection();
         super.onCreate();
     }
 }

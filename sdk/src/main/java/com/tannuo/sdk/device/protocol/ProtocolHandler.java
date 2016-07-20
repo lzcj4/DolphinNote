@@ -164,13 +164,13 @@ public class ProtocolHandler {
             }
 
             switch (protocol.parse(data)) {
-                case JYProtocol.STATUS_CHANGE_DATA_FEATURE:
+                case ProtocolBase.STATUS_CHANGE_DATA_FEATURE:
                     byte[] cmdChangeFeature = protocol.getCmd();
                     if (cmdChangeFeature != null) {
                         service.write(cmdChangeFeature);
                     }
                     break;
-                case JYProtocol.STATUS_GET_DATA:
+                case ProtocolBase.STATUS_GET_DATA:
                     List<TouchPoint> points = protocol.getPoints();
                     if (!points.isEmpty()) {
                         TouchEvent event = new TouchEvent();

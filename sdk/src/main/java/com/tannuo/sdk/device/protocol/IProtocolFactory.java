@@ -5,5 +5,5 @@ package com.tannuo.sdk.device.protocol;
  */
 public interface IProtocolFactory {
 
-    IProtocol get(int type);
+    IProtocol getProtocol(int type);
 }

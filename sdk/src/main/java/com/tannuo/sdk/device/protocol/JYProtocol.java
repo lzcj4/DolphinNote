@@ -48,16 +48,17 @@ public class JYProtocol extends ProtocolBase {
     private static final int PROTOCOL_MAX_LENGTH = 40;
     private static final int FEATURE_CHECKSUM_LEN = 2;
 
+    private static final byte ACTION_NONE = 0x00;
     public final static byte ACTION_DOWN = 0x07;
-    public final static byte ACTION_MOVE = 0x01;/// TODO: 2016/7/1   undefined move action code
+    public final static byte ACTION_MOVE = ACTION_NONE;/// TODO: 2016/7/1   undefined move action code
     public final static byte ACTION_UP = 0x04;
 
-    private static final byte[] PACKAGE_ENABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, 0x00, (byte) 0xEB};
-    private static final byte[] PACKAGE_DISABLE_USB = {0x68, 0x03, (byte) FEATURE_USB_CONTROL, (byte) 0xAA, (byte) 0x95};
+    private static final byte[] PACKAGE_ENABLE_USB = {0x68, 0x03, FEATURE_USB_CONTROL, 0x00, (byte) 0xEB};
+    private static final byte[] PACKAGE_DISABLE_USB = {0x68, 0x03, FEATURE_USB_CONTROL, (byte) 0xAA, (byte) 0x95};
 
-    private static final byte[] PACKAGE_FEATURE_DATA_5 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x00, (byte) 0xEC};
-    private static final byte[] PACKAGE_FEATURE_DATA_6 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x01, (byte) 0xED};
-    private static final byte[] PACKAGE_FEATURE_DATA_10 = {0x68, 0x03, (byte) FEATURE_CHANGE_DATA_FORMAT, 0x02, (byte) 0xEE};
+    private static final byte[] PACKAGE_FEATURE_DATA_5 = {0x68, 0x03, FEATURE_CHANGE_DATA_FORMAT, 0x00, (byte) 0xEC};
+    private static final byte[] PACKAGE_FEATURE_DATA_6 = {0x68, 0x03, FEATURE_CHANGE_DATA_FORMAT, 0x01, (byte) 0xED};
+    private static final byte[] PACKAGE_FEATURE_DATA_10 = {0x68, 0x03, FEATURE_CHANGE_DATA_FORMAT, 0x02, (byte) 0xEE};
 
 //    名称	         含义	                        长度	      备注
 //    帧头	         0x68	                        1字节
@@ -87,7 +88,7 @@ public class JYProtocol extends ProtocolBase {
     private int mPointNum = 1;
     private JYTouchScreen mTouchScreen;
 
-    private int[] mDataBuffer;
+    private byte[] mDataBuffer;
 
     public JYProtocol(JYTouchScreen touchScreen) {
         mTouchScreen = touchScreen;
@@ -95,7 +96,7 @@ public class JYProtocol extends ProtocolBase {
         mChangeDataFeature = FEATURE_DATA_5;
         mUSBCode = USB_DISABLED;
 
-        mDataBuffer = new int[0];
+        mDataBuffer = new byte[0];
         mPointLen = 0;
         mPointNum = 0;
         TouchPoint.setActions(ACTION_DOWN, ACTION_MOVE, ACTION_UP);
@@ -178,17 +179,18 @@ public class JYProtocol extends ProtocolBase {
 
     @Override
     public byte[] getCmd() {
-        if (mChangeDataFeature == FEATURE_DATA_5) {
-            mChangeDataFeature = FEATURE_DATA_6;
-            return PACKAGE_FEATURE_DATA_6;
-        } else if (mChangeDataFeature == FEATURE_DATA_6) {
-            mChangeDataFeature = FEATURE_DATA_10;
-            return PACKAGE_FEATURE_DATA_10;
-        } else if (mChangeDataFeature == FEATURE_DATA_10) {
-            mChangeDataFeature = FEATURE_DATA_5;
-            return PACKAGE_FEATURE_DATA_5;
-        } else
-            return null;
+        return PACKAGE_FEATURE_DATA_10;
+//        if (mChangeDataFeature == FEATURE_DATA_5) {
+//            mChangeDataFeature = FEATURE_DATA_6;
+//            return PACKAGE_FEATURE_DATA_6;
+//        } else if (mChangeDataFeature == FEATURE_DATA_6) {
+//            mChangeDataFeature = FEATURE_DATA_10;
+//            return PACKAGE_FEATURE_DATA_10;
+//        } else if (mChangeDataFeature == FEATURE_DATA_10) {
+//            mChangeDataFeature = FEATURE_DATA_5;
+//            return PACKAGE_FEATURE_DATA_5;
+//        } else
+//            return null;
     }
 
     private byte[] changeUsbStatus() {
@@ -225,7 +227,7 @@ public class JYProtocol extends ProtocolBase {
             validData.add(header);
             if (header != PROTOCOL_HEADER) {
                 // errorCode = ERROR_HEADER;
-                //Log.e(TAG, "get invalid protocol header ");
+                //Log.e(TAG, "getFactory invalid protocol header ");
                 continue;
             } else {
                 if (i == totalData.length - 1) {
@@ -238,7 +240,7 @@ public class JYProtocol extends ProtocolBase {
             validData.add(totalData[i + 1]);
             if (mPointLen < FEATURE_CHECKSUM_LEN) {
                 // errorCode = ERROR_DATA_LENGTH;
-                Log.e(TAG, "get invalid protocol  data len ");
+                Log.e(TAG, "getFactory invalid protocol  data len ");
                 continue;
             } else {
                 if (i + 1 + mPointLen >= len) {
@@ -252,7 +254,7 @@ public class JYProtocol extends ProtocolBase {
             calcPoints();
             if (!lengthCheck()) {
                 //  errorCode = ERROR_DATA_FEATURE;
-                Log.e(TAG, "get data feature and calc point len failed ");
+                Log.e(TAG, "getFactory data feature and calc point len failed ");
                 continue;
             }
 
@@ -261,14 +263,15 @@ public class JYProtocol extends ProtocolBase {
             int dataEndIndex = dataStartIndex + dataLen;
             if (dataLen >= 0 && dataEndIndex < totalData.length) {
                 byte[] tempData = Arrays.copyOfRange(totalData, dataStartIndex, dataEndIndex);
-                mDataBuffer = new int[tempData.length];
+                mDataBuffer = new byte[tempData.length];
                 for (int index = 0; index < tempData.length; index++) {
-                    mDataBuffer[index] = HexUtil.byteToUnsignedByte(tempData[index]);
-                     validData.add(tempData[index]);
+                    //mDataBuffer[index] = HexUtil.byteToUnsignedByte(tempData[index]);
+                    mDataBuffer[index] = tempData[index];
+                    validData.add(tempData[index]);
                 }
             } else {
                 // errorCode = ERROR_DATA;
-                Log.e(TAG, "get real data failed ");
+                Log.e(TAG, "getFactory real data failed ");
                 continue;
             }
 

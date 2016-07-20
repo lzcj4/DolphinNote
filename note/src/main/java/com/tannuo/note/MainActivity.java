@@ -6,9 +6,14 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,20 +22,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.tannuo.note.server.ServerAPI;
+import com.tannuo.note.utility.SettingPref;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
+import com.tannuo.sdk.device.DeviceFactory;
 import com.tannuo.sdk.device.TouchDeviceImpl;
-import com.tannuo.sdk.device.bluetooth.BTDeviceFactory;
-import com.tannuo.sdk.device.bluetooth.IDevice;
-import com.tannuo.sdk.device.TouchEvent;
-import com.tannuo.sdk.device.protocol.ProtocolHandler;
 import com.tannuo.sdk.device.TouchDeviceListener;
+import com.tannuo.sdk.device.TouchEvent;
+import com.tannuo.sdk.device.bluetooth.IDevice;
+import com.tannuo.sdk.device.bluetooth.IDeviceFactory;
+import com.tannuo.sdk.device.protocol.IProtocol;
+import com.tannuo.sdk.device.protocol.ProtocolFactory;
+import com.tannuo.sdk.device.protocol.ProtocolHandler;
+import com.tannuo.sdk.device.protocol.ProtocolType;
+import com.tannuo.sdk.device.usb.HttpServer;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
 
@@ -40,13 +53,16 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.greenrobot.eventbus.meta.SubscriberInfo;
 import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,11 +86,19 @@ public class MainActivity extends AppCompatActivity {
     RadioButton radioLog;
     @Bind(R.id.radio_draw)
     RadioButton radioDraw;
+    @Bind(R.id.drawer_Layout)
+    DrawerLayout drawerLayout;
+    @Bind(R.id.content_layout)
+    LinearLayout contentLayout;
+    //    @Bind(R.id.slide_layout)
+//    FrameLayout slideLayout;
+    @Bind(R.id.drawer)
+    NavigationView drawerView;
 
     LogFragment mLogFragment;
     DrawFragment mDrawFragment;
     Fragment mCurrentFragment;
-    IDevice mService;
+    IDevice mDevice;
     TouchDeviceListener mTouchDeviceListener;
     WakeLock mWakeLock;
 
@@ -95,32 +119,43 @@ public class MainActivity extends AppCompatActivity {
         final FragmentTransaction trans = getFragmentManager().beginTransaction();
         trans.add(R.id.layout_data, mLogFragment).commit();
         mCurrentFragment = mLogFragment;
-
-        radioLog.setOnCheckedChangeListener((view, isChecked) -> {
-            if (!isChecked) {
-                return;
+        drawerView.setNavigationItemSelectedListener((item) -> {
+            if (item.getItemId() == R.id.menu_setting) {
+                this.startActivity(new Intent(this, SettingsActivity.class));
             }
-            FragmentTransaction trans1 = getFragmentManager().beginTransaction();
-            trans1.replace(R.id.layout_data, mLogFragment)
-                    .addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
-            mCurrentFragment = mLogFragment;
-        });
-        radioDraw.setOnCheckedChangeListener((view, isChecked) -> {
-            if (!isChecked) {
-                return;
-            }
-            if (mDrawFragment == null) {
-                mDrawFragment = new DrawFragment();
-            }
-            FragmentTransaction trans1 = getFragmentManager().beginTransaction();
-            trans1.replace(R.id.layout_data, mDrawFragment)
-                    .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
-            mCurrentFragment = mDrawFragment;
+            return true;
         });
 
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.txt_open, R.string.txt_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+//                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) contentLayout.getLayoutParams();
+//                layoutParams.setMargins((int)slideOffset,0,0,0);
+//                contentLayout.setLayoutParams(layoutParams);
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                super.onDrawerStateChanged(newState);
+            }
+        };
+
+        drawerLayout.addDrawerListener(drawerToggle);
         mWakeLock = new WakeLock(this);
         mWakeLock.lockScreen();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -147,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
-            //testEnentBus();
+            // testEnentBus();
             this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
@@ -159,6 +194,27 @@ public class MainActivity extends AppCompatActivity {
             intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
             intentIntegrator.initiateScan();
             lastScan = SystemClock.currentThreadTimeMillis();
+        }
+    }
+
+    @OnCheckedChanged({R.id.radio_log, R.id.radio_draw})
+    void radioChecked(RadioButton view, boolean isChecked) {
+        if (!isChecked) {
+            return;
+        }
+
+        FragmentTransaction trans = getFragmentManager().beginTransaction();
+        if (view.getId() == R.id.radio_log) {
+            trans.replace(R.id.layout_data, mLogFragment)
+                    .addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
+            mCurrentFragment = mLogFragment;
+        } else {
+            if (mDrawFragment == null) {
+                mDrawFragment = new DrawFragment();
+            }
+            trans.replace(R.id.layout_data, mDrawFragment)
+                    .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
+            mCurrentFragment = mDrawFragment;
         }
     }
 
@@ -179,13 +235,58 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connect() {
-        if (null == mService) {
+        if (null == mDevice) {
+            int conn = SettingPref.getInstance().getConnection();
+            int prot = SettingPref.getInstance().getProtocol();
+            int vendorId = SettingPref.getInstance().getVendor();
+            IDeviceFactory factory = DeviceFactory.getInstance().getDeviceFactory(conn);
+            IProtocol protocol = ProtocolFactory.getInstance().getFactory(conn).getProtocol(prot);
+            if (factory == null || protocol == null) {
+                popProtocolError(conn, prot);
+                return;
+            }
+
             txtDevice.setText("正在连接.......");
-            BTDeviceFactory factory = new BTDeviceFactory();
-            mService = factory.get(this, this.mTouchDeviceListener);
-            mService.connect(getDeviceName());
+            mDevice = factory.get(this, this.mTouchDeviceListener, protocol, vendorId);
+            mDevice.connect(getDeviceName());
             isStarted = true;
         }
+    }
+
+    private void popProtocolError(int conn, int protocol) {
+
+        String currentConn = "BLC";
+        switch (conn) {
+            case DeviceFactory.DEVICE_BLC:
+                currentConn = "BLC";
+                break;
+            case DeviceFactory.DEVICE_BLE:
+                currentConn = "BLE";
+                break;
+            case DeviceFactory.DEVICE_USB:
+                currentConn = "USB";
+                break;
+            default:
+                currentConn = "未知";
+                break;
+        }
+        String error = null;
+        switch (protocol) {
+            case ProtocolType.JY:
+                error = String.format("当前连接：%s 不支持： %s 协议", currentConn, "精研");
+                break;
+            case ProtocolType.CVT:
+                error = String.format("当前连接：%s 不支持： %s 协议", currentConn, "CVT");
+                break;
+            case ProtocolType.PQ:
+                error = String.format("当前连接：%s 不支持： %s 协议", currentConn, "PQ");
+                break;
+            default:
+                error = String.format("当前连接：%s 不支持： %s 协议", currentConn, "未知");
+                break;
+        }
+
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
 
     private String getDeviceName() {
@@ -193,9 +294,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void disconnect() {
-        if (mService != null) {
-            mService.disconnect();
-            mService = null;
+        if (mDevice != null) {
+            mDevice.disconnect();
+            mDevice = null;
             txtDevice.setText("");
 
             isStarted = false;
@@ -372,6 +473,11 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics metrics = this.getResources().getDisplayMetrics();
     }
 
+    private void testUsb() {
+        UsbManager usbManager = (UsbManager) this.getSystemService(Context.USB_SERVICE);
+        HashMap<String, UsbDevice> deviceHashMap = usbManager.getDeviceList();
+    }
+
     private void testEnentBus() {
         EventBus.builder().addIndex(new SubscriberInfoIndex() {
             @Override
@@ -383,8 +489,14 @@ public class MainActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
         EventBus.getDefault().post("test");
 
+        HttpServer httpServer = new HttpServer(8080);
+        try {
+            httpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ServerAPI api = new ServerAPI();
-        api.getServerConfig();
+        api.createConf();
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)

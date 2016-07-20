@@ -187,12 +187,12 @@ public class DrawView extends View {
      * </br> For reference, you can see more detail here: <a href="http://en.wikipedia.org/wiki/B%C3%A9zier_curve">Wiki</a>
      * </br> We 'll draw a  smooth curves from three points. And the stroke size will be changed depend on the start width and the end width
      *
-     * @param canvas : we 'll draw on this canvas
-     * @param p0 the start point
-     * @param p1 mid point
-     * @param p2 end point
-     * @param paint the paint is used to draw the points.
-     * @param lastWidth start stroke width
+     * @param canvas       : we 'll draw on this canvas
+     * @param p0           the start point
+     * @param p1           mid point
+     * @param p2           end point
+     * @param paint        the paint is used to draw the points.
+     * @param lastWidth    start stroke width
      * @param currentWidth end stroke width
      */
     private void draw(Canvas canvas, Point p0, Point p1, Point p2, Paint paint, float lastWidth, float currentWidth) {
@@ -226,12 +226,47 @@ public class DrawView extends View {
 
     /**
      * This method is used to save the bitmap to an output stream
+     *
      * @param outputStream
      */
     public void save(OutputStream outputStream) {
         Bitmap bitmap = getDrawingCache();
         if (bitmap != null) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream);
+        }
+    }
+
+
+    public class Point {
+        public final float x;
+        public final float y;
+        public final long time;
+
+        public Point(float x, float y, long time) {
+            this.x = x;
+            this.y = y;
+            this.time = time;
+        }
+
+        /**
+         * Caculate the distance between current point to the other.
+         *
+         * @param p the other point
+         * @return
+         */
+        private float distanceTo(Point p) {
+            return (float) (Math.sqrt(Math.pow((x - p.x), 2) + Math.pow((y - p.y), 2)));
+        }
+
+
+        /**
+         * Caculate the velocity from the current point to the other.
+         *
+         * @param p the other point
+         * @return
+         */
+        public float velocityFrom(Point p) {
+            return distanceTo(p) / (this.time - p.time);
         }
     }
 

@@ -3,8 +3,6 @@ package com.tannuo.sdk.device;
 import com.tannuo.sdk.device.protocol.JYProtocol;
 import com.tannuo.sdk.util.Logger;
 
-import java.security.InvalidParameterException;
-
 /**
  * Created by Nick_PC on 2016/5/20.
  */
@@ -137,7 +135,7 @@ public class TouchPoint {
         } else if (action == action_up) {
             this.action = ACTION_UP;
         } else {
-            throw new InvalidParameterException();
+            // throw new InvalidParameterException();
         }
     }
 
