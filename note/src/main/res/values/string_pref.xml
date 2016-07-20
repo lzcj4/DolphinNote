@@ -71,7 +71,7 @@
         <item>2</item>
     </string-array>
 
-    <string name="pref_title_vendor">蓝牙厂商</string>
+    <string name="pref_title_vendor">BLE蓝牙厂商</string>
     <string-array name="pref_vendor_titles">
         <item>四海胜电</item>
         <item>飞易通</item>

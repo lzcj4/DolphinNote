@@ -1,5 +1,7 @@
 package com.tannuo.sdk.device.protocol;
 
+import com.tannuo.sdk.device.TouchFrame;
+import com.tannuo.sdk.device.TouchPath;
 import com.tannuo.sdk.device.TouchPoint;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
@@ -27,7 +29,7 @@ public class CVTUsbProtocol extends ProtocolBase {
         TouchPoint.setActions(ACTION_DOWN, ACTION_MOVE, ACTION_UP);
     }
 
-    TouchPoint lastPoint = null;
+    TouchFrame mTouchFrame = new TouchFrame();
 
     @Override
     public int parse(byte[] data) {
@@ -78,11 +80,13 @@ public class CVTUsbProtocol extends ProtocolBase {
                 point.setWidth(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
                 point.setHeight(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
                 mPoints.add(point);
-                if (lastPoint != null && lastPoint.getIsMove() &&
-                        action == ACTION_UP) {
+                TouchPath path = mTouchFrame.get(point.getId());
+                if (path != null && path.getLastPoint() != null &&
+                        path.getLastPoint().getIsMove() && action == ACTION_UP) {
                     point.setAction(TouchPoint.ACTION_UP);
+                    mTouchFrame.remove(point.getId());
                 }
-                lastPoint = point;
+                mTouchFrame.put(point);
             }
             // Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
             int frameEnd = totalData[index++];

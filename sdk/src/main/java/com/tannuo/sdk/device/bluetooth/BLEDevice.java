@@ -37,15 +37,12 @@ public class BLEDevice extends DeviceBase {
     /**
      * Unit: ms
      */
-    private static final int TIMER_INTERVAL = 60 * 1000;
+    private static final int TIMER_INTERVAL = 2 * 60 * 1000;
 
     protected String mUART_Uuid = UART_UUID;
-    protected String mUART_TX_Uuid = UART_UUID_TX;
-    protected String mUART_RX_Uuid = UART_UUID_RX;
     protected String mUART_Notify_Desc = UART_UUID_NOTIFY_DESC;
 
     private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattService mGattService;
     /**
      * Write only characteristic
      */
@@ -54,8 +51,6 @@ public class BLEDevice extends DeviceBase {
      * Read only characteristic
      */
     private BluetoothGattCharacteristic mGattRXChara;
-
-    private boolean mIsGattConnected = false;
 
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private BluetoothGattCallback mGattCallback;
@@ -113,7 +108,7 @@ public class BLEDevice extends DeviceBase {
 
     private void stopLeScan(BluetoothAdapter.LeScanCallback callback) {
         if (null != mBTAdapter) {
-            // mBTAdapter.stopLeScan(callback);
+            mBTAdapter.stopLeScan(callback);
         }
     }
 
@@ -138,8 +133,6 @@ public class BLEDevice extends DeviceBase {
             mBluetoothGatt.close();
             mBluetoothGatt = null;
         }
-
-        mIsGattConnected = false;
     }
 
     @Override
@@ -178,12 +171,10 @@ public class BLEDevice extends DeviceBase {
             super.onConnectionStateChange(gatt, status, newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d(TAG, String.format("++ BLE BluetoothGattCallback connection connected"));
-                mIsGattConnected = true;
                 mDeviceListener.onConnected();
                 mBluetoothGatt.discoverServices();
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, String.format("-- BLE BluetoothGattCallback connection disconnected"));
-                mIsGattConnected = false;
                 mDeviceListener.onError(BL_ERROR_CONN_LOST);
             }
         }
@@ -202,7 +193,6 @@ public class BLEDevice extends DeviceBase {
                     continue;
                 }
                 Log.d(TAG, String.format("-- BLE BluetoothGattCallback service discovered :%s", mUART_Uuid));
-                mGattService = service;
                 List<BluetoothGattCharacteristic> gattCharacteristics = service.getCharacteristics();
 
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
