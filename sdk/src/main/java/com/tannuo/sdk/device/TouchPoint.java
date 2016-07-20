@@ -24,6 +24,14 @@ public class TouchPoint {
     public static final byte ACTION_DOWN = 0;
     public static final byte ACTION_MOVE = 1;
     public static final byte ACTION_UP = 2;
+    public static float WIDTHHEIGHTRATIO = 525f / 932;
+
+    private int rubberMaxSize = 2812 * 4993;  //80mm / 932mm * 32767,  80mm / 525mm * 32767
+    private int rubberMinSize = 1406 * 2496;  //40mm / 932mm * 32767,  40mm / 525mm * 32767
+    private int penMaxSize = 360 * 630;      //10mm / 932mm * 32767,  10mm / 525mm * 32767
+    private int penMinSize = 144 * 252;      //4mm / 932mm * 32767,  4mm / 525mm * 32767
+    private float penWidth = 4;               //pixel
+
 
     public static void setActions(byte actionDown, byte actionMove, byte actionUp) {
         action_down = actionDown;
@@ -161,12 +169,6 @@ public class TouchPoint {
     public boolean isLongDistance(TouchPoint point) {
         return distance(point) > 50;
     }
-
-    private int rubberMaxSize = 2812 * 4993;  //80mm / 932mm * 32767,  80mm / 525mm * 32767
-    private int rubberMinSize = 1406 * 2496;  //40mm / 932mm * 32767,  40mm / 525mm * 32767
-    private int penMaxSize = 360 * 630;      //10mm / 932mm * 32767,  10mm / 525mm * 32767
-    private int penMinSize = 144 * 252;      //4mm / 932mm * 32767,  4mm / 525mm * 32767
-    private float penWidth = 4;               //pixel
 
     public boolean isRubber() {
         return getArea() >= rubberMinSize && getArea() <= rubberMaxSize || getArea() > rubberMaxSize;

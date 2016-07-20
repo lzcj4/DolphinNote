@@ -308,6 +308,9 @@ public class MainActivity extends AppCompatActivity {
         if (mCurrentFragment == mLogFragment) {
             mLogFragment.clearData();
         }
+        if (mCurrentFragment == mDrawFragment) {
+            mDrawFragment.clear();
+        }
         this.txtCount.setText("0");
         DataLog.getInstance().restart();
         rowIndex = 0;
