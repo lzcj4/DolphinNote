@@ -9,12 +9,13 @@ public interface ProtocolType {
      */
     byte JY = 0x00;
     /**
-     * PQ 品奇
-     */
-    byte PQ = 0x01;
-
-    /**
      * CVT
      */
-    byte CVT = 0x02;
+    byte CVT = 0x01;
+    /**
+     * PQ 品奇
+     */
+    byte PQ = 0x02;
+
+
 }

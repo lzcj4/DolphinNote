@@ -1,7 +1,6 @@
-package com.tannuo.note.whiteboard;
+package com.tannuo.sdk.device;
 
-import com.tannuo.sdk.device.TouchPoint;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,10 +20,23 @@ public class TouchPath {
     List<TouchPoint> mPoints;
 
     public List<TouchPoint> getPoints() {
+        mPoints = mPoints == null ? new ArrayList<>() : mPoints;
         return mPoints;
+    }
+
+    public TouchPoint getLastPoint() {
+        TouchPoint point = null;
+        if (getPoints().size() > 0) {
+            point = getPoints().get(getPoints().size() - 1);
+        }
+        return point;
     }
 
     public void setPoints(List<TouchPoint> points) {
         this.mPoints = points;
+    }
+
+    public void add(TouchPoint point) {
+        getPoints().add(point);
     }
 }

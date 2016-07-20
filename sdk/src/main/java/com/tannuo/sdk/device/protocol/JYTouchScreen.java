@@ -47,7 +47,7 @@ public class JYTouchScreen {
         mPoints.clear();
     }
 
-    public void setPoint(int pointLen, int[] buffer) {
+    public void setPoint(int pointLen, byte[] buffer) {
         if (pointLen <= 0 || buffer == null || (buffer.length % 10) != 0) {
             throw new IllegalArgumentException("point length or data invalid");
         }
@@ -94,7 +94,7 @@ public class JYTouchScreen {
     }
 
     //
-    public void setIrTouchFeature(int[] dataBuffer) {
+    public void setIrTouchFeature(byte[] dataBuffer) {
         if (null == dataBuffer || dataBuffer.length != 9) {
             throw new IllegalArgumentException("Invalid data");
         }

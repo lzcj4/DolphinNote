@@ -1,7 +1,16 @@
 <resources>
-    <string name="app_name">Dolphin Note</string>
+    <string name="app_name">海豚笔记</string>
     <string name="action_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="txt_open">Open</string>
+    <string name="txt_close">Close</string>
+    <string name="txt_connect_mode">连接方式：</string>
+    <string name="txt_protocol_mode">协议：</string>
+
+    <string name="menu_title_setting">设置</string>
+    <string name="title_activity_settings">设备设置</string>
+
+
 </resources>

@@ -190,7 +190,7 @@ public class ZoomSurfaceView extends SurfaceView {
             mPosX += (focusX - lastFocusX);
             mPosY += (focusY - lastFocusY);
             Log.v("Hi Zoom", "Factor:" + mScaleFactor);
-            // Don't let the object get too small or too large.
+            // Don't let the object getFactory too small or too large.
             mScaleFactor = Math.max(0.5f, Math.min(mScaleFactor, 2.0f));
 
             lastFocusX = focusX;

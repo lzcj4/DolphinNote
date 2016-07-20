@@ -1,5 +1,7 @@
 package com.tannuo.sdk.device.protocol;
 
+import com.tannuo.sdk.device.TouchFrame;
+import com.tannuo.sdk.device.TouchPath;
 import com.tannuo.sdk.device.TouchPoint;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
@@ -14,11 +16,10 @@ import java.util.List;
 public class CVTProtocol extends ProtocolBase {
     private final byte HEADER_1 = 0x1F;
     private final byte HEADER_2 = (byte) 0xF7;
-    private final byte FRAME_LEN = 0x2B;
+    private final byte FRAME_LEN = 67;
     private final byte HEADER_RESERVED = 0x02;
-    private final byte FRAME_BYTES = 43;
     private final byte FRAME_POINTS = 6;
-    private final byte POINT_BYTES = 6;
+    private final byte POINT_BYTES = 10;
 
     private final byte ACTION_DOWN = 0x02;
     private final byte ACTION_MOVE = 0x03;
@@ -29,7 +30,8 @@ public class CVTProtocol extends ProtocolBase {
         TouchPoint.setActions(ACTION_DOWN, ACTION_MOVE, ACTION_UP);
     }
 
-    TouchPoint lastPoint = null;
+
+    TouchFrame mTouchFrame = new TouchFrame();
 
     @Override
     public int parse(byte[] data) {
@@ -51,7 +53,7 @@ public class CVTProtocol extends ProtocolBase {
         int len = totalData.length;
         for (int i = 0; i < len && len > 0; ) {
             int index = i;
-            if ((len - index) < FRAME_BYTES) {
+            if ((len - index) < FRAME_LEN) {
                 lastUnhandledBytes = Arrays.copyOfRange(totalData, index, len);
                 break;
             }
@@ -73,17 +75,21 @@ public class CVTProtocol extends ProtocolBase {
                     index += POINT_BYTES - 1;
                     continue;
                 }
-                point.setActionByDevice(action);
-                point.setId(totalData[index++]);
-                point.setX(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));
-                point.setY(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));
+                point.setActionByDevice(action); // byte:0
+                point.setId(totalData[index++]);// byte:1
+                point.setX(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:2,3
+                point.setY(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:4,5
+                point.setWidth(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
+                point.setHeight(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
 
                 mPoints.add(point);
-                if (lastPoint != null && lastPoint.getIsMove() &&
-                        action == ACTION_UP) {
-                    point.setAction(ACTION_UP);
+                TouchPath path = mTouchFrame.get(point.getId());
+                if (path != null && path.getLastPoint() != null &&
+                        path.getLastPoint().getIsMove() && action == ACTION_UP) {
+                    point.setAction(TouchPoint.ACTION_UP);
+                    mTouchFrame.remove(point.getId());
                 }
-                lastPoint = point;
+                mTouchFrame.put(point);
             }
             Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
             if (index < len) {
@@ -104,7 +110,7 @@ public class CVTProtocol extends ProtocolBase {
             return false;
         }
         byte sum = 0;
-        for (int i = 0; i < FRAME_BYTES - 1; i++) {
+        for (int i = 0; i < FRAME_LEN - 1; i++) {
             sum += data[index++];
         }
         byte checksum = data[index];

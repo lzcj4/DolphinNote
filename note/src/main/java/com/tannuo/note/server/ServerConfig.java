@@ -1,4 +1,4 @@
-package com.tannuo.note;
+package com.tannuo.note.server;
 
 /**
  * Created by Nick_PC on 2016/5/12.

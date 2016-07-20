@@ -1,10 +1,11 @@
-package com.tannuo.note;
+package com.tannuo.note.server;
 
 /**
- * Created by Nick_PC on 2016/5/15.
+ * Created by Nickon 2016/5/15.
  */
 public class HttpResult<T> {
     private int code;
+    private T data;
 
     public int getCode() {
         return code;
@@ -14,14 +15,6 @@ public class HttpResult<T> {
         this.code = code;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public T getData() {
         return data;
     }
@@ -29,7 +22,4 @@ public class HttpResult<T> {
     public void setData(T data) {
         this.data = data;
     }
-
-    private String message;
-    private T data;
 }
