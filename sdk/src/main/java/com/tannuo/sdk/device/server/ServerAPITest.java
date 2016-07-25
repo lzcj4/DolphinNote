@@ -1,4 +1,4 @@
-package com.tannuo.note.server;
+package com.tannuo.sdk.device.server;
 
 
 import android.text.TextUtils;

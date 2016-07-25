@@ -1,4 +1,4 @@
-package com.tannuo.note.server;
+package com.tannuo.sdk.device.server;
 
 
 import java.util.List;
@@ -52,4 +52,6 @@ public interface IServerAPI {
 
     @POST
     Observable<ResponseBody> postImageRx(@Url String url, RequestBody body);
+
+    //endregion
 }

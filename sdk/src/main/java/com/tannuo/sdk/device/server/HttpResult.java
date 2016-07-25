@@ -1,4 +1,4 @@
-package com.tannuo.note.server;
+package com.tannuo.sdk.device.server;
 
 /**
  * Created by Nickon 2016/5/15.
