@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.tannuo.note.server.ServerAPI;
+import com.tannuo.note.server.ServerAPITest;
 import com.tannuo.note.utility.SettingPref;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
@@ -43,17 +43,12 @@ import com.tannuo.sdk.device.protocol.IProtocol;
 import com.tannuo.sdk.device.protocol.ProtocolFactory;
 import com.tannuo.sdk.device.protocol.ProtocolHandler;
 import com.tannuo.sdk.device.protocol.ProtocolType;
-import com.tannuo.sdk.device.usb.HttpServer;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.greenrobot.eventbus.meta.SubscriberInfo;
-import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
-            // testEnentBus();
-            this.connect();
+            testEnentBus();
+            //this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
         } else if (id == R.id.btnClear) {
@@ -482,25 +477,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testEnentBus() {
-        EventBus.builder().addIndex(new SubscriberInfoIndex() {
-            @Override
-            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
-                return null;
-            }
-        }).installDefaultEventBus();
-
-        EventBus.getDefault().register(this);
-        EventBus.getDefault().post("test");
-
-        HttpServer httpServer = new HttpServer(8080);
-        try {
-            httpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ServerAPI api = new ServerAPI();
-        api.createConf();
+//        EventBus.builder().addIndex(new SubscriberInfoIndex() {
+//            @Override
+//            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
+//                return null;
+//            }
+//        }).installDefaultEventBus();
+//
+//        EventBus.getDefault().register(this);
+//        EventBus.getDefault().post("test");
+//
+//        HttpServer httpServer = new HttpServer(8080);
+//        try {
+//            httpServer.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        ServerAPITest api = new ServerAPITest();
+        api.test();
     }
+
 
     @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)
     public void handleEvent(Object obj) {

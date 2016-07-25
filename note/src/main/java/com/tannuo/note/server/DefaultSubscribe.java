@@ -19,7 +19,7 @@ public class DefaultSubscribe<T> extends Subscriber<T> {
     @Override
     public void onError(Throwable e) {
 
-        Logger.d(TAG, String.format("onError invoked:%s", e.getMessage()));
+        Logger.e(TAG, String.format("onError invoked:%s", e.getMessage()));
     }
 
     @Override

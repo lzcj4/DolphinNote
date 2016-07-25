@@ -77,10 +77,10 @@ public class CVTProtocol extends ProtocolBase {
                 }
                 point.setActionByDevice(action); // byte:0
                 point.setId(totalData[index++]);// byte:1
-                point.setX(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:2,3
-                point.setY(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:4,5
-                point.setWidth(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
-                point.setHeight(DataUtil.bytesToIntLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
+                point.setX(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:2,3
+                point.setY(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:4,5
+                point.setWidth(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
+                point.setHeight(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
 
                 mPoints.add(point);
                 TouchPath path = mTouchFrame.get(point.getId());

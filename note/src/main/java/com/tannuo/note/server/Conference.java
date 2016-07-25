@@ -21,127 +21,105 @@ public class Conference {
      * nicknames : ["Nick"]
      * users : ["5733f3acc0e563211498a66b"]
      */
+    private String _id;
+    private String name;
+    private String password;
+    private long datetime;
+    private String location;
+    private String company;
+    @SerializedName("abstract")
+    private String abstractX;
+    private String techBridgeId;
+    private List<?> images;
+    private List<String> nicknames;
+    private List<String> users;
 
-    private ConferenceBean conference;
-    private String meetingUrl;
-
-    public ConferenceBean getConference() {
-        return conference;
+    public String getId() {
+        return _id;
     }
 
-    public void setConference(ConferenceBean conference) {
-        this.conference = conference;
+    public void setId(String _id) {
+        this._id = _id;
     }
 
-    public String getMeetingUrl() {
-        return meetingUrl;
+    public String getName() {
+        return name;
     }
 
-    public void setMeetingUrl(String meetingUrl) {
-        this.meetingUrl = meetingUrl;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public static class ConferenceBean {
-        private String _id;
-        private String name;
-        private String password;
-        private long datetime;
-        private String location;
-        private String company;
-        @SerializedName("abstract")
-        private String abstractX;
-        private String techBridgeId;
-        private List<?> images;
-        private List<String> nicknames;
-        private List<String> users;
+    public String getPassword() {
+        return password;
+    }
 
-        public String get_id() {
-            return _id;
-        }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-        public void set_id(String _id) {
-            this._id = _id;
-        }
+    public long getDatetime() {
+        return datetime;
+    }
 
-        public String getName() {
-            return name;
-        }
+    public void setDatetime(long datetime) {
+        this.datetime = datetime;
+    }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    public String getLocation() {
+        return location;
+    }
 
-        public String getPassword() {
-            return password;
-        }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-        public void setPassword(String password) {
-            this.password = password;
-        }
+    public String getCompany() {
+        return company;
+    }
 
-        public long getDatetime() {
-            return datetime;
-        }
+    public void setCompany(String company) {
+        this.company = company;
+    }
 
-        public void setDatetime(long datetime) {
-            this.datetime = datetime;
-        }
+    public String getAbstractX() {
+        return abstractX;
+    }
 
-        public String getLocation() {
-            return location;
-        }
+    public void setAbstractX(String abstractX) {
+        this.abstractX = abstractX;
+    }
 
-        public void setLocation(String location) {
-            this.location = location;
-        }
+    public String getTechBridgeId() {
+        return techBridgeId;
+    }
 
-        public String getCompany() {
-            return company;
-        }
+    public void setTechBridgeId(String techBridgeId) {
+        this.techBridgeId = techBridgeId;
+    }
 
-        public void setCompany(String company) {
-            this.company = company;
-        }
+    public List<?> getImages() {
+        return images;
+    }
 
-        public String getAbstractX() {
-            return abstractX;
-        }
+    public void setImages(List<?> images) {
+        this.images = images;
+    }
 
-        public void setAbstractX(String abstractX) {
-            this.abstractX = abstractX;
-        }
+    public List<String> getNicknames() {
+        return nicknames;
+    }
 
-        public String getTechBridgeId() {
-            return techBridgeId;
-        }
+    public void setNicknames(List<String> nicknames) {
+        this.nicknames = nicknames;
+    }
 
-        public void setTechBridgeId(String techBridgeId) {
-            this.techBridgeId = techBridgeId;
-        }
+    public List<String> getUsers() {
+        return users;
+    }
 
-        public List<?> getImages() {
-            return images;
-        }
-
-        public void setImages(List<?> images) {
-            this.images = images;
-        }
-
-        public List<String> getNicknames() {
-            return nicknames;
-        }
-
-        public void setNicknames(List<String> nicknames) {
-            this.nicknames = nicknames;
-        }
-
-        public List<String> getUsers() {
-            return users;
-        }
-
-        public void setUsers(List<String> users) {
-            this.users = users;
-        }
+    public void setUsers(List<String> users) {
+        this.users = users;
     }
 }
 

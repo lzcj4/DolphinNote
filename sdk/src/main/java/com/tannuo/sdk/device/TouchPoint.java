@@ -40,17 +40,17 @@ public class TouchPoint {
     }
 
     private int id;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    private short x;
+    private short y;
+    private short width;
+    private short height;
     private byte color;
     private int action;
 
     public TouchPoint() {
     }
 
-    public TouchPoint(int id, int x, int y) {
+    public TouchPoint(int id, short x, short y) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -68,11 +68,11 @@ public class TouchPoint {
         return width * height;
     }
 
-    public int getRawX() {
+    public short getRawX() {
         return x;
     }
 
-    public int getRawY() {
+    public short getRawY() {
         return y;
     }
 
@@ -94,11 +94,11 @@ public class TouchPoint {
         return getScaleY(this.y);
     }
 
-    public void setY(int y) {
+    public void setY(short y) {
         this.y = y;
     }
 
-    public void setX(int x) {
+    public void setX(short x) {
         this.x = x;
     }
 
@@ -106,7 +106,7 @@ public class TouchPoint {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(short width) {
         this.width = width;
     }
 
@@ -114,7 +114,7 @@ public class TouchPoint {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(short height) {
         this.height = height;
     }
 

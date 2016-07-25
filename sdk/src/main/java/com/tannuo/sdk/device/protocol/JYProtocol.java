@@ -318,7 +318,7 @@ public class JYProtocol extends ProtocolBase {
                 result = STATUS_GET_SNAPSHOT;
                 break;
             case JYProtocol.FEATURE_IDENTI:
-                mTouchScreen.setID(DataUtil.bytesToIntLittleEndian(mDataBuffer[0], mDataBuffer[1], mDataBuffer[2], mDataBuffer[3]));
+                mTouchScreen.setID(DataUtil.bytesShortLittleEndian(mDataBuffer[0], mDataBuffer[1], mDataBuffer[2], mDataBuffer[3]));
                 result = STATUS_GET_IDENTI;
                 break;
             default:

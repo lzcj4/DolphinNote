@@ -24,6 +24,10 @@ public class TouchPath {
         return mPoints;
     }
 
+    public int size() {
+        return getPoints().size();
+    }
+
     public TouchPoint getLastPoint() {
         TouchPoint point = null;
         if (getPoints().size() > 0) {

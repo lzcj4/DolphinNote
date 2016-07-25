@@ -75,10 +75,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginTop="5dp"
             android:id="@+id/layoutStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -212,46 +212,6 @@
         </RelativeLayout>
 
     </LinearLayout>
-
-    <!--<FrameLayout-->
-    <!--android:id="@+id/slide_layout"-->
-    <!--android:layout_width="100dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="start">-->
-
-    <!--<LinearLayout-->
-
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_gravity="start"-->
-    <!--android:layout_marginLeft="10dp"-->
-    <!--android:layout_marginRight="10dp"-->
-    <!--android:orientation="vertical">-->
-
-
-    <!--<TextView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="@string/txt_connect_mode"-->
-    <!--tools:text="连接方式：" />-->
-
-    <!--<Spinner-->
-    <!--android:id="@+id/spinner_con"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"></Spinner>-->
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="@string/txt_protocol_mode"-->
-    <!--tools:text="协议：" />-->
-
-    <!--<Spinner-->
-    <!--android:id="@+id/spinner_protocol"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"></Spinner>-->
-    <!--</LinearLayout>-->
-    <!--</FrameLayout>-->
 
     <android.support.design.widget.NavigationView
         android:id="@+id/drawer"

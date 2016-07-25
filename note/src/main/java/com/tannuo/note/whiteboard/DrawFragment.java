@@ -103,7 +103,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                     lp.width = mPaintWidth;
                     lp.height = mPaintHeight;
                     surfaceView.setLayoutParams(lp);
-                    surfaceView.getHolder().setFixedSize(lp.width, lp.height);
+                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
                 } else {
                     //keep width and adjust height
                     mPaintHeight = (int) (mPaintWidth / designedWHRatio);
@@ -111,7 +111,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                     lp.width = mPaintWidth;
                     lp.height = mPaintHeight;
                     surfaceView.setLayoutParams(lp);
-                    surfaceView.getHolder().setFixedSize(lp.width, lp.height);
+                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
                 }
 
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
@@ -340,7 +340,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             int len = pointArray.length;
             List<TouchPoint> result = new ArrayList<>();
             for (int i = 0; i < len; i++) {
-                TouchPoint p = new TouchPoint(pointArray[i][0], pointArray[i][1], pointArray[i][2]);
+                TouchPoint p = new TouchPoint((short) pointArray[i][0], (short) pointArray[i][1], (short) pointArray[i][2]);
                 result.add(p);
             }
             return result;

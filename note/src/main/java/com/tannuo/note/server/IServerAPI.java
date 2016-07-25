@@ -1,6 +1,11 @@
 package com.tannuo.note.server;
 
 
+import java.util.List;
+
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -31,12 +36,20 @@ public interface IServerAPI {
     Observable<ServerConfig> getConfigRx();
 
     @GET("conference/alive")
-    Observable<HttpResult<Conference>> getAliveConfsRx();
+    Observable<HttpResult<List<Conference>>> getAliveConfsRx();
+
+    @POST("user/wxlogin")
+    Observable<HttpResult<User>> wxLoginRx(@Body User user);
 
     @POST("conference/launch")
-    Observable<HttpResult<Conference>> createConfRx(@Body Conference conf);
+    Observable<HttpMeetingResult<Conference>> createConfRx(@Body Conference conf);
+
+    @POST
+    Observable<Response<ResponseBody>> postConfDataRx(@Url String url, @Body RequestBody body);
 
     @GET
-    Observable<String> getGitHubRx(@Url String url);
-    //endregion
+    Observable<Response<ResponseBody>> getConfDataRx(@Url String url);
+
+    @POST
+    Observable<ResponseBody> postImageRx(@Url String url, RequestBody body);
 }

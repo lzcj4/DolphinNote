@@ -1,10 +1,16 @@
 package com.tannuo.note.server;
 
-import java.util.ArrayList;
+import com.tannuo.sdk.device.TouchFrame;
+
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -22,7 +28,10 @@ public class ServerAPI {
     OkHttpClient client;
 
     IServerAPI serverAPI;
-    final String URI_BASE = "http://tn.glasslink.cn:3000/";
+    //final String URI_BASE = "http://tn.glasslink.cn:3000/";
+    final String URI_BASE = "http://10.10.10.27:3000/";
+    // final String URI_BASE = "http://192.168.3.211:3000/";
+    private static final String MIME_STREAM = "application/octet-stream";
 
     {
         final int TIMEOUT = 60;
@@ -31,7 +40,6 @@ public class ServerAPI {
                 .readTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
                 .build();
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI_BASE)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -50,7 +58,7 @@ public class ServerAPI {
         return SingletonHolder.INSTANCE;
     }
 
-    private class HttpResultFunc<T> implements Func1<HttpResult<T>, T> {
+    public static class HttpResultFunc<T> implements Func1<HttpResult<T>, T> {
         @Override
         public T call(HttpResult<T> httpResult) {
             if (httpResult.getCode() != 0) {
@@ -77,29 +85,49 @@ public class ServerAPI {
 //        });
     }
 
-    public void getAliveConfs() {
-        toSubscribe(serverAPI.getAliveConfsRx().map(new HttpResultFunc<>()), new DefaultSubscribe<>());
+    public void getAliveConfs(Subscriber<List<Conference>> subscriber) {
+        toSubscribe(serverAPI.getAliveConfsRx().map(new HttpResultFunc<>()), subscriber);
     }
 
-    public void createConf() {
-        Conference conf = new Conference();
-        Conference.ConferenceBean bean = new Conference.ConferenceBean();
-        bean.setName("test");
-        bean.setPassword("123");
-        bean.setTechBridgeId("114893792");
-        List<String> nickNames = new ArrayList<>();
-        nickNames.add("Nick");
-        bean.setNicknames(nickNames);
-        bean.setUsers(nickNames);
-        bean.setDatetime(1466471100000l);
-        conf.setConference(bean);
-        toSubscribe(serverAPI.createConfRx(conf).map(new HttpResultFunc<>()), new DefaultSubscribe<>());
+    public void wxLogin(User user, Subscriber<User> subscriber) {
+        toSubscribe(serverAPI.wxLoginRx(user).map(new HttpResultFunc<>()), subscriber);
     }
 
-    private void toSubscribe(Observable o, Subscriber s) {
+    public void createConf(Conference conf, Subscriber<Conference> subscriber) {
+        toSubscribe(serverAPI.createConfRx(conf).map(new HttpResultFunc<>()), subscriber);
+    }
+
+    public void postConfData(String baseUrl, String meetingId, TouchFrame frame,
+                             Subscriber<Response<ResponseBody>> subscriber) {
+
+        String url = baseUrl + String.format("/meeting/%s/frame", meetingId);
+        MediaType mediaType = MediaType.parse(MIME_STREAM);
+        byte[] data = frame.getBytes();
+        RequestBody body = RequestBody.create(mediaType, data);
+        toSubscribe(serverAPI.postConfDataRx(url, body), subscriber);
+    }
+
+    public void getConfData(String baseUrl, String meetingId, int seqId,
+                            Subscriber<Response<ResponseBody>> subscriber) {
+
+        String url = baseUrl + String.format("/meeting/%s/frames/%d", meetingId, seqId);
+        toSubscribe(serverAPI.getConfDataRx(url), subscriber);
+    }
+
+    public void postImage(String baseUrl, String meetingId, String filePath,
+                          Subscriber<Response<ResponseBody>> subscriber) {
+
+        String url = baseUrl + String.format("meeting/%s/snapshot", meetingId);
+        RequestBody body = RequestBody.create(MediaType.parse(MIME_STREAM), new File(filePath));
+        toSubscribe(serverAPI.postImageRx(url, body), subscriber);
+    }
+
+    public void toSubscribe(Observable o, Subscriber s) {
         o.subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(s);
     }
+
+
 }
