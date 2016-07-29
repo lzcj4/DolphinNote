@@ -2,6 +2,8 @@ package com.tannuo.sdk.device;
 
 import android.util.SparseArray;
 
+import com.tannuo.sdk.util.Logger;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -11,6 +13,8 @@ import java.util.Iterator;
  */
 public class TouchFrameSet
         implements Iterator<TouchFrame>, Iterable<TouchFrame> {
+
+    private static final String TAG = TouchFrameSet.class.getSimpleName();
 
     private int mSeqId;
 
@@ -53,7 +57,7 @@ public class TouchFrameSet
         TouchFrameSet result = null;
         try {
             int seqId = reader.readInt();//seq id 4
-            int frameLen = reader.readShort();//frame size 2
+            short frameLen = reader.readShort();//frame size 2
 
             if (frameLen <= 0) {
                 return result;
@@ -63,12 +67,12 @@ public class TouchFrameSet
 
             for (int i = 0; i < frameLen; i++) {
                 TouchFrame frame = new TouchFrame();
-                frame.setSeqId(seqId);
+                //  frame.setSeqId(seqId);
                 result.put(frame);
 
                 short pathLen = reader.readShort(); // path len 2
                 for (int j = 0; j < pathLen; j++) {
-                    int pathId = reader.readByte();  // 1
+                    byte pathId = reader.readByte();  // 1
                     TouchPath path = new TouchPath();
                     path.setId(pathId);
                     frame.put(path);
@@ -87,6 +91,7 @@ public class TouchFrameSet
                 }
             }
         } catch (IOException e) {
+            Logger.e(TAG, String.format("Parse FrameSet error:%s", e.getMessage()));
             e.printStackTrace();
         }
 

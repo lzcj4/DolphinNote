@@ -80,7 +80,6 @@ public class TouchFrame implements Iterator<TouchPath>, Iterable<TouchPath> {
                 writer.writeShort(pointSize);
                 for (int j = 0; j < pointSize; j++) {
                     TouchPoint point = path.getPoints().get(j);
-
                     writer.writeShort(point.getRawX());
                     writer.writeShort(point.getRawY());
                     writer.writeShort(point.getWidth());

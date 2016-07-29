@@ -12,8 +12,8 @@ public class ServerConfig {
      * postHeartbeatInterval : 20000
      * clientConnectTimeout : 10000
      * clientReadTimeout : 10000
-     * ruberMaxSize : 14040316
-     * ruberMinSize : 3509376
+     * rubberMaxSize : 14040316
+     * rubberMinSize : 3509376
      * penMaxSize : 493719
      * penMinSize : 8777
      * penWidth : 4.5
@@ -31,8 +31,8 @@ public class ServerConfig {
     private int postHeartbeatInterval;
     private int clientConnectTimeout;
     private int clientReadTimeout;
-    private int ruberMaxSize;
-    private int ruberMinSize;
+    private int rubberMaxSize;
+    private int rubberMinSize;
     private int penMaxSize;
     private int penMinSize;
     private double penWidth;
@@ -98,20 +98,20 @@ public class ServerConfig {
         this.clientReadTimeout = clientReadTimeout;
     }
 
-    public int getRuberMaxSize() {
-        return ruberMaxSize;
+    public int getRubberMaxSize() {
+        return rubberMaxSize;
     }
 
-    public void setRuberMaxSize(int ruberMaxSize) {
-        this.ruberMaxSize = ruberMaxSize;
+    public void setRubberMaxSize(int rubberMaxSize) {
+        this.rubberMaxSize = rubberMaxSize;
     }
 
-    public int getRuberMinSize() {
-        return ruberMinSize;
+    public int getRubberMinSize() {
+        return rubberMinSize;
     }
 
-    public void setRuberMinSize(int ruberMinSize) {
-        this.ruberMinSize = ruberMinSize;
+    public void setRubberMinSize(int rubberMinSize) {
+        this.rubberMinSize = rubberMinSize;
     }
 
     public int getPenMaxSize() {

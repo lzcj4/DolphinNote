@@ -39,7 +39,7 @@ public class TouchPoint {
         action_up = actionUp;
     }
 
-    private int id;
+    private byte id;
     private short x;
     private short y;
     private short width;
@@ -48,19 +48,20 @@ public class TouchPoint {
     private int action;
 
     public TouchPoint() {
+
     }
 
-    public TouchPoint(int id, short x, short y) {
+    public TouchPoint(byte id, short x, short y) {
         this.id = id;
         this.x = x;
         this.y = y;
     }
 
-    public int getId() {
+    public byte getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(byte id) {
         this.id = id;
     }
 
@@ -94,15 +95,15 @@ public class TouchPoint {
         return getScaleY(this.y);
     }
 
-    public void setY(short y) {
-        this.y = y;
+    public void setY(short newValue) {
+        this.y = newValue;
     }
 
-    public void setX(short x) {
-        this.x = x;
+    public void setX(short newValue) {
+        this.x = newValue;
     }
 
-    public int getWidth() {
+    public short getWidth() {
         return width;
     }
 
@@ -110,7 +111,7 @@ public class TouchPoint {
         this.width = width;
     }
 
-    public int getHeight() {
+    public short getHeight() {
         return height;
     }
 
@@ -194,6 +195,6 @@ public class TouchPoint {
     @Override
     public String toString() {
         return String.format("Id:%s ,action:%s , x:%s ,y:%s ,width:%s ,height:%s,area:%s",
-                getId(), getAction(), getRawX(), getRawX(), getWidth(), getHeight(), getArea());
+                getId(), getAction(), getRawX(), getRawY(), getWidth(), getHeight(), getArea());
     }
 }

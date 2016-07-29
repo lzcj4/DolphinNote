@@ -9,6 +9,7 @@ import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Url;
 import rx.Observable;
 
@@ -44,6 +45,15 @@ public interface IServerAPI {
     @POST("conference/launch")
     Observable<HttpMeetingResult<Conference>> createConfRx(@Body Conference conf);
 
+    @POST("conference/update")
+    Observable<HttpMeetingResult<Conference>> updateConfRx(@Body Conference conf);
+
+    @POST("conference/join")
+    Observable<HttpMeetingResult<Conference>> joinConfRx(@Body Conference conf);
+
+    @POST("conference/end")
+    Observable<HttpResult<Void>> endConfRx(@Body Conference conf);
+
     @POST
     Observable<Response<ResponseBody>> postConfDataRx(@Url String url, @Body RequestBody body);
 
@@ -51,7 +61,16 @@ public interface IServerAPI {
     Observable<Response<ResponseBody>> getConfDataRx(@Url String url);
 
     @POST
-    Observable<ResponseBody> postImageRx(@Url String url, RequestBody body);
+    Observable<Response<ResponseBody>> postImageRx(@Url String url, @Body RequestBody body);
+
+    @POST("meeting/{meetingId}/heartbeat")
+    Observable<HttpResult<Void>> postHeartbeat(@Path("meetingId") String meetingId);
+
+    @GET("meeting/{meetingId}/iamonline/{userId}")
+    Observable<HttpResult<Void>> getUserOnlineRx(@Path("meetingId") String meetingId, @Path("userId") String userId);
+
+    @GET("meeting/{meetingId}/iamoffline/{userId}")
+    Observable<HttpResult<Void>> getUserOfflineRx(@Path("meetingId") String meetingId, @Path("userId") String userId);
 
     //endregion
 }

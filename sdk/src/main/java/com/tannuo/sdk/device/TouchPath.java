@@ -7,13 +7,13 @@ import java.util.List;
  * Created by Nick_PC on 2016/5/20.
  */
 public class TouchPath {
-    private int mId;
+    private byte mId;
 
-    public int getId() {
+    public byte getId() {
         return mId;
     }
 
-    public void setId(int id) {
+    public void setId(byte id) {
         this.mId = id;
     }
 

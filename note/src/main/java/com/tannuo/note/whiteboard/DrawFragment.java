@@ -27,6 +27,9 @@ import com.tannuo.sdk.device.TouchFrame;
 import com.tannuo.sdk.device.TouchPath;
 import com.tannuo.sdk.device.TouchPoint;
 import com.tannuo.sdk.device.TouchPointListener;
+import com.tannuo.sdk.device.server.DefaultSubscribe;
+import com.tannuo.sdk.device.server.ServerAPI;
+import com.tannuo.sdk.device.server.ServerAPITest;
 import com.tannuo.sdk.util.Logger;
 
 import java.util.ArrayList;
@@ -34,6 +37,8 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,26 +98,26 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                 mPaintWidth = surfaceView.getWidth();
                 mPaintHeight = surfaceView.getHeight();
 
-                float defaultWHRatio = mPaintWidth / (float) mPaintHeight;
-                float designedWHRatio = TouchPoint.WIDTHHEIGHTRATIO;
-
-                if (defaultWHRatio >= designedWHRatio) {
-                    //keep height and adjust width
-                    mPaintWidth = (int) (designedWHRatio * mPaintHeight);
-                    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
-                    lp.width = mPaintWidth;
-                    lp.height = mPaintHeight;
-                    surfaceView.setLayoutParams(lp);
-                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
-                } else {
-                    //keep width and adjust height
-                    mPaintHeight = (int) (mPaintWidth / designedWHRatio);
-                    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
-                    lp.width = mPaintWidth;
-                    lp.height = mPaintHeight;
-                    surfaceView.setLayoutParams(lp);
-                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
-                }
+//                float defaultWHRatio = mPaintWidth / (float) mPaintHeight;
+//                float designedWHRatio = TouchPoint.WIDTHHEIGHTRATIO;
+//
+//                if (defaultWHRatio >= designedWHRatio) {
+//                    //keep height and adjust width
+//                    mPaintWidth = (int) (designedWHRatio * mPaintHeight);
+//                    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
+//                    lp.width = mPaintWidth;
+//                    lp.height = mPaintHeight;
+//                    surfaceView.setLayoutParams(lp);
+//                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
+//                } else {
+//                    //keep width and adjust height
+//                    mPaintHeight = (int) (mPaintWidth / designedWHRatio);
+//                    ViewGroup.LayoutParams lp = surfaceView.getLayoutParams();
+//                    lp.width = mPaintWidth;
+//                    lp.height = mPaintHeight;
+//                    surfaceView.setLayoutParams(lp);
+//                    //surfaceView.getHolder().setFixedSize(lp.width, lp.height);
+//                }
 
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
             }
@@ -158,11 +163,13 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                     for (TouchPath item : downFrame) {
                         touchDown(item.getPoints());
                     }
+                    uploadData(downFrame);
                 }
                 if (!moveFrame.isEmpty()) {
                     for (TouchPath item : moveFrame) {
                         drawLine(item.getPoints());
                     }
+                    uploadData(moveFrame);
                 }
                 if (!upFrame.isEmpty()) {
                     for (TouchPath item : upFrame) {
@@ -177,6 +184,20 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             default:
                 break;
         }
+    }
+
+    private void uploadData(TouchFrame frame) {
+
+        ServerAPI.getInstance().postConfData(ServerAPITest.meetingUrl, ServerAPITest.meetingId, frame, new DefaultSubscribe<Response<ResponseBody>>() {
+            @Override
+            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                super.onNext(responseBodyResponse);
+                int code = responseBodyResponse.raw().code();
+                if (code == 200) {
+                    Logger.i(TAG, "upload succeed");
+                }
+            }
+        });
     }
 
     @Override
@@ -340,7 +361,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             int len = pointArray.length;
             List<TouchPoint> result = new ArrayList<>();
             for (int i = 0; i < len; i++) {
-                TouchPoint p = new TouchPoint((short) pointArray[i][0], (short) pointArray[i][1], (short) pointArray[i][2]);
+                TouchPoint p = new TouchPoint((byte) pointArray[i][0], (short) pointArray[i][1], (short) pointArray[i][2]);
                 result.add(p);
             }
             return result;

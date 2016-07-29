@@ -41,18 +41,18 @@ public class ServerAPITest {
                                 if (!TextUtils.isEmpty(result.getMeetingUrl()) && result.getData() != null) {
                                     meetingUrl = result.getMeetingUrl();
                                     meetingId = result.getData().getId();
-
-//                                    testPostConfData(result.getMeetingUrl(), result.getData().getId(),
-//                                            new DefaultSubscribe<Response<ResponseBody>>() {
-//                                                @Override
-//                                                public void onNext(Response<ResponseBody> responseBodyResponse) {
-//                                                    super.onNext(responseBodyResponse);
-//                                                    int code = responseBodyResponse.raw().code();
-//                                                    if (code == 200) {
-//                                                        testGetConfData(result.getMeetingUrl(), result.getData().getId(), -1);
-//                                                    }
-//                                                }
-//                                            });
+                                    testPostConfData(result.getMeetingUrl(), result.getData().getId(),
+                                            new DefaultSubscribe<Response<ResponseBody>>() {
+                                                @Override
+                                                public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                                    super.onNext(responseBodyResponse);
+                                                    int code = responseBodyResponse.raw().code();
+                                                    if (code == 200) {
+                                                        testGetConfData(result.getMeetingUrl(), result.getData().getId(), -1);
+                                                        testPostImage(meetingUrl, meetingId, "/sdcard/point_data/data.txt");
+                                                    }
+                                                }
+                                            });
                                 }
                             }
                         }
@@ -69,8 +69,7 @@ public class ServerAPITest {
         user.setCity("杭州");
         user.setCountry("CHINA");
         user.setProvince("zj");
-        mServerApi.toSubscribe(mServerApi.serverAPI.wxLoginRx(user)
-                .map(new ServerAPI.HttpResultFunc()), subscriber);
+        mServerApi.wxLogin(user, subscriber);
     }
 
     private void testCreateConf(User user, Subscriber<HttpMeetingResult<Conference>> subscriber) {
@@ -85,14 +84,13 @@ public class ServerAPITest {
         userIds.add(user.getId());
         conf.setUsers(userIds);
         conf.setDatetime(System.currentTimeMillis());
-        mServerApi.toSubscribe(mServerApi.serverAPI.createConfRx(conf), subscriber);
-        //.map(new ServerAPI.HttpResultFunc<>()), subscriber);
+        mServerApi.createConf(conf, subscriber);
     }
 
     private void testPostConfData(String baseUrl, String meetingId, DefaultSubscribe<Response<ResponseBody>> subscriber) {
         TouchFrame frame = new TouchFrame();
         TouchPoint p = new TouchPoint();
-        p.setId(11);
+        p.setId((byte) 11);
         p.setX((short) 22);
         p.setY((short) 33);
         p.setWidth((short) 44);
@@ -100,7 +98,7 @@ public class ServerAPITest {
         frame.put(p);
 
         TouchPoint p2 = new TouchPoint();
-        p2.setId(666);
+        p2.setId((byte) 20);
         p2.setX((short) 777);
         p2.setY((short) 888);
         p2.setWidth((short) 999);
@@ -127,6 +125,73 @@ public class ServerAPITest {
                         e.printStackTrace();
                     }
                 }
+            }
+        });
+    }
+
+    private void testPostImage(String baseUrl, String meetingId, String filePath) {
+        mServerApi.postImage(baseUrl, meetingId, filePath, new DefaultSubscribe<Response<ResponseBody>>() {
+            @Override
+            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                super.onNext(responseBodyResponse);
+                int code = responseBodyResponse.raw().code();
+                if (code == 200) {
+                }
+            }
+        });
+    }
+
+    private void testUpdateConf(Conference conf) {
+        conf.setCompany("tttttttttttttttttttt");
+        mServerApi.updateConf(conf, new DefaultSubscribe<HttpMeetingResult<Conference>>() {
+            @Override
+            public void onNext(HttpMeetingResult<Conference> httpConf) {
+                super.onNext(httpConf);
+            }
+        });
+    }
+
+    private void testJoinConf(Conference conf) {
+        mServerApi.joinConf(conf, new DefaultSubscribe<HttpMeetingResult<Conference>>() {
+            @Override
+            public void onNext(HttpMeetingResult<Conference> httpConf) {
+                super.onNext(httpConf);
+            }
+        });
+    }
+
+    private void testEndConf(Conference conf) {
+        mServerApi.endConf(conf, new DefaultSubscribe<HttpMeetingResult<Conference>>() {
+            @Override
+            public void onNext(HttpMeetingResult<Conference> httpConf) {
+                super.onNext(httpConf);
+            }
+        });
+    }
+
+    private void testHeatbeat(String meetingId) {
+        mServerApi.postHeartbeat(meetingId, new DefaultSubscribe<HttpResult<Void>>() {
+            @Override
+            public void onNext(HttpResult<Void> result) {
+                super.onNext(result);
+            }
+        });
+    }
+
+    private void testGetUserOnline(String meetingId, String userId) {
+        mServerApi.getUserOnLine(meetingId, userId, new DefaultSubscribe<HttpResult<Void>>() {
+            @Override
+            public void onNext(HttpResult<Void> result) {
+                super.onNext(result);
+            }
+        });
+    }
+
+    private void testGetUserOffline(String meetingId, String userId) {
+        mServerApi.getUserOffLine(meetingId, userId, new DefaultSubscribe<HttpResult<Void>>() {
+            @Override
+            public void onNext(HttpResult<Void> result) {
+                super.onNext(result);
             }
         });
     }

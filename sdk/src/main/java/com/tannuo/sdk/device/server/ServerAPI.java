@@ -29,7 +29,7 @@ public class ServerAPI {
 
     IServerAPI serverAPI;
     //final String URI_BASE = "http://tn.glasslink.cn:3000/";
-    final String URI_BASE = "http://10.10.10.27:3000/";
+    final String URI_BASE = "http://10.10.10.205:3000/";
     // final String URI_BASE = "http://192.168.3.211:3000/";
     private static final String MIME_STREAM = "application/octet-stream";
 
@@ -93,8 +93,20 @@ public class ServerAPI {
         toSubscribe(serverAPI.wxLoginRx(user).map(new HttpResultFunc<>()), subscriber);
     }
 
-    public void createConf(Conference conf, Subscriber<Conference> subscriber) {
-        toSubscribe(serverAPI.createConfRx(conf).map(new HttpResultFunc<>()), subscriber);
+    public void createConf(Conference conf, Subscriber<HttpMeetingResult<Conference>> subscriber) {
+        toSubscribe(serverAPI.createConfRx(conf), subscriber);
+    }
+
+    public void joinConf(Conference conf, Subscriber<HttpMeetingResult<Conference>> subscriber) {
+        toSubscribe(serverAPI.joinConfRx(conf), subscriber);
+    }
+
+    public void endConf(Conference conf, Subscriber<HttpMeetingResult<Conference>> subscriber) {
+        toSubscribe(serverAPI.endConfRx(conf), subscriber);
+    }
+
+    public void updateConf(Conference conf, Subscriber<HttpMeetingResult<Conference>> subscriber) {
+        toSubscribe(serverAPI.updateConfRx(conf), subscriber);
     }
 
     public void postConfData(String baseUrl, String meetingId, TouchFrame frame,
@@ -117,9 +129,27 @@ public class ServerAPI {
     public void postImage(String baseUrl, String meetingId, String filePath,
                           Subscriber<Response<ResponseBody>> subscriber) {
 
-        String url = baseUrl + String.format("meeting/%s/snapshot", meetingId);
-        RequestBody body = RequestBody.create(MediaType.parse(MIME_STREAM), new File(filePath));
-        toSubscribe(serverAPI.postImageRx(url, body), subscriber);
+        String url = baseUrl + String.format("/meeting/%s/snapshot", meetingId);
+        File file = new File(filePath);
+        if (file.exists()) {
+            RequestBody body = RequestBody.create(MediaType.parse(MIME_STREAM), file);
+            toSubscribe(serverAPI.postImageRx(url, body), subscriber);
+        }
+    }
+
+    public void postHeartbeat(String meetingId,
+                              Subscriber<HttpResult<Void>> subscriber) {
+        toSubscribe(serverAPI.postHeartbeat(meetingId), subscriber);
+    }
+
+    public void getUserOnLine(String meetingId,String userId,
+                              Subscriber<HttpResult<Void>> subscriber) {
+        toSubscribe(serverAPI.getUserOnlineRx(meetingId,userId), subscriber);
+    }
+
+    public void getUserOffLine(String meetingId,String userId,
+                              Subscriber<HttpResult<Void>> subscriber) {
+        toSubscribe(serverAPI.getUserOfflineRx(meetingId,userId), subscriber);
     }
 
     public void toSubscribe(Observable o, Subscriber s) {
