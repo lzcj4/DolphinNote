@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.tannuo.note.server.ServerAPITest;
+import com.tannuo.sdk.device.server.ServerAPITest;
 import com.tannuo.note.utility.SettingPref;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
-            testEnentBus();
-            //this.connect();
+            testEventBus();
+            this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
         } else if (id == R.id.btnClear) {
@@ -476,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, UsbDevice> deviceHashMap = usbManager.getDeviceList();
     }
 
-    private void testEnentBus() {
+    private void testEventBus() {
 //        EventBus.builder().addIndex(new SubscriberInfoIndex() {
 //            @Override
 //            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {

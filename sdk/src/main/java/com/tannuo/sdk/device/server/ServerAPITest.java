@@ -26,6 +26,9 @@ public class ServerAPITest {
         mServerApi = ServerAPI.getInstance();
     }
 
+    public static String meetingUrl;
+    public static String meetingId;
+
     public void test() {
         testWXLogin(new DefaultSubscribe<User>() {
             @Override
@@ -36,17 +39,20 @@ public class ServerAPITest {
                             public void onNext(HttpMeetingResult<Conference> result) {
                                 super.onNext(result);
                                 if (!TextUtils.isEmpty(result.getMeetingUrl()) && result.getData() != null) {
-                                    testPostConfData(result.getMeetingUrl(), result.getData().getId(),
-                                            new DefaultSubscribe<Response<ResponseBody>>() {
-                                                @Override
-                                                public void onNext(Response<ResponseBody> responseBodyResponse) {
-                                                    super.onNext(responseBodyResponse);
-                                                    int code = responseBodyResponse.raw().code();
-                                                    if (code == 200) {
-                                                        testGetConfData(result.getMeetingUrl(), result.getData().getId(), -1);
-                                                    }
-                                                }
-                                            });
+                                    meetingUrl = result.getMeetingUrl();
+                                    meetingId = result.getData().getId();
+
+//                                    testPostConfData(result.getMeetingUrl(), result.getData().getId(),
+//                                            new DefaultSubscribe<Response<ResponseBody>>() {
+//                                                @Override
+//                                                public void onNext(Response<ResponseBody> responseBodyResponse) {
+//                                                    super.onNext(responseBodyResponse);
+//                                                    int code = responseBodyResponse.raw().code();
+//                                                    if (code == 200) {
+//                                                        testGetConfData(result.getMeetingUrl(), result.getData().getId(), -1);
+//                                                    }
+//                                                }
+//                                            });
                                 }
                             }
                         }
