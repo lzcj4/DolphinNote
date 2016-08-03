@@ -291,7 +291,9 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         Canvas canvas = null;
         try {
-            canvas = mSurfaceHolder.lockCanvas(mDirtyRect);
+            canvas = mSurfaceHolder.lockCanvas();
+            //Lead to line broken
+            //  canvas = mSurfaceHolder.lockCanvas(rect);
             if (null == canvas) {
                 return;
             }

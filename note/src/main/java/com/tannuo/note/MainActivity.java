@@ -200,15 +200,15 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTransaction trans = getFragmentManager().beginTransaction();
         if (view.getId() == R.id.radio_log) {
-            trans.replace(R.id.layout_data, mLogFragment)
-                    .addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
+            trans.replace(R.id.layout_data, mLogFragment).commit();
+                    //.addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mLogFragment;
         } else {
             if (mDrawFragment == null) {
                 mDrawFragment = new DrawFragment();
             }
-            trans.replace(R.id.layout_data, mDrawFragment)
-                    .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
+            trans.replace(R.id.layout_data, mDrawFragment).commit();
+                    //.addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mDrawFragment;
         }
     }
@@ -494,7 +494,7 @@ public class MainActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
         ServerAPITest api = new ServerAPITest();
-        api.test();
+        //api.test();
     }
 
 

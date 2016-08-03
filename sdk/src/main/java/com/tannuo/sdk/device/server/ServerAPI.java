@@ -25,12 +25,12 @@ import rx.schedulers.Schedulers;
  */
 public class ServerAPI {
 
-    OkHttpClient client;
+    private OkHttpClient client;
 
     IServerAPI serverAPI;
     //final String URI_BASE = "http://tn.glasslink.cn:3000/";
-    final String URI_BASE = "http://10.10.10.205:3000/";
-    // final String URI_BASE = "http://192.168.3.211:3000/";
+    //final String URI_BASE = "http://10.10.10.205:3000/";
+    final String URI_BASE = "http://192.168.1.120:3000/";
     private static final String MIME_STREAM = "application/octet-stream";
 
     {
@@ -142,14 +142,14 @@ public class ServerAPI {
         toSubscribe(serverAPI.postHeartbeat(meetingId), subscriber);
     }
 
-    public void getUserOnLine(String meetingId,String userId,
+    public void getUserOnLine(String meetingId, String userId,
                               Subscriber<HttpResult<Void>> subscriber) {
-        toSubscribe(serverAPI.getUserOnlineRx(meetingId,userId), subscriber);
+        toSubscribe(serverAPI.getUserOnlineRx(meetingId, userId), subscriber);
     }
 
-    public void getUserOffLine(String meetingId,String userId,
-                              Subscriber<HttpResult<Void>> subscriber) {
-        toSubscribe(serverAPI.getUserOfflineRx(meetingId,userId), subscriber);
+    public void getUserOffLine(String meetingId, String userId,
+                               Subscriber<HttpResult<Void>> subscriber) {
+        toSubscribe(serverAPI.getUserOfflineRx(meetingId, userId), subscriber);
     }
 
     public void toSubscribe(Observable o, Subscriber s) {

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.tannuo.sdk.device.TouchFrame;
 import com.tannuo.sdk.device.TouchFrameSet;
 import com.tannuo.sdk.device.TouchPoint;
+import com.tannuo.sdk.util.Logger;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Nick_PC on 2016/7/23.
@@ -30,6 +33,7 @@ public class ServerAPITest {
     public static String meetingId;
 
     public void test() {
+        test2();
         testWXLogin(new DefaultSubscribe<User>() {
             @Override
             public void onNext(User user) {
@@ -58,6 +62,52 @@ public class ServerAPITest {
                         }
 
                 );
+            }
+        });
+    }
+
+    private void test2() {
+        User user = new User();
+        user.setWeixinOpenId("id_abcd12355");
+        user.setName("wx_NICK");
+        user.setCity("杭州");
+        user.setCountry("CHINA");
+        user.setProvince("zj");
+        mServerApi.serverAPI.wxLoginRx(user)
+                .flatMap((httpUser) -> {
+                    User newUser = httpUser.getData();
+                    Conference conf = new Conference();
+                    conf.setName("CC_1");
+                    conf.setPassword("123");
+                    conf.setTechBridgeId("114893723");
+                    List<String> nickNames = new ArrayList<>();
+                    nickNames.add("Nick");
+                    conf.setNicknames(nickNames);
+                    List<String> userIds = new ArrayList<>();
+                    userIds.add(newUser.getId());
+                    conf.setUsers(userIds);
+                    conf.setDatetime(System.currentTimeMillis());
+                    return mServerApi.serverAPI.createConfRx(conf);
+                })
+                .flatMap(httpConf -> {
+                    meetingId = httpConf.getData().getId();
+                    meetingUrl = httpConf.getMeetingUrl();
+                    return mServerApi.serverAPI.joinConfRx(httpConf.getData());
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((httpConf) -> {
+                    Logger.d("AA", httpConf.getMeetingUrl());
+                });
+
+
+    }
+
+    private void testUser() {
+        testWXLogin(new DefaultSubscribe<User>() {
+            @Override
+            public void onNext(User o) {
+                super.onNext(o);
             }
         });
     }
