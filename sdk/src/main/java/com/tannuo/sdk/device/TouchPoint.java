@@ -24,6 +24,14 @@ public class TouchPoint {
     public static final byte ACTION_DOWN = 0;
     public static final byte ACTION_MOVE = 1;
     public static final byte ACTION_UP = 2;
+    public static float WIDTHHEIGHTRATIO = 525f / 932;
+
+    private int rubberMaxSize = 2812 * 4993;  //80mm / 932mm * 32767,  80mm / 525mm * 32767
+    private int rubberMinSize = 1406 * 2496;  //40mm / 932mm * 32767,  40mm / 525mm * 32767
+    private int penMaxSize = 360 * 630;      //10mm / 932mm * 32767,  10mm / 525mm * 32767
+    private int penMinSize = 144 * 252;      //4mm / 932mm * 32767,  4mm / 525mm * 32767
+    private float penWidth = 4;               //pixel
+
 
     public static void setActions(byte actionDown, byte actionMove, byte actionUp) {
         action_down = actionDown;
@@ -31,28 +39,29 @@ public class TouchPoint {
         action_up = actionUp;
     }
 
-    private int id;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    private byte id;
+    private short x;
+    private short y;
+    private short width;
+    private short height;
     private byte color;
     private int action;
 
     public TouchPoint() {
+
     }
 
-    public TouchPoint(int id, int x, int y) {
+    public TouchPoint(byte id, short x, short y) {
         this.id = id;
         this.x = x;
         this.y = y;
     }
 
-    public int getId() {
+    public byte getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(byte id) {
         this.id = id;
     }
 
@@ -60,11 +69,11 @@ public class TouchPoint {
         return width * height;
     }
 
-    public int getRawX() {
+    public short getRawX() {
         return x;
     }
 
-    public int getRawY() {
+    public short getRawY() {
         return y;
     }
 
@@ -86,27 +95,27 @@ public class TouchPoint {
         return getScaleY(this.y);
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public void setY(short newValue) {
+        this.y = newValue;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public void setX(short newValue) {
+        this.x = newValue;
     }
 
-    public int getWidth() {
+    public short getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(short width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public short getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(short height) {
         this.height = height;
     }
 
@@ -162,12 +171,6 @@ public class TouchPoint {
         return distance(point) > 50;
     }
 
-    private int rubberMaxSize = 2812 * 4993;  //80mm / 932mm * 32767,  80mm / 525mm * 32767
-    private int rubberMinSize = 1406 * 2496;  //40mm / 932mm * 32767,  40mm / 525mm * 32767
-    private int penMaxSize = 360 * 630;      //10mm / 932mm * 32767,  10mm / 525mm * 32767
-    private int penMinSize = 144 * 252;      //4mm / 932mm * 32767,  4mm / 525mm * 32767
-    private float penWidth = 4;               //pixel
-
     public boolean isRubber() {
         return getArea() >= rubberMinSize && getArea() <= rubberMaxSize || getArea() > rubberMaxSize;
     }
@@ -192,6 +195,6 @@ public class TouchPoint {
     @Override
     public String toString() {
         return String.format("Id:%s ,action:%s , x:%s ,y:%s ,width:%s ,height:%s,area:%s",
-                getId(), getAction(), getRawX(), getRawX(), getWidth(), getHeight(), getArea());
+                getId(), getAction(), getRawX(), getRawY(), getWidth(), getHeight(), getArea());
     }
 }

@@ -2,6 +2,9 @@ package com.tannuo.sdk.device;
 
 import android.util.SparseArray;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 
 /**
@@ -23,6 +26,10 @@ public class TouchFrame implements Iterator<TouchPath>, Iterable<TouchPath> {
     public SparseArray<TouchPath> getPaths() {
         mPaths = mPaths == null ? new SparseArray<>() : mPaths;
         return mPaths;
+    }
+
+    public int size() {
+        return this.getPaths().size();
     }
 
     public void setPaths(SparseArray<TouchPath> paths) {
@@ -53,6 +60,46 @@ public class TouchFrame implements Iterator<TouchPath>, Iterable<TouchPath> {
 
     public boolean isEmpty() {
         return getPaths().size() == 0;
+    }
+
+    public TouchPath getItemAt(int index) {
+        return this.getPaths().valueAt(index);
+    }
+
+    public byte[] getBytes() {
+        byte[] result;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        DataOutputStream writer = new DataOutputStream(stream);
+        try {
+            int pathSize = this.size();
+            writer.writeShort(pathSize);
+            for (int i = 0; i < pathSize; i++) {
+                TouchPath path = this.getItemAt(i);
+                writer.writeByte(path.getId());
+                int pointSize = path.size();
+                writer.writeShort(pointSize);
+                for (int j = 0; j < pointSize; j++) {
+                    TouchPoint point = path.getPoints().get(j);
+                    writer.writeShort(point.getRawX());
+                    writer.writeShort(point.getRawY());
+                    writer.writeShort(point.getWidth());
+                    writer.writeShort(point.getHeight());
+                    writer.writeByte(point.getColor());
+                }
+            }
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            result = stream.toByteArray();
+            try {
+                stream.close();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     int step = 0;
