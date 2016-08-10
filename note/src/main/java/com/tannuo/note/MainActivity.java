@@ -29,7 +29,8 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.tannuo.note.server.ServerAPI;
+import com.tannuo.jy.BLCommService;
+import com.tannuo.jy.IrmtInt;
 import com.tannuo.note.utility.SettingPref;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
@@ -43,17 +44,13 @@ import com.tannuo.sdk.device.protocol.IProtocol;
 import com.tannuo.sdk.device.protocol.ProtocolFactory;
 import com.tannuo.sdk.device.protocol.ProtocolHandler;
 import com.tannuo.sdk.device.protocol.ProtocolType;
-import com.tannuo.sdk.device.usb.HttpServer;
+import com.tannuo.sdk.device.server.ServerAPITest;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.greenrobot.eventbus.meta.SubscriberInfo;
-import org.greenrobot.eventbus.meta.SubscriberInfoIndex;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     void buttonClick(View view) {
         int id = view.getId();
         if (id == R.id.btnConnect) {
-            // testEnentBus();
+            testEventBus();
             this.connect();
         } else if (id == R.id.btnDisconnect) {
             this.disconnect();
@@ -205,15 +202,15 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTransaction trans = getFragmentManager().beginTransaction();
         if (view.getId() == R.id.radio_log) {
-            trans.replace(R.id.layout_data, mLogFragment)
-                    .addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
+            trans.replace(R.id.layout_data, mLogFragment).commit();
+            //.addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mLogFragment;
         } else {
             if (mDrawFragment == null) {
                 mDrawFragment = new DrawFragment();
             }
-            trans.replace(R.id.layout_data, mDrawFragment)
-                    .addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
+            trans.replace(R.id.layout_data, mDrawFragment).commit();
+            //.addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mDrawFragment;
         }
     }
@@ -249,8 +246,17 @@ public class MainActivity extends AppCompatActivity {
             txtDevice.setText("正在连接.......");
             mDevice = factory.get(this, this.mTouchDeviceListener, protocol, vendorId);
             mDevice.connect(getDeviceName());
+
             isStarted = true;
         }
+    }
+
+    private void connectJY(){
+
+        BLCommService ble = new BLCommService(this, new IrmtInt());
+        ble.userConnect(getDeviceName(), null, null, new String[]{"0000fff0-0000-1000-8000-00805f9b34fb",
+                "0000fff1-0000-1000-8000-00805f9b34fb",
+                "0000fff2-0000-1000-8000-00805f9b34fb"});
     }
 
     private void popProtocolError(int conn, int protocol) {
@@ -307,6 +313,9 @@ public class MainActivity extends AppCompatActivity {
     private void clear() {
         if (mCurrentFragment == mLogFragment) {
             mLogFragment.clearData();
+        }
+        if (mCurrentFragment == mDrawFragment) {
+            mDrawFragment.clear();
         }
         this.txtCount.setText("0");
         DataLog.getInstance().restart();
@@ -478,26 +487,27 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, UsbDevice> deviceHashMap = usbManager.getDeviceList();
     }
 
-    private void testEnentBus() {
-        EventBus.builder().addIndex(new SubscriberInfoIndex() {
-            @Override
-            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
-                return null;
-            }
-        }).installDefaultEventBus();
-
-        EventBus.getDefault().register(this);
-        EventBus.getDefault().post("test");
-
-        HttpServer httpServer = new HttpServer(8080);
-        try {
-            httpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ServerAPI api = new ServerAPI();
-        api.createConf();
+    private void testEventBus() {
+//        EventBus.builder().addIndex(new SubscriberInfoIndex() {
+//            @Override
+//            public SubscriberInfo getSubscriberInfo(Class<?> subscriberClass) {
+//                return null;
+//            }
+//        }).installDefaultEventBus();
+//
+//        EventBus.getDefault().register(this);
+//        EventBus.getDefault().post("test");
+//
+//        HttpServer httpServer = new HttpServer(8080);
+//        try {
+//            httpServer.start();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        ServerAPITest api = new ServerAPITest();
+        //api.test();
     }
+
 
     @Subscribe(threadMode = ThreadMode.ASYNC, sticky = false, priority = 0)
     public void handleEvent(Object obj) {

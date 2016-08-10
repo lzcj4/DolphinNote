@@ -59,10 +59,10 @@ public class JYTouchScreen {
             TouchPoint point = new TouchPoint();
             point.setActionByDevice(buffer[pos]);
             point.setId(buffer[pos + 1]);
-            point.setX(DataUtil.bytesToIntLittleEndian(buffer[pos + 2], buffer[pos + 3]));
-            point.setY(DataUtil.bytesToIntLittleEndian(buffer[pos + 4], buffer[pos + 5]));
-            point.setWidth(DataUtil.bytesToIntLittleEndian(buffer[pos + 6], buffer[pos + 7]));
-            point.setHeight(DataUtil.bytesToIntLittleEndian(buffer[pos + 8], buffer[pos + 9]));
+            point.setX(DataUtil.bytesShortLittleEndian(buffer[pos + 2], buffer[pos + 3]));
+            point.setY(DataUtil.bytesShortLittleEndian(buffer[pos + 4], buffer[pos + 5]));
+            point.setWidth(DataUtil.bytesShortLittleEndian(buffer[pos + 6], buffer[pos + 7]));
+            point.setHeight(DataUtil.bytesShortLittleEndian(buffer[pos + 8], buffer[pos + 9]));
             float area = point.getArea();
             if ((area > mRedMin) && (area < mRedMax)) {
                 point.setColor(TouchPoint.COLOR_RED);
@@ -99,10 +99,10 @@ public class JYTouchScreen {
             throw new IllegalArgumentException("Invalid data");
         }
         mIrTouch = new IrTouch();
-        mIrTouch.mScreenXLED = DataUtil.bytesToIntLittleEndian(dataBuffer[0], dataBuffer[1]);
-        mIrTouch.mScreenYLED = DataUtil.bytesToIntLittleEndian(dataBuffer[2], dataBuffer[3]);
+        mIrTouch.mScreenXLED = DataUtil.bytesShortLittleEndian(dataBuffer[0], dataBuffer[1]);
+        mIrTouch.mScreenYLED = DataUtil.bytesShortLittleEndian(dataBuffer[2], dataBuffer[3]);
         mIrTouch.mScreenLedInsert = dataBuffer[4];
-        mIrTouch.mScreenLedDistance = DataUtil.bytesToIntLittleEndian(dataBuffer[5], dataBuffer[6]);
+        mIrTouch.mScreenLedDistance = DataUtil.bytesShortLittleEndian(dataBuffer[5], dataBuffer[6]);
         mIrTouch.mScreenMaxPoint = dataBuffer[7];
         mIrTouch.mScreenFrameRate = dataBuffer[8];
     }

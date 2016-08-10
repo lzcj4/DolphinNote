@@ -1,6 +1,5 @@
 package com.tannuo.sdk.device;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,10 +7,9 @@ import java.util.List;
  */
 public class TouchEvent {
     public static final byte ACTION_TOUCH = 0;
-    public static final int ACIION_SNAPSHOT = 1;
+    public static final int ACTION_SNAPSHOT = 1;
 
     private byte action;
-    private List<TouchPoint> points;
 
     public byte getAction() {
         return action;
@@ -21,18 +19,34 @@ public class TouchEvent {
         this.action = action;
     }
 
-    public List<TouchPoint> getPoints() {
-        return points;
-    }
+    TouchFrame downFrame = new TouchFrame();
+    TouchFrame moveFrame = new TouchFrame();
+    TouchFrame upFrame = new TouchFrame();
 
     public void setPoints(List<TouchPoint> points) {
-        this.points = points;
+        if (null == points) {
+            return;
+        }
+        for (TouchPoint point : points) {
+            if (point.getIsDown()) {
+                downFrame.put(point);
+            } else if (point.getIsMove()) {
+                moveFrame.put(point);
+            } else if (point.getIsUp()) {
+                upFrame.put(point);
+            }
+        }
     }
 
-    public void append(TouchPoint point) {
-        if (null == points) {
-            points = new ArrayList<>();
-        }
-        points.add(point);
+    public TouchFrame getDownFrame() {
+        return downFrame;
+    }
+
+    public TouchFrame getMoveFrame() {
+        return moveFrame;
+    }
+
+    public TouchFrame getUpFrame() {
+        return upFrame;
     }
 }

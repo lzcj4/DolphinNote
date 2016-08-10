@@ -13,16 +13,16 @@ public class DataUtil {
      * @param bytes
      * @return
      */
-    public static int bytesToIntLittleEndian(byte... bytes) {
-        if (null == bytes || bytes.length == 0) {
+    public static short bytesShortLittleEndian(byte... bytes) {
+        if (null == bytes) {
             return 0;
         }
-        if (!(bytes.length == 4 || bytes.length == 2)) {
+        if (bytes.length != 2) {
             throw new IllegalArgumentException("invalid bytes'len");
         }
 
         int len = bytes.length - 1;
-        int result = 0;
+        short result = 0;
         for (int i = len; i >= 0; i--) {
             int b = byteToUnsignedByte(bytes[i]);
             result += b << 8 * i;

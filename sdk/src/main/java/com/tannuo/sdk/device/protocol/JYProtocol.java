@@ -300,6 +300,7 @@ public class JYProtocol extends ProtocolBase {
             case JYProtocol.FEATURE_DATA_5:
             case JYProtocol.FEATURE_DATA_6:
                 result = STATUS_CHANGE_DATA_FEATURE;
+                result = STATUS_GET_DATA;
                 break;
             case JYProtocol.FEATURE_DATA_10:
                 mTouchScreen.setPoint(mPointNum, this.mDataBuffer);
@@ -307,19 +308,22 @@ public class JYProtocol extends ProtocolBase {
                 break;
             case JYProtocol.FEATURE_SCREEN:
                 mTouchScreen.setIrTouchFeature(this.mDataBuffer);
-                result = STATUS_GET_SCREEN_FEATURE;
+                result = STATUS_GET_DATA;
+                //result = STATUS_GET_SCREEN_FEATURE;
                 break;
             case JYProtocol.FEATURE_GESTURE:
                 mTouchScreen.setGesture(this.mDataBuffer[0]);
-                result = STATUS_GET_GESTURE;
+                result = STATUS_GET_DATA;
+                //result = STATUS_GET_GESTURE;
                 break;
             case JYProtocol.FEATURE_SNAPSHOT:
                 mTouchScreen.setSnapshot(this.mDataBuffer[0]);
                 result = STATUS_GET_SNAPSHOT;
                 break;
             case JYProtocol.FEATURE_IDENTI:
-                mTouchScreen.setID(DataUtil.bytesToIntLittleEndian(mDataBuffer[0], mDataBuffer[1], mDataBuffer[2], mDataBuffer[3]));
-                result = STATUS_GET_IDENTI;
+                mTouchScreen.setID(DataUtil.bytesShortLittleEndian(mDataBuffer[0], mDataBuffer[1], mDataBuffer[2], mDataBuffer[3]));
+                result = STATUS_GET_DATA;
+                //result = STATUS_GET_IDENTI;
                 break;
             default:
                 break;
