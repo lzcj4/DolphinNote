@@ -29,7 +29,8 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.tannuo.sdk.device.server.ServerAPITest;
+import com.tannuo.jy.BLCommService;
+import com.tannuo.jy.IrmtInt;
 import com.tannuo.note.utility.SettingPref;
 import com.tannuo.note.utility.WakeLock;
 import com.tannuo.note.whiteboard.DrawFragment;
@@ -43,6 +44,7 @@ import com.tannuo.sdk.device.protocol.IProtocol;
 import com.tannuo.sdk.device.protocol.ProtocolFactory;
 import com.tannuo.sdk.device.protocol.ProtocolHandler;
 import com.tannuo.sdk.device.protocol.ProtocolType;
+import com.tannuo.sdk.device.server.ServerAPITest;
 import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.HexUtil;
 
@@ -201,14 +203,14 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction trans = getFragmentManager().beginTransaction();
         if (view.getId() == R.id.radio_log) {
             trans.replace(R.id.layout_data, mLogFragment).commit();
-                    //.addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
+            //.addToBackStack(mLogFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mLogFragment;
         } else {
             if (mDrawFragment == null) {
                 mDrawFragment = new DrawFragment();
             }
             trans.replace(R.id.layout_data, mDrawFragment).commit();
-                    //.addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
+            //.addToBackStack(mDrawFragment.getClass().getSimpleName()).commit();
             mCurrentFragment = mDrawFragment;
         }
     }
@@ -244,8 +246,17 @@ public class MainActivity extends AppCompatActivity {
             txtDevice.setText("正在连接.......");
             mDevice = factory.get(this, this.mTouchDeviceListener, protocol, vendorId);
             mDevice.connect(getDeviceName());
+
             isStarted = true;
         }
+    }
+
+    private void connectJY(){
+
+        BLCommService ble = new BLCommService(this, new IrmtInt());
+        ble.userConnect(getDeviceName(), null, null, new String[]{"0000fff0-0000-1000-8000-00805f9b34fb",
+                "0000fff1-0000-1000-8000-00805f9b34fb",
+                "0000fff2-0000-1000-8000-00805f9b34fb"});
     }
 
     private void popProtocolError(int conn, int protocol) {

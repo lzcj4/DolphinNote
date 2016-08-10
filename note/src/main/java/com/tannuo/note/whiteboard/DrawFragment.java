@@ -72,6 +72,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 mSurfaceHolder = holder;
+                surfaceView.setBackgroundColor(Color.WHITE);
             }
 
             @Override
@@ -87,9 +88,10 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         mLinePaint = initialBrush();
         mBmpPaint = initialBrush();
+        mBmpPaint.setColor(Color.WHITE);
         mRubberPaint = initialBrush();
         mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mRubberPaint.setColor(Color.BLACK);
+        mRubberPaint.setColor(Color.WHITE);
 
         surfaceView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -131,7 +133,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setPathEffect(new CornerPathEffect(STROKE_WIDTH / 2));
-        paint.setColor(Color.WHITE);
+        paint.setColor(Color.BLACK);
         // result.setDither(true);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
@@ -214,7 +216,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
     SparseArray<TouchPoint> historyMap = new SparseArray<>();
     Path mDrawPath = new Path();
-
+    LineSmooth mLineSmooth=new LineSmooth();
     private void drawLine(List<TouchPoint> points) {
         if (null == mBmpCanvas || points.isEmpty()) {
             return;
@@ -225,6 +227,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         if (lastPoint == null) {
             lastPoint = points.get(0);
         }
+        //mLineSmooth.drawLine(points);
 
         DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
         int len = points.size();
