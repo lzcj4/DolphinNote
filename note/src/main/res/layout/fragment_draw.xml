@@ -7,19 +7,17 @@
 
     <SurfaceView
         android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:background="@android:color/white" />
 
-    <!--<com.tannuo.note.whiteboard.ZoomSurfaceView-->
-    <!--android:Id="@+Id/surfaceView"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" />-->
-
-    <com.tannuo.note.whiteboard.DrawView
+    <com.tannuo.note.whiteboard.PointDrawView
+        android:id="@+id/drawView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
 </FrameLayout>

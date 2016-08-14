@@ -103,8 +103,10 @@ public class MockDevice implements IDevice {
 
     @Override
     public int disconnect() {
-        isRunning = false;
-        mListener.onDisconnected();
+        if (isRunning) {
+            isRunning = false;
+            mListener.onDisconnected();
+        }
         return 0;
     }
 
