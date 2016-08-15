@@ -187,6 +187,8 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
     }
 
+    LineSmooth mLineSmooth = new LineSmooth();
+
     private void touchDown(List<TouchPoint> points) {
         SparseArray<List<TouchPoint>> groups = new SparseArray<>();
         for (TouchPoint item : points) {
@@ -200,9 +202,11 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         for (int i = 0; i < groups.size(); i++) {
             List<TouchPoint> list = groups.valueAt(i);
-            drawView.drawPoints(list);
+            //drawView.drawPoints(list);
             //drawSmoothLine(list);
-            // drawLine(list);
+            //drawLine(list);
+
+            mLineSmooth.drawLine(list);
         }
     }
 
@@ -489,8 +493,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     }
 
     private class LineSmooth {
-        Smooth mSmooth = new Smooth();
-        TouchPoint lastPoint;
+        BezierSmooth mSmooth = new BezierSmooth();
 
         private int[][] toPointArray(List<TouchPoint> points) {
             int len = points.size();
@@ -515,24 +518,30 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         }
 
         private void drawLine(List<TouchPoint> points) {
-            int[][] pointArray = toPointArray(points);
-            pointArray = mSmooth.smoothLine(pointArray);
-
-            List<TouchPoint> newPoints = toTouchPoints(pointArray);
-            TouchPoint firstPoint = newPoints.get(0);
-            int len = newPoints.size();
-            if (lastPoint != null && lastPoint.getId() == firstPoint.getId()) {
-                mBmpCanvas.drawLine(lastPoint.getX(), lastPoint.getY(), firstPoint.getX(), firstPoint.getY(), mLinePaint);
+            TouchPoint firstPoint = points.get(0);
+            TouchPoint lastPoint = historyMap.get(firstPoint.getId());
+            if (lastPoint == null) {
+                lastPoint = points.get(0);
             }
-            for (int i = 1; i < len; i++) {
-                if (newPoints.get(i - 1).getId() == newPoints.get(i).getId()) {
-                    mBmpCanvas.drawLine(newPoints.get(i - 1).getX(), newPoints.get(i - 1).getY()
-                            , newPoints.get(i).getX(), newPoints.get(i).getY(), mLinePaint);
+
+            DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+            int[][] rawPointArray = toPointArray(points);
+            int len = points.size();
+            for (int i = 0; i < len; i++) {
+                Logger.d(TAG, String.format("/-----  rawPointArray:x=%s,y=%s,id=%s", rawPointArray[i][0], rawPointArray[i][1], rawPointArray[i][2]));
+                int[][] pointArray = mSmooth.Point_Filter(rawPointArray[i], false);
+                if (null != pointArray) {
+                    for (int j = 0; j < pointArray.length; i++) {
+                        Logger.d(TAG, String.format("/++++ translate pointArray:x=%s,y=%s,id=%s", pointArray[j][0], pointArray[j][1], pointArray[j][2]));
+                        Logger.d(TAG, String.format("/****  translate point:x=%s,y=%s,id=%s",
+                                TouchPoint.getScaleX(pointArray[j][0]), TouchPoint.getScaleY(pointArray[j][1]), pointArray[j][2]));
+                        mDrawPath.lineTo(TouchPoint.getScaleX(pointArray[j][0]), TouchPoint.getScaleY(pointArray[j][1]));
+                    }
                 }
             }
-
+            mBmpCanvas.drawPath(mDrawPath, mLinePaint);
             drawBitmap();
-            lastPoint = newPoints.get(len - 1);
+            mDrawPath.reset();
         }
 
     }

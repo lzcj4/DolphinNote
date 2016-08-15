@@ -1,6 +1,5 @@
 package com.tannuo.note.whiteboard;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -79,10 +78,12 @@ public class PointDrawView extends FrameLayout {
             });
         }
         mSurfaceView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+
             @Override
             public void onGlobalLayout() {
-                mSurfaceView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                if (Build.VERSION.SDK_INT >= 16) {
+                    mSurfaceView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
                 mPaintWidth = mSurfaceView.getWidth();
                 mPaintHeight = mSurfaceView.getHeight();
                 mSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
@@ -128,12 +129,12 @@ public class PointDrawView extends FrameLayout {
 
         for (int i = 0; i < groups.size(); i++) {
             List<TouchPoint> list = groups.valueAt(i);
-            drawSmoothLine(list);
+            startDraw(list);
             // drawLine(list);
         }
     }
 
-    private void drawSmoothLine(List<TouchPoint> points) {
+    private void startDraw(List<TouchPoint> points) {
         if (null == mBmpCanvas || points.isEmpty()) {
             return;
         }
@@ -214,9 +215,8 @@ public class PointDrawView extends FrameLayout {
             // A simple lowpass filter to mitigate velocity aberrations.
             velocity = VELOCITY_FILTER_WEIGHT * velocity + (1 - VELOCITY_FILTER_WEIGHT) * lastVelocity;
 
-            // Caculate the stroke width based on the velocity
+            // Calculate the stroke width based on the velocity
             float strokeWidth = getStrokeWidth(velocity);
-
 
             // Draw line to the canvasBmp canvas.
             drawLine(mBmpCanvas, mLinePaint, lastWidth, strokeWidth);
@@ -268,8 +268,8 @@ public class PointDrawView extends FrameLayout {
     private void draw(Canvas canvas, Point p0, Point p1, Point p2, Paint paint, float lastWidth, float currentWidth) {
         float xa, xb, ya, yb, x, y;
         float different = (currentWidth - lastWidth);
-        mPath.moveTo(p1.x, p1.y);
-        paint.setStrokeWidth(lastWidth);
+//        mPath.moveTo(p1.x, p1.y);
+//        paint.setStrokeWidth(lastWidth);
         for (float i = 0; i < 1; i += 0.01) {
             // This block of code is used to calculate next point to draw on the curves
             xa = getPt(p0.x, p1.x, i);
@@ -281,10 +281,10 @@ public class PointDrawView extends FrameLayout {
             y = getPt(ya, yb, i);
             // reset strokeWidth
             paint.setStrokeWidth(lastWidth + different * (i));
-            mPath.lineTo(x, y);
-            //canvas.drawPoint(x, y, paint);
+            //mPath.lineTo(x, y);
+            canvas.drawPoint(x, y, paint);
         }
-        canvas.drawPath(mPath, paint);
+        // canvas.drawPath(mPath, paint);
     }
 
 
