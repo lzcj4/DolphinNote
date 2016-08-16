@@ -12,6 +12,7 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -230,11 +231,24 @@ public class BLEDevice extends DeviceBase {
             }
         }
 
+        long totalLen = 0;
+        long elapsedTime = 0;
+
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
             byte[] data = characteristic.getValue();
+            totalLen += data.length;
+            if (elapsedTime <= 0) {
+                elapsedTime = SystemClock.elapsedRealtime();
+            }
+
+            long interval = SystemClock.elapsedRealtime() - elapsedTime;
+            if (interval != 0) {
+                int speed = (int) (totalLen / interval / 1000);
+                Log.e("Speed", String.format("/--------速度:%s 字节/秒", speed));
+            }
             mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);
         }
 
