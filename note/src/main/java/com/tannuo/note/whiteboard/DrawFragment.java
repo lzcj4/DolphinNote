@@ -170,6 +170,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                 if (!upFrame.isEmpty()) {
                     for (TouchPath item : upFrame) {
                         touchUp(item.getPoints());
+                        mLineSmooth.drawLine(item.getPoints(), true);
                     }
                 }
                 break;
@@ -202,11 +203,11 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         for (int i = 0; i < groups.size(); i++) {
             List<TouchPoint> list = groups.valueAt(i);
-            //drawView.drawPoints(list);
+            drawView.drawPoints(list);
             //drawSmoothLine(list);
             //drawLine(list);
 
-            mLineSmooth.drawLine(list);
+            // mLineSmooth.drawLine(list,false);
         }
     }
 
@@ -319,6 +320,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     private void touchUp(List<TouchPoint> points) {
         for (TouchPoint item : points) {
             historyMap.remove(item.getId());
+
         }
     }
 
@@ -334,7 +336,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     }
 
     //The stroke width (default will be 7 pixels).
-    private int STROKE_WIDTH = 7;
+    private int STROKE_WIDTH = 5;
 
     // A value is used in a lowpass filter to calculate the velocity between two points.
     private float VELOCITY_FILTER_WEIGHT = 0.2f;
@@ -507,35 +509,35 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             return result;
         }
 
-        private List<TouchPoint> toTouchPoints(int[][] pointArray) {
-            int len = pointArray.length;
-            List<TouchPoint> result = new ArrayList<>();
-            for (int i = 0; i < len; i++) {
-                TouchPoint p = new TouchPoint((byte) pointArray[i][0], (short) pointArray[i][1], (short) pointArray[i][2]);
-                result.add(p);
-            }
-            return result;
-        }
+        TouchPoint mLastPoint = null;
 
-        private void drawLine(List<TouchPoint> points) {
-            TouchPoint firstPoint = points.get(0);
-            TouchPoint lastPoint = historyMap.get(firstPoint.getId());
-            if (lastPoint == null) {
-                lastPoint = points.get(0);
+        private void drawLine(List<TouchPoint> points, boolean isUp) {
+            if (null == points || points.size() == 0) {
+                return;
+            }
+            if (mLastPoint == null) {
+                mLastPoint = points.get(0);
             }
 
-            DrawUtil.getInstance().moveTo(mDrawPath, lastPoint.getX(), lastPoint.getY(), mPaintWidth, mPaintHeight);
+            DrawUtil.getInstance().moveTo(mDrawPath, mLastPoint.getX(), mLastPoint.getY(), mPaintWidth, mPaintHeight);
             int[][] rawPointArray = toPointArray(points);
             int len = points.size();
             for (int i = 0; i < len; i++) {
                 Logger.d(TAG, String.format("/-----  rawPointArray:x=%s,y=%s,id=%s", rawPointArray[i][0], rawPointArray[i][1], rawPointArray[i][2]));
                 int[][] pointArray = mSmooth.Point_Filter(rawPointArray[i], false);
                 if (null != pointArray) {
-                    for (int j = 0; j < pointArray.length; i++) {
+                    for (int j = 0; j < pointArray.length; j++) {
                         Logger.d(TAG, String.format("/++++ translate pointArray:x=%s,y=%s,id=%s", pointArray[j][0], pointArray[j][1], pointArray[j][2]));
                         Logger.d(TAG, String.format("/****  translate point:x=%s,y=%s,id=%s",
                                 TouchPoint.getScaleX(pointArray[j][0]), TouchPoint.getScaleY(pointArray[j][1]), pointArray[j][2]));
                         mDrawPath.lineTo(TouchPoint.getScaleX(pointArray[j][0]), TouchPoint.getScaleY(pointArray[j][1]));
+                        mLastPoint = new TouchPoint();
+                        mLastPoint.setId(pointArray[j][2]);
+                        mLastPoint.setX((short) pointArray[j][0]);
+                        mLastPoint.setY((short) pointArray[j][1]);
+                    }
+                    if (isUp) {
+                        mLastPoint = null;
                     }
                 }
             }

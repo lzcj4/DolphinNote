@@ -1,7 +1,6 @@
 package com.tannuo.sdk.device.protocol;
 
 import com.tannuo.sdk.device.TouchPoint;
-import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
 import com.tannuo.sdk.util.Logger;
 
@@ -47,12 +46,11 @@ public class PQProtocol extends ProtocolBase {
                 break;
             }
 
-            //Check header
-            if (!(totalData[index++] == FRAME_HEADER1 && totalData[index++] == FRAME_HEADER1)) {
+            //Check header byte:1,2
+            if (!(totalData[index++] == FRAME_HEADER1 && totalData[index++] == FRAME_HEADER2)) {
                 i++;
                 continue;
             }
-
 
             TouchPoint point = new TouchPoint();
             byte action = totalData[index++];
@@ -60,15 +58,11 @@ public class PQProtocol extends ProtocolBase {
                 index += POINT_BYTES - 1;
                 continue;
             }
-            point.setActionByDevice(action); // byte:0
-            //point.setId(totalData[index++]);// byte:1
-            point.setX(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:2,3
-            point.setY(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:4,5
-//            point.setWidth(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:6,7
-//            point.setHeight(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:8,9
+            point.setActionByDevice(action); // byte:2
+            point.setX(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:3,4
+            point.setY(DataUtil.bytesShortLittleEndian(totalData[index++], totalData[index++]));// byte:5,6
             mPoints.add(point);
-            index++;
-            // Collections.sort(mPoints, (lhs, rhs) -> lhs.getId() - rhs.getId());
+            index += 2;
             byte checksum = totalData[index++];
 
             byte[] frameData = Arrays.copyOfRange(totalData, index - 10, index - 1);
@@ -81,7 +75,7 @@ public class PQProtocol extends ProtocolBase {
     }
 
     private boolean checkChecksum(byte[] frameData, byte checksum) {
-        byte sum = 0;
+        byte sum = (byte) 0xAA;
         for (byte b : frameData) {
             sum += b;
         }

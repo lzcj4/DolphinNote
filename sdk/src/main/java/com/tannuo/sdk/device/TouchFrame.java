@@ -52,7 +52,7 @@ public class TouchFrame implements Iterator<TouchPath>, Iterable<TouchPath> {
         TouchPath path = getPaths().get(point.getId());
         if (null == path) {
             path = new TouchPath();
-            path.setId(point.getId());
+            path.setId((byte)point.getId());
         }
         path.add(point);
         put(path);

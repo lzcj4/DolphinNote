@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -205,6 +206,9 @@ public class BLCDevice extends DeviceBase {
             return result;
         }
 
+        long totalLen = 0;
+        long elapsedTime = 0;
+
         private void readInLoop() {
             byte[] buffer = new byte[1024];
             int readLen;
@@ -224,6 +228,16 @@ public class BLCDevice extends DeviceBase {
                 }
 
                 byte[] data = Arrays.copyOfRange(buffer, 0, readLen);
+                totalLen += data.length;
+                if (elapsedTime <= 0) {
+                    elapsedTime = SystemClock.elapsedRealtime();
+                }
+
+                double interval = (SystemClock.elapsedRealtime() - elapsedTime) / 1000.0;
+                if (interval > 0) {
+                    int speed = (int) (totalLen / interval);
+                    Log.e("Speed", String.format("/--------速度:%s 字节/秒", speed));
+                }
                 mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);
             }
         }

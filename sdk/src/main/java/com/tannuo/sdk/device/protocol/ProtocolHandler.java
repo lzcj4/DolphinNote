@@ -162,7 +162,8 @@ public class ProtocolHandler {
             if (handler.mDataListener != null) {
                 handler.mDataListener.onReceive(data);
             }
-
+            DataLog.getInstance().writeInData(data);
+            DataLog.getInstance().writeInLineData(data);
             switch (protocol.parse(data)) {
                 case ProtocolBase.STATUS_CHANGE_DATA_FEATURE:
                     byte[] cmdChangeFeature = protocol.getCmd();

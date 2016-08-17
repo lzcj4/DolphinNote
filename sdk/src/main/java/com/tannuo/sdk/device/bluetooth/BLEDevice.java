@@ -244,9 +244,9 @@ public class BLEDevice extends DeviceBase {
                 elapsedTime = SystemClock.elapsedRealtime();
             }
 
-            long interval = SystemClock.elapsedRealtime() - elapsedTime;
-            if (interval != 0) {
-                int speed = (int) (totalLen / interval / 1000);
+            double interval = (SystemClock.elapsedRealtime() - elapsedTime) / 1000.0;
+            if (interval > 0) {
+                int speed = (int) (totalLen / interval);
                 Log.e("Speed", String.format("/--------速度:%s 字节/秒", speed));
             }
             mHandler.sendMessage(ProtocolHandler.MESSAGE_PROTOCOL_PARSE, data);

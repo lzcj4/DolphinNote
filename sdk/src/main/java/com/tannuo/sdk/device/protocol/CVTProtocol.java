@@ -3,7 +3,6 @@ package com.tannuo.sdk.device.protocol;
 import com.tannuo.sdk.device.TouchFrame;
 import com.tannuo.sdk.device.TouchPath;
 import com.tannuo.sdk.device.TouchPoint;
-import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
 
 import java.util.Arrays;
@@ -39,8 +38,6 @@ public class CVTProtocol extends ProtocolBase {
             throw new IllegalArgumentException();
         }
 
-        DataLog.getInstance().writeInData(data);
-        DataLog.getInstance().writeInLineData(data);
         reset();
 //        1F F7 2B 00 02
 //        02 00 80 0F 26 72 00 01 00 00 00 00 00 02 00 00 00 00 00 03 00 00 00 00 00

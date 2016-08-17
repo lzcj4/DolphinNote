@@ -15,6 +15,7 @@ public class BTProtocolFactory implements IProtocolFactory {
                 result = new JYProtocol(new JYTouchScreen(600, 2000));
                 break;
             case ProtocolType.PQ:
+                result = new PQProtocol();
                 break;
             case ProtocolType.CVT:
                 result = new CVTProtocol();

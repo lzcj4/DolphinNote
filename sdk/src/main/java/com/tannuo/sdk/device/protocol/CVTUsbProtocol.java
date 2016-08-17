@@ -3,7 +3,6 @@ package com.tannuo.sdk.device.protocol;
 import com.tannuo.sdk.device.TouchFrame;
 import com.tannuo.sdk.device.TouchPath;
 import com.tannuo.sdk.device.TouchPoint;
-import com.tannuo.sdk.util.DataLog;
 import com.tannuo.sdk.util.DataUtil;
 import com.tannuo.sdk.util.Logger;
 
@@ -37,8 +36,6 @@ public class CVTUsbProtocol extends ProtocolBase {
             throw new IllegalArgumentException();
         }
 
-        DataLog.getInstance().writeInData(data);
-        DataLog.getInstance().writeInLineData(data);
         reset();
 
 //        02 07 00 90 52 8a 13 38 00 66 00 00 01 00 00 00

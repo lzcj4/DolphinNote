@@ -39,7 +39,7 @@ public class TouchPoint {
         action_up = actionUp;
     }
 
-    private byte id;
+    private int id;
     private short x;
     private short y;
     private short width;
@@ -57,11 +57,11 @@ public class TouchPoint {
         this.y = y;
     }
 
-    public byte getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(byte id) {
+    public void setId(int id) {
         this.id = id;
     }
 

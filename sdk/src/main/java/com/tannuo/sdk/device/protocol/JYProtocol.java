@@ -210,8 +210,6 @@ public class JYProtocol extends ProtocolBase {
             throw new IllegalArgumentException();
         }
 
-        DataLog.getInstance().writeInData(data);
-        DataLog.getInstance().writeInLineData(data);
         this.reset();
         //  68 0C 02 07 09 F7 35 FE 5E DF 00 B4 00 A1
         byte[] totalData = combineBytes(lastUnhandledBytes, data);
