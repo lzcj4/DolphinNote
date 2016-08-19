@@ -170,7 +170,15 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                 if (!upFrame.isEmpty()) {
                     for (TouchPath item : upFrame) {
                         touchUp(item.getPoints());
-                        mLineSmooth.drawLine(item.getPoints(), true);
+                        List<TouchPoint> list = item.getPoints();
+                        if (list.size() > 0 && list.get(0).isRubber()) {
+                            for (TouchPoint point : list) {
+                                drawRubber(point);
+                            }
+                        } else {
+                            mLineSmooth.drawLine(list, true);
+                        }
+
                     }
                 }
                 break;
@@ -203,11 +211,16 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         for (int i = 0; i < groups.size(); i++) {
             List<TouchPoint> list = groups.valueAt(i);
-            drawView.drawPoints(list);
+            //drawView.drawPoints(list);
             //drawSmoothLine(list);
             //drawLine(list);
-
-            // mLineSmooth.drawLine(list,false);
+            if (list.size() > 0 && list.get(0).isRubber()) {
+                for (TouchPoint point : list) {
+                    drawRubber(point);
+                }
+            } else {
+                mLineSmooth.drawLine(list, false);
+            }
         }
     }
 

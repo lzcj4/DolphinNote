@@ -41,7 +41,7 @@ public class MockDevice implements IDevice {
 
     private void mockReader() {
         BufferedReader reader = null;
-        File file = new File("/sdcard/point_data/data.txt");
+        File file = new File("/sdcard/BTData/In/In_line.txt");
         if (file.exists()) {
             try {
                 reader = new BufferedReader(new FileReader(file));

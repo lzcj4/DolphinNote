@@ -6,8 +6,8 @@
 
     <SurfaceView
         android:id="@+id/surfaceView"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
@@ -15,8 +15,8 @@
 
     <com.tannuo.note.whiteboard.PointDrawView
         android:id="@+id/drawView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="1dp"
+        android:layout_height="1dp"/>
 
 
 </FrameLayout>
