@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
@@ -175,9 +176,10 @@ public class DrawFragment extends Fragment implements TouchPointListener {
                             for (TouchPoint point : list) {
                                 drawRubber(point);
                             }
-                        } else {
-                            mLineSmooth.drawLine(list, true);
                         }
+//                        else {
+//                            mLineSmooth.drawLine(list, true);
+//                        }
                     }
                 }
                 break;
@@ -210,20 +212,19 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
         for (int i = 0; i < groups.size(); i++) {
             List<TouchPoint> list = groups.valueAt(i);
-            //drawView.drawPoints(list);
-            if (list.size() > 0 && list.get(0).isRubber()) {
-                for (TouchPoint point : list) {
-                    drawRubber(point);
-                }
-            } else {
-                mLineSmooth.drawLine(list, false);
-            }
+            drawView.drawPoints(list);
+//            if (list.size() > 0 && list.get(0).isRubber()) {
+//                for (TouchPoint point : list) {
+//                    drawRubber(point);
+//                }
+//            } else {
+//                mLineSmooth.drawLine(list, false);
+//            }
         }
     }
 
     SparseArray<TouchPoint> historyMap = new SparseArray<>();
     Path mDrawPath = new Path();
-
 
     private void drawLine(List<TouchPoint> points) {
         if (null == mBmpCanvas || points.isEmpty()) {
@@ -285,8 +286,6 @@ public class DrawFragment extends Fragment implements TouchPointListener {
         return result;
     }
 
-    Rect mDirtyRect = new Rect();
-
     private void drawBitmap() {
         if (null == mSurfaceHolder) {
             return;
@@ -304,6 +303,7 @@ public class DrawFragment extends Fragment implements TouchPointListener {
             if (null == canvas) {
                 return;
             }
+
             canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
             canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
         } finally {
@@ -315,7 +315,6 @@ public class DrawFragment extends Fragment implements TouchPointListener {
     private void touchUp(List<TouchPoint> points) {
         for (TouchPoint item : points) {
             historyMap.remove(item.getId());
-
         }
     }
 
@@ -332,7 +331,6 @@ public class DrawFragment extends Fragment implements TouchPointListener {
 
     //The stroke width (default will be 7 pixels).
     private int STROKE_WIDTH = 5;
-
 
     private class LineSmooth {
         BezierSmooth mSmooth = new BezierSmooth();

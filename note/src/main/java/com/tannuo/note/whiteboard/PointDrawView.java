@@ -5,31 +5,34 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.CornerPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.os.Build;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 
 import com.tannuo.sdk.device.TouchPoint;
+import com.tannuo.sdk.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
 
 /**
  * Created by Nick on 2016/8/13.
  */
-public class PointDrawView extends FrameLayout {
+public class PointDrawView extends SurfaceView {
+    private final String TAG = this.getClass().getSimpleName();
 
-    private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
     private Bitmap mBitmap;
     private Canvas mBmpCanvas;
@@ -37,6 +40,14 @@ public class PointDrawView extends FrameLayout {
     private int mPaintWidth, mPaintHeight;
     private SparseArray<TouchPoint> historyMap = new SparseArray<>();
     private Path mDrawPath = new Path();
+    private ScaleGestureDetector mScaleGestureDetector;
+    private final float MIN_SCALE_FACTOR = 1.0f;
+    private final float MAX_SCALE_FACTOR = 2.0f;
+    private float mScaleFactor = MIN_SCALE_FACTOR;
+    private float mScaleFX;
+    private float mScaleFY;
+    private final int COLOR_PEN = Color.BLACK;
+    private final int COLOR_BACKGROUND = Color.WHITE;
 
     public PointDrawView(Context context) {
         this(context, null);
@@ -48,17 +59,16 @@ public class PointDrawView extends FrameLayout {
 
     public PointDrawView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mSurfaceView = new SurfaceView(context, attrs, defStyleAttr);
-        mSurfaceView.setBackgroundColor(Color.WHITE);
-        mSurfaceView.setZOrderOnTop(true);
-        this.addView(mSurfaceView);
+        this.setBackgroundColor(COLOR_BACKGROUND);
+        this.setZOrderOnTop(true);
+
         mLinePaint = initialBrush();
         mBmpPaint = initialBrush();
         mRubberPaint = initialBrush();
         mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mRubberPaint.setColor(Color.WHITE);
+        mRubberPaint.setColor(COLOR_BACKGROUND);
 
-        mSurfaceHolder = mSurfaceView.getHolder();
+        mSurfaceHolder = this.getHolder();
         if (null != mSurfaceHolder) {
             mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
                 @Override
@@ -77,20 +87,38 @@ public class PointDrawView extends FrameLayout {
                 }
             });
         }
-        mSurfaceView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 
             @Override
             public void onGlobalLayout() {
                 if (Build.VERSION.SDK_INT >= 16) {
-                    mSurfaceView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    PointDrawView.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                mPaintWidth = mSurfaceView.getWidth();
-                mPaintHeight = mSurfaceView.getHeight();
-                mSurfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
-                mSurfaceView.setZOrderOnTop(true);
+                mPaintWidth = PointDrawView.this.getWidth();
+                mPaintHeight = PointDrawView.this.getHeight();
+                mSurfaceHolder.setFormat(PixelFormat.RGBA_8888);
+                PointDrawView.this.setZOrderOnTop(true);
                 float defaultWHRatio = mPaintWidth / (float) mPaintHeight;
                 float designedWHRatio = TouchPoint.WIDTHHEIGHTRATIO;
                 setPaintWidthAndHeight(mPaintWidth, mPaintHeight);
+            }
+        });
+
+        mScaleGestureDetector = new ScaleGestureDetector(this.getContext(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            @Override
+            public boolean onScale(ScaleGestureDetector detector) {
+                mScaleFactor *= detector.getScaleFactor();
+                mScaleFactor = Math.max(MIN_SCALE_FACTOR, Math.min(MAX_SCALE_FACTOR, mScaleFactor));
+                mScaleFX = detector.getFocusX();
+                mScaleFY = detector.getFocusY();
+                Logger.e(TAG, String.format("Scale position x:%s , y=%s", mScaleFX, mScaleFY));
+                drawBitmap();
+                return true;
+            }
+
+            @Override
+            public boolean onScaleBegin(ScaleGestureDetector detector) {
+                return true;
             }
         });
     }
@@ -101,7 +129,7 @@ public class PointDrawView extends FrameLayout {
         // mLinePaint.setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setPathEffect(new CornerPathEffect(STROKE_WIDTH / 2));
-        paint.setColor(Color.BLACK);
+        paint.setColor(COLOR_PEN);
         paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setStrokeCap(Paint.Cap.ROUND);
 
@@ -113,7 +141,56 @@ public class PointDrawView extends FrameLayout {
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mBmpCanvas = new Canvas(mBitmap);
         mBmpCanvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
+    }
 
+    private float mLastTouchX, mLastTouchY;
+    private float mPosX, mPosY;
+    private int mActivePointerId;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+        int action = MotionEventCompat.getActionMasked(event);
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mLastTouchX = event.getX();
+                mLastTouchY = event.getY();
+                mActivePointerId = event.getPointerId(0);
+
+                break;
+            case MotionEvent.ACTION_MOVE:
+                final int pointerIndex = event.findPointerIndex(mActivePointerId);
+                if (pointerIndex < 0) {
+                    break;
+                }
+                final float x = event.getX(pointerIndex);
+                final float y = event.getY(pointerIndex);
+                if (!mScaleGestureDetector.isInProgress()) {
+                    mPosX += x - mLastTouchX;
+                    mPosY += y - mLastTouchY;
+                    Logger.e(TAG, String.format("Move position x:%s , y=%s", mPosX, mPosY));
+                    drawBitmap();
+                }
+                mLastTouchX = x;
+                mLastTouchY = y;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mActivePointerId = -1;
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                final int pIndex = MotionEventCompat.getActionIndex(event);
+                final int pId = event.getPointerId(pIndex);
+                if (pId == mActivePointerId) {
+                    final int newIndex = pIndex == 0 ? 1 : 0;
+                    mLastTouchX = event.getX(newIndex);
+                    mLastTouchY = event.getY(newIndex);
+                    mActivePointerId = event.getPointerId(pIndex);
+                }
+                break;
+
+        }
+        return mScaleGestureDetector.onTouchEvent(event);
     }
 
     public void drawPoints(List<TouchPoint> points) {
@@ -145,7 +222,11 @@ public class PointDrawView extends FrameLayout {
             TouchPoint lastPoint = historyMap.get(point.getId());
 
             startDraw(lastPoint, point);
-            historyMap.put(point.getId(), point);
+            if (null != lastPoint && lastPoint.getIsUp()) {
+                historyMap.remove(lastPoint.getId());
+            } else {
+                historyMap.put(point.getId(), point);
+            }
         }
         drawBitmap();
     }
@@ -154,10 +235,10 @@ public class PointDrawView extends FrameLayout {
         if (null == mSurfaceHolder) {
             return;
         }
-        RectF rectF = new RectF();
-        mDrawPath.computeBounds(rectF, true);
-        Rect rect = new Rect();
-        rectF.round(rect);
+//        RectF rectF = new RectF();
+//        mDrawPath.computeBounds(rectF, true);
+//        Rect rect = new Rect();
+//        rectF.round(rect);
 
         Canvas canvas = null;
         try {
@@ -168,6 +249,9 @@ public class PointDrawView extends FrameLayout {
                 return;
             }
             canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
+            canvas.drawColor(COLOR_BACKGROUND);
+            canvas.scale(mScaleFactor, mScaleFactor, mScaleFX, mScaleFY);
+            canvas.translate(mPosX, mPosY);
             canvas.drawBitmap(mBitmap, 0, 0, mBmpPaint);
         } finally {
             if (null != canvas)

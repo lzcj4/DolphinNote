@@ -54,6 +54,15 @@ public class ZoomSurfaceView extends SurfaceView {
 
     public ZoomSurfaceView(Context context) {
         this(context, null, 0);
+    }
+
+    public ZoomSurfaceView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public ZoomSurfaceView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+
         mMyChracter = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 
         setWillNotDraw(false);
@@ -68,15 +77,6 @@ public class ZoomSurfaceView extends SurfaceView {
                 true);
         currentView = this;
         this.context = context;
-    }
-
-    public ZoomSurfaceView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public ZoomSurfaceView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
