@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.RectF;
 import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
@@ -18,14 +19,16 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.VelocityTracker;
+import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
+import android.widget.OverScroller;
 
 import com.tannuo.sdk.device.TouchPoint;
 import com.tannuo.sdk.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
 
 /**
  * Created by Nick on 2016/8/13.
@@ -48,6 +51,8 @@ public class PointDrawView extends SurfaceView {
     private float mScaleFY;
     private final int COLOR_PEN = Color.BLACK;
     private final int COLOR_BACKGROUND = Color.WHITE;
+    private Matrix mMatrix = new Matrix();
+    private float mDragSlop, mMinFlingVelocity;
 
     public PointDrawView(Context context) {
         this(context, null);
@@ -67,6 +72,9 @@ public class PointDrawView extends SurfaceView {
         mRubberPaint = initialBrush();
         mRubberPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mRubberPaint.setColor(COLOR_BACKGROUND);
+        ViewConfiguration viewConfiguration = ViewConfiguration.get(this.getContext());
+        mDragSlop = viewConfiguration.getScaledTouchSlop();
+        mMinFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
 
         mSurfaceHolder = this.getHolder();
         if (null != mSurfaceHolder) {
@@ -111,7 +119,8 @@ public class PointDrawView extends SurfaceView {
                 mScaleFactor = Math.max(MIN_SCALE_FACTOR, Math.min(MAX_SCALE_FACTOR, mScaleFactor));
                 mScaleFX = detector.getFocusX();
                 mScaleFY = detector.getFocusY();
-                Logger.e(TAG, String.format("Scale position x:%s , y=%s", mScaleFX, mScaleFY));
+                mMatrix.setScale(mScaleFactor, mScaleFactor, mScaleFX, mScaleFY);
+                // Logger.e(TAG, String.format("Scale position x:%s , y=%s", mScaleFX, mScaleFY));
                 drawBitmap();
                 return true;
             }
@@ -144,8 +153,10 @@ public class PointDrawView extends SurfaceView {
     }
 
     private float mLastTouchX, mLastTouchY;
+    private float mFirstTouchX, mFirstTouchY;
     private float mPosX, mPosY;
     private int mActivePointerId;
+    private boolean mIsDragging = false;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -155,8 +166,11 @@ public class PointDrawView extends SurfaceView {
             case MotionEvent.ACTION_DOWN:
                 mLastTouchX = event.getX();
                 mLastTouchY = event.getY();
+                mFirstTouchX = mLastTouchX;
+                mFirstTouchY = mLastTouchY;
                 mActivePointerId = event.getPointerId(0);
-
+                mVelocityTracker = VelocityTracker.obtain();
+                mVelocityTracker.addMovement(event);
                 break;
             case MotionEvent.ACTION_MOVE:
                 final int pointerIndex = event.findPointerIndex(mActivePointerId);
@@ -166,17 +180,68 @@ public class PointDrawView extends SurfaceView {
                 final float x = event.getX(pointerIndex);
                 final float y = event.getY(pointerIndex);
                 if (!mScaleGestureDetector.isInProgress()) {
-                    mPosX += x - mLastTouchX;
-                    mPosY += y - mLastTouchY;
-                    Logger.e(TAG, String.format("Move position x:%s , y=%s", mPosX, mPosY));
-                    drawBitmap();
+                    float deltaX = x - mLastTouchX;
+                    float deltaY = y - mLastTouchY;
+                    if (!mIsDragging &&
+                            (Math.sqrt(deltaX * deltaX + deltaY * deltaY) >= mDragSlop)) {
+                        mIsDragging = true;
+                    }
+
+                    if (mIsDragging && mScaleFactor != 1.0f) {
+                        mVelocityTracker.addMovement(event);
+                        mPosX += deltaX;
+                        mPosY += deltaY;
+                        final RectF rectF = new RectF(0, 0, mPaintWidth, mPaintHeight);
+                        mMatrix.mapRect(rectF);
+                        final float scaledWidth = rectF.width();
+                        final float scaledHeight = rectF.height();
+                        if (mFirstTouchX - mPosX > scaledWidth) {
+                            mPosX -= deltaX;
+                        }
+                        if (mFirstTouchY - mPosY > scaledHeight) {
+                            mPosY -= deltaY;
+                        }
+
+                        mLastTouchX = x;
+                        mLastTouchY = y;
+                        //onDrag();
+                        // mMatrix.setTranslate(mPosX, mPosY);
+
+                        Logger.e(TAG, String.format("Move position x:%s , y=%s", mPosX, mPosY));
+                        drawBitmap();
+                    }
                 }
-                mLastTouchX = x;
-                mLastTouchY = y;
                 break;
-            case MotionEvent.ACTION_UP:
+
             case MotionEvent.ACTION_CANCEL:
                 mActivePointerId = -1;
+                break;
+            case MotionEvent.ACTION_UP:
+                mActivePointerId = -1;
+                if (mIsDragging) {
+                    if (null != mVelocityTracker) {
+                        mLastTouchX = event.getX();
+                        mLastTouchY = event.getY();
+
+                        // Compute velocity within the last 1000ms
+                        mVelocityTracker.addMovement(event);
+                        mVelocityTracker.computeCurrentVelocity(1000);
+
+                        final float vX = mVelocityTracker.getXVelocity(), vY = mVelocityTracker
+                                .getYVelocity();
+
+                        if (Math.max(Math.abs(vX), Math.abs(vY)) >= mMinFlingVelocity) {
+//                            mListener.onFling(mLastTouchX, mLastTouchY, -vX,
+//                                    -vY);
+                        }
+                    }
+                }
+
+                // Recycle Velocity Tracker
+                if (null != mVelocityTracker) {
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
+                }
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 final int pIndex = MotionEventCompat.getActionIndex(event);
@@ -191,6 +256,32 @@ public class PointDrawView extends SurfaceView {
 
         }
         return mScaleGestureDetector.onTouchEvent(event);
+    }
+
+    OverScroller scroller;
+    VelocityTracker mVelocityTracker;
+
+    private void onDrag() {
+        final RectF rectF = new RectF(0, 0, mPaintWidth, mPaintHeight);
+        mMatrix.mapRect(rectF);
+        final float scaledWidth = rectF.width();
+        final float scaledHeight = rectF.height();
+
+        if (scaledWidth < mPaintWidth) {
+            mPosX = (scaledWidth - mPaintWidth) / 2 - rectF.left;
+        } else if (rectF.left > 0) {
+            mPosX = -rectF.left;
+        } else if (rectF.right < mPaintWidth) {
+            mPosX = mPaintWidth - rectF.right;
+        }
+
+        if (scaledHeight < mPaintHeight) {
+            mPosY = (scaledHeight - mPaintHeight) / 2 - rectF.top;
+        } else if (rectF.top > 0) {
+            mPosY = -rectF.top;
+        } else if (rectF.bottom < mPaintHeight) {
+            mPosY = mPaintHeight - rectF.bottom;
+        }
     }
 
     public void drawPoints(List<TouchPoint> points) {
@@ -220,13 +311,18 @@ public class PointDrawView extends SurfaceView {
         for (int i = 0; i < len; i++) {
             TouchPoint point = points.get(i);
             TouchPoint lastPoint = historyMap.get(point.getId());
-
-            startDraw(lastPoint, point);
             if (null != lastPoint && lastPoint.getIsUp()) {
                 historyMap.remove(lastPoint.getId());
             } else {
                 historyMap.put(point.getId(), point);
             }
+            if (point.isRubber()) {
+                float r = Math.max(TouchPoint.getScaleX(point.getWidth()) / 2,
+                        TouchPoint.getScaleY(point.getHeight()) / 2);
+                mBmpCanvas.drawCircle(point.getX(), point.getY(), r, mRubberPaint);
+                continue;
+            }
+            startDraw(lastPoint, point);
         }
         drawBitmap();
     }
@@ -352,8 +448,8 @@ public class PointDrawView extends SurfaceView {
     private void draw(Canvas canvas, Point p0, Point p1, Point p2, Paint paint, float lastWidth, float currentWidth) {
         float xa, xb, ya, yb, x, y;
         float different = (currentWidth - lastWidth);
-//        mPath.moveTo(p1.x, p1.y);
-//        paint.setStrokeWidth(lastWidth);
+        mPath.moveTo(p1.x, p1.y);
+        paint.setStrokeWidth(STROKE_WIDTH);
         for (float i = 0; i < 1; i += 0.01) {
             // This block of code is used to calculate next point to draw on the curves
             xa = getPt(p0.x, p1.x, i);
@@ -365,10 +461,11 @@ public class PointDrawView extends SurfaceView {
             y = getPt(ya, yb, i);
             // reset strokeWidth
             paint.setStrokeWidth(lastWidth + different * (i));
-            //mPath.lineTo(x, y);
-            canvas.drawPoint(x, y, paint);
+            mPath.lineTo(x, y);
+            //canvas.drawPoint(x, y, paint);
         }
-        // canvas.drawPath(mPath, paint);
+        canvas.drawPath(mPath, paint);
+        mPath.reset();
     }
 
 
