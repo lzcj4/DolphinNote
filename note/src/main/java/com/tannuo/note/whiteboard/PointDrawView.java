@@ -15,6 +15,7 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
@@ -22,6 +23,7 @@ import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.OverScroller;
 
 import com.tannuo.sdk.device.TouchPoint;
@@ -35,6 +37,11 @@ import java.util.List;
  */
 public class PointDrawView extends SurfaceView {
     private final String TAG = this.getClass().getSimpleName();
+    private final float MIN_SCALE_FACTOR = 1.0f;
+    private final float MAX_SCALE_FACTOR = 2.0f;
+    private final int COLOR_PEN = Color.BLACK;
+    private final int COLOR_BACKGROUND = Color.WHITE;
+    private final int INVALID_POINTER_ID = -1;
 
     private SurfaceHolder mSurfaceHolder;
     private Bitmap mBitmap;
@@ -44,15 +51,18 @@ public class PointDrawView extends SurfaceView {
     private SparseArray<TouchPoint> historyMap = new SparseArray<>();
     private Path mDrawPath = new Path();
     private ScaleGestureDetector mScaleGestureDetector;
-    private final float MIN_SCALE_FACTOR = 1.0f;
-    private final float MAX_SCALE_FACTOR = 2.0f;
     private float mScaleFactor = MIN_SCALE_FACTOR;
     private float mScaleFX;
     private float mScaleFY;
-    private final int COLOR_PEN = Color.BLACK;
-    private final int COLOR_BACKGROUND = Color.WHITE;
     private Matrix mMatrix = new Matrix();
     private float mDragSlop, mMinFlingVelocity;
+
+    private float mLastTouchX, mLastTouchY;
+    private float mPosX, mPosY;
+    private int mActivePointerId;
+    private boolean mIsDragging = false;
+    private GestureDetector mGestureDetector;
+    private OverScroller mScroller;
 
     public PointDrawView(Context context) {
         this(context, null);
@@ -75,6 +85,7 @@ public class PointDrawView extends SurfaceView {
         ViewConfiguration viewConfiguration = ViewConfiguration.get(this.getContext());
         mDragSlop = viewConfiguration.getScaledTouchSlop();
         mMinFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
+        mScroller = new OverScroller(this.getContext(), new DecelerateInterpolator());
 
         mSurfaceHolder = this.getHolder();
         if (null != mSurfaceHolder) {
@@ -120,6 +131,9 @@ public class PointDrawView extends SurfaceView {
                 mScaleFX = detector.getFocusX();
                 mScaleFY = detector.getFocusY();
                 mMatrix.setScale(mScaleFactor, mScaleFactor, mScaleFX, mScaleFY);
+                if (mScaleFactor == MIN_SCALE_FACTOR) {
+                    mPosY = mPosX = 0;
+                }
                 // Logger.e(TAG, String.format("Scale position x:%s , y=%s", mScaleFX, mScaleFY));
                 drawBitmap();
                 return true;
@@ -127,6 +141,20 @@ public class PointDrawView extends SurfaceView {
 
             @Override
             public boolean onScaleBegin(ScaleGestureDetector detector) {
+                return true;
+            }
+        });
+
+        mGestureDetector = new GestureDetector(this.getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                super.onDoubleTap(e);
+                mScaleFactor = (int) ((mScaleFactor + 1) % (MAX_SCALE_FACTOR + 1));
+                mScaleFactor = mScaleFactor == 0 ? MIN_SCALE_FACTOR : mScaleFactor;
+                if (mScaleFactor == MIN_SCALE_FACTOR) {
+                    mPosY = mPosX = 0;
+                }
+                drawBitmap();
                 return true;
             }
         });
@@ -152,104 +180,114 @@ public class PointDrawView extends SurfaceView {
         mBmpCanvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
     }
 
-    private float mLastTouchX, mLastTouchY;
-    private float mFirstTouchX, mFirstTouchY;
-    private float mPosX, mPosY;
-    private int mActivePointerId;
-    private boolean mIsDragging = false;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
         int action = MotionEventCompat.getActionMasked(event);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mLastTouchX = event.getX();
-                mLastTouchY = event.getY();
-                mFirstTouchX = mLastTouchX;
-                mFirstTouchY = mLastTouchY;
-                mActivePointerId = event.getPointerId(0);
-                mVelocityTracker = VelocityTracker.obtain();
+                int index = MotionEventCompat.getActionIndex(event);
+                mActivePointerId = MotionEventCompat.getPointerId(event, index);
+                mLastTouchX = MotionEventCompat.getX(event, index);
+                mLastTouchY = MotionEventCompat.getY(event, index);
+                mVelocityTracker.recycle();
                 mVelocityTracker.addMovement(event);
                 break;
             case MotionEvent.ACTION_MOVE:
-                final int pointerIndex = event.findPointerIndex(mActivePointerId);
-                if (pointerIndex < 0) {
+                final int pointerIndex = MotionEventCompat.findPointerIndex(event, mActivePointerId);
+                if (mScaleGestureDetector.isInProgress()) {
                     break;
                 }
-                final float x = event.getX(pointerIndex);
-                final float y = event.getY(pointerIndex);
-                if (!mScaleGestureDetector.isInProgress()) {
-                    float deltaX = x - mLastTouchX;
-                    float deltaY = y - mLastTouchY;
-                    if (!mIsDragging &&
-                            (Math.sqrt(deltaX * deltaX + deltaY * deltaY) >= mDragSlop)) {
-                        mIsDragging = true;
+
+                final float x = MotionEventCompat.getX(event, pointerIndex);
+                final float y = MotionEventCompat.getY(event, pointerIndex);
+                float deltaX = x - mLastTouchX;
+                float deltaY = y - mLastTouchY;
+                mLastTouchX = x;
+                mLastTouchY = y;
+
+                if (!mIsDragging &&
+                        (Math.sqrt(deltaX * deltaX + deltaY * deltaY) >= mDragSlop)) {
+                    mIsDragging = true;
+                    if (deltaX > 0) {
+                        deltaX -= mDragSlop;
+                    } else {
+                        deltaX += mDragSlop;
                     }
 
-                    if (mIsDragging && mScaleFactor != 1.0f) {
-                        mVelocityTracker.addMovement(event);
-                        mPosX += deltaX;
-                        mPosY += deltaY;
-
-                        mLastTouchX = x;
-                        mLastTouchY = y;
-                        checkDragRange(deltaX, deltaY);
-                        // mMatrix.setTranslate(mPosX, mPosY);
-
-                        Logger.e(TAG, String.format("Move position x:%s , y=%s", mPosX, mPosY));
-                        drawBitmap();
+                    if (deltaY > 0) {
+                        deltaY -= mDragSlop;
+                    } else {
+                        deltaY += mDragSlop;
                     }
+                }
+
+                if (mIsDragging && mScaleFactor != MIN_SCALE_FACTOR) {
+                    mVelocityTracker.addMovement(event);
+                    mPosX += deltaX;
+                    mPosY += deltaY;
+                    checkDragRange(deltaX, deltaY);
+                    Logger.d(TAG, String.format("/--> move position x:%s , y=%s", mPosX, mPosY));
+                    drawBitmap();
                 }
                 break;
 
             case MotionEvent.ACTION_CANCEL:
-                mActivePointerId = -1;
+                mActivePointerId = INVALID_POINTER_ID;
+                mVelocityTracker.recycle();
                 break;
             case MotionEvent.ACTION_UP:
-                mActivePointerId = -1;
                 if (mIsDragging) {
-                    if (null != mVelocityTracker) {
-                        mLastTouchX = event.getX();
-                        mLastTouchY = event.getY();
+//                    int upIndex = MotionEventCompat.getActionIndex(event);
+//                    mLastTouchX = MotionEventCompat.getX(event, upIndex);
+//                    mLastTouchY = MotionEventCompat.getY(event, upIndex);
 
-                        // Compute velocity within the last 1000ms
-                        mVelocityTracker.addMovement(event);
-                        mVelocityTracker.computeCurrentVelocity(1000);
+                    // Compute velocity within the last 1000ms
+                    mVelocityTracker.addMovement(event);
+                    mVelocityTracker.computeCurrentVelocity(1000);
 
-                        final float vX = mVelocityTracker.getXVelocity(), vY = mVelocityTracker
-                                .getYVelocity();
+                    final float vX = mVelocityTracker.getXVelocity(), vY = mVelocityTracker.getYVelocity();
 
-                        if (Math.max(Math.abs(vX), Math.abs(vY)) >= mMinFlingVelocity) {
-//                            mListener.onFling(mLastTouchX, mLastTouchY, -vX,
-//                                    -vY);
-                        }
+                    if (Math.max(Math.abs(vX), Math.abs(vY)) >= mMinFlingVelocity && mScroller.isFinished()) {
+                        mScroller.fling((int) mLastTouchX, (int) mLastTouchY, (int) vX, (int) vY, 0, (int) (mScaleFactor) * mPaintWidth, 0, (int) (mScaleFactor) * mPaintHeight);
+                        this.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mScroller.computeScrollOffset()) {
+                                    float dx = mScroller.getCurrX();
+                                    float dy = mScroller.getCurrY();
+                                    mPosX += dx;
+                                    mPosY += dy;
+                                    checkDragRange(dx, dy);
+                                    drawBitmap();
+                                    PointDrawView.this.post(this);
+                                }
+                            }
+                        });
                     }
                 }
 
-                // Recycle Velocity Tracker
-                if (null != mVelocityTracker) {
-                    mVelocityTracker.recycle();
-                    mVelocityTracker = null;
-                }
+                mActivePointerId = INVALID_POINTER_ID;
+                mVelocityTracker.recycle();
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 final int pIndex = MotionEventCompat.getActionIndex(event);
-                final int pId = event.getPointerId(pIndex);
+                final int pId = MotionEventCompat.getPointerId(event, pIndex);
+                this.getParent().requestDisallowInterceptTouchEvent(false);
                 if (pId == mActivePointerId) {
                     final int newIndex = pIndex == 0 ? 1 : 0;
-                    mLastTouchX = event.getX(newIndex);
-                    mLastTouchY = event.getY(newIndex);
-                    mActivePointerId = event.getPointerId(pIndex);
+                    mLastTouchX = MotionEventCompat.getX(event, newIndex);
+                    mLastTouchY = MotionEventCompat.getY(event, newIndex);
+                    mActivePointerId = event.getPointerId(newIndex);
                 }
                 break;
 
         }
+        mGestureDetector.onTouchEvent(event);
         return mScaleGestureDetector.onTouchEvent(event);
     }
 
-    OverScroller scroller;
-    VelocityTracker mVelocityTracker;
+    VelocityTracker mVelocityTracker = VelocityTracker.obtain();
 
     private void checkDragRange(float deltaX, float deltaY) {
         final int DRAG_LEFT = 0x01;
@@ -274,7 +312,7 @@ public class PointDrawView extends SurfaceView {
         mMatrix.mapRect(rectF);
         final float scaledWidth = rectF.width();
         final float scaledHeight = rectF.height();
-        
+
         float scrollLeftWidth = -(scaledWidth - mPaintWidth - Math.abs(rectF.left));
         float scrollTopHeight = -(scaledHeight - mPaintHeight - Math.abs(rectF.top));
         float scrollRightWidth = Math.abs(rectF.left);
@@ -295,7 +333,7 @@ public class PointDrawView extends SurfaceView {
         }
         if ((direction & DRAG_BOTTOM) > 0 &&
                 (mPosY > scrollBottomHeight)) {
-            mPosY = scrollRightWidth;
+            mPosY = scrollBottomHeight;
         }
     }
 
