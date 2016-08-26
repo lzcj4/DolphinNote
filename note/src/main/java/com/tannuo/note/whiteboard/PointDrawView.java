@@ -191,20 +191,10 @@ public class PointDrawView extends SurfaceView {
                         mVelocityTracker.addMovement(event);
                         mPosX += deltaX;
                         mPosY += deltaY;
-                        final RectF rectF = new RectF(0, 0, mPaintWidth, mPaintHeight);
-                        mMatrix.mapRect(rectF);
-                        final float scaledWidth = rectF.width();
-                        final float scaledHeight = rectF.height();
-                        if (mFirstTouchX - mPosX > scaledWidth) {
-                            mPosX -= deltaX;
-                        }
-                        if (mFirstTouchY - mPosY > scaledHeight) {
-                            mPosY -= deltaY;
-                        }
 
                         mLastTouchX = x;
                         mLastTouchY = y;
-                        //onDrag();
+                        checkDragRange(deltaX, deltaY);
                         // mMatrix.setTranslate(mPosX, mPosY);
 
                         Logger.e(TAG, String.format("Move position x:%s , y=%s", mPosX, mPosY));
@@ -261,26 +251,51 @@ public class PointDrawView extends SurfaceView {
     OverScroller scroller;
     VelocityTracker mVelocityTracker;
 
-    private void onDrag() {
+    private void checkDragRange(float deltaX, float deltaY) {
+        final int DRAG_LEFT = 0x01;
+        final int DRAG_RIGHT = 0x02;
+        final int DRAG_TOP = 0x04;
+        final int DRAG_BOTTOM = 0x08;
+
+        int direction = 0;
+        if (deltaX < 0) {
+            direction |= DRAG_LEFT;
+        } else {
+            direction |= DRAG_RIGHT;
+        }
+
+        if (deltaY < 0) {
+            direction |= DRAG_TOP;
+        } else {
+            direction |= DRAG_BOTTOM;
+        }
+
         final RectF rectF = new RectF(0, 0, mPaintWidth, mPaintHeight);
         mMatrix.mapRect(rectF);
         final float scaledWidth = rectF.width();
         final float scaledHeight = rectF.height();
+        
+        float scrollLeftWidth = -(scaledWidth - mPaintWidth - Math.abs(rectF.left));
+        float scrollTopHeight = -(scaledHeight - mPaintHeight - Math.abs(rectF.top));
+        float scrollRightWidth = Math.abs(rectF.left);
+        float scrollBottomHeight = Math.abs(rectF.top);
 
-        if (scaledWidth < mPaintWidth) {
-            mPosX = (scaledWidth - mPaintWidth) / 2 - rectF.left;
-        } else if (rectF.left > 0) {
-            mPosX = -rectF.left;
-        } else if (rectF.right < mPaintWidth) {
-            mPosX = mPaintWidth - rectF.right;
+        if ((direction & DRAG_LEFT) > 0 &&
+                (mPosX < scrollLeftWidth)) {
+            mPosX = scrollLeftWidth;
+        }
+        if ((direction & DRAG_RIGHT) > 0 &&
+                (mPosX > scrollRightWidth)) {
+            mPosX = scrollRightWidth;
         }
 
-        if (scaledHeight < mPaintHeight) {
-            mPosY = (scaledHeight - mPaintHeight) / 2 - rectF.top;
-        } else if (rectF.top > 0) {
-            mPosY = -rectF.top;
-        } else if (rectF.bottom < mPaintHeight) {
-            mPosY = mPaintHeight - rectF.bottom;
+        if ((direction & DRAG_TOP) > 0 &&
+                (mPosY < scrollTopHeight)) {
+            mPosY = scrollTopHeight;
+        }
+        if ((direction & DRAG_BOTTOM) > 0 &&
+                (mPosY > scrollBottomHeight)) {
+            mPosY = scrollRightWidth;
         }
     }
 
